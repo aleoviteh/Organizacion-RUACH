@@ -192,9 +192,11 @@
                 <div class="mb-6">
                     <select id="filter-singer" onchange="renderSongbook()" class="w-full md:w-64">
                         <option value="all">Todos los cantantes</option>
+                        <option value="Alejandro">Alejandro</option>
                         <option value="Diana">Diana</option>
                         <option value="Mery">Mery</option>
                         <option value="Marianny">Marianny</option>
+                        <option value="Alejandra">Alejandra</option>
                         <option value="Nelly">Nelly</option>
                         <option value="Nicole">Nicole</option>
                     </select>
@@ -259,11 +261,13 @@
                                     <input type="text" placeholder="Canción" class="col-span-1 text-sm">
                                     <input type="text" placeholder="Autor" class="col-span-1 text-sm">
                                     <select class="col-span-1 text-sm">
-                                        <option value="Diana">Diana</option>
-                                        <option value="Mery">Mery</option>
-                                        <option value="Marianny">Marianny</option>
-                                        <option value="Nelly">Nelly</option>
-                                        <option value="Nicole">Nicole</option>
+                        <option value="Alejandro">Alejandro</option>
+                        <option value="Diana">Diana</option>
+                        <option value="Mery">Mery</option>
+                        <option value="Marianny">Marianny</option>
+                        <option value="Alejandra">Alejandra</option>
+                        <option value="Nelly">Nelly</option>
+                        <option value="Nicole">Nicole</option>
                                     </select>
                                 </div>
                             </div>
@@ -354,9 +358,16 @@
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
 
+            // Lógica de Usuario Administrador (Líder)
             if (user === 'Admin' && pass === 'admin123') {
                 proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
-            } else {
+            } 
+            // NUEVO: Lógica de Usuario Observador
+            else if (user === 'ruach' && pass === 'ruach123') {
+                proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
+            }
+            // Lógica de Usuarios de la Base de Datos
+            else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
                 if(found && pass === 'ruach123') {
                     proceedLogin({ ...found, uid: found.id });
@@ -621,4 +632,5 @@
     </script>
 </body>
 </html>
+
 
