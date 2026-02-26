@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ministerio Ruach - Gestión</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #0f0f0f;
+            --silver-gradient: linear-gradient(145deg, #c0c0c0, #7a7a7a);
+            --accent-silver: #e0e0e0;
+            --glass-bg: rgba(255, 255, 255, 0.05);
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+        }
+
+        .silver-text {
+            background: var(--silver-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+        }
+
+        .sidebar {
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 110;
+        }
+
+        .sidebar.closed {
+            transform: translateX(-100%);
+        }
+
+        .menu-toggle-btn {
+            z-index: 120;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 2px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-radius: 8px;
+        }
+
+        .calendar-day:hover {
+            background: rgba(192, 192, 192, 0.2);
+        }
+
+        .calendar-day.has-event {
+            background: rgba(192, 192, 192, 0.4);
+            font-weight: bold;
+            border: 1px solid silver;
+        }
+
+        .active-section {
+            display: block !important;
+        }
+
+        .hidden-section {
+            display: none !important;
+        }
+
+        input, select, textarea {
+            background: #1a1a1a !important;
+            border: 1px solid #333 !important;
+            color: white !important;
+            border-radius: 8px !important;
+            padding: 10px !important;
+        }
+
+        .btn-silver {
+            background: var(--silver-gradient);
+            color: black;
+            font-weight: bold;
+            transition: opacity 0.2s;
+        }
+
+        .btn-silver:hover {
+            opacity: 0.8;
+        }
+        
+        .logo-img {
+            max-width: 180px;
+            filter: drop-shadow(0 0 10px rgba(192,192,192,0.3));
+        }
+
+        main {
+            transition: margin-left 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center p-6">
+        <div class="glass-panel p-8 w-full max-w-md text-center">
+            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300&auto=format&fit=crop" alt="Ruach Logo Placeholder" class="logo-img mx-auto mb-6 rounded-lg opacity-80 border border-silver">
+            <h1 class="text-3xl font-bold silver-text mb-2">MINISTERIO RUACH</h1>
+            <p class="text-gray-400 mb-8">Gestión Organizacional</p>
+            
+            <div class="space-y-4">
+                <input type="text" id="login-user" placeholder="Usuario" class="w-full">
+                <input type="password" id="login-pass" placeholder="Contraseña" class="w-full">
+                <button onclick="handleLogin()" class="w-full btn-silver p-3 rounded-lg mt-4">INGRESAR</button>
+            </div>
+            <p id="login-error" class="text-red-500 mt-4 text-sm hidden">Credenciales incorrectas.</p>
+        </div>
+    </div>
+
+    <!-- App Principal -->
+    <div id="app-container" class="hidden-section">
+        
+        <!-- Botón de Menú Persistente -->
+        <button onclick="toggleSidebar()" class="menu-toggle-btn p-2 text-2xl glass-panel px-4 rounded-lg hover:bg-white/10 transition-colors">
+            <i class="fas fa-bars"></i>
+        </button>
+
+        <!-- Sidebar -->
+        <nav id="sidebar" class="sidebar fixed top-0 left-0 h-full w-64 glass-panel rounded-none border-y-0 border-l-0 closed">
+            <div class="p-6 pt-20">
+                <div class="flex items-center gap-3 mb-10">
+                    <i class="fas fa-music text-silver-text text-xl"></i>
+                    <span class="font-bold text-lg silver-text">RUACH MENU</span>
+                </div>
+                
+                <ul class="space-y-4">
+                    <li onclick="showSection('miembros')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
+                        <i class="fas fa-users w-6"></i> MIEMBROS
+                    </li>
+                    <li onclick="showSection('cancionero')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
+                        <i class="fas fa-book-open w-6"></i> CANCIONERO
+                    </li>
+                    <li onclick="showSection('planificacion')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
+                        <i class="fas fa-calendar-alt w-6"></i> PLANIFICACION
+                    </li>
+                    <li id="menu-ingreso" onclick="showSection('ingreso')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
+                        <i class="fas fa-plus-circle w-6 text-green-400"></i> INGRESO
+                    </li>
+                    <li id="menu-usuario" onclick="showSection('usuarios-admin')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
+                        <i class="fas fa-user-cog w-6 text-blue-400"></i> USUARIOS
+                    </li>
+                </ul>
+
+                <button onclick="handleLogout()" class="absolute bottom-10 left-6 flex items-center gap-3 text-red-400 hover:text-red-300">
+                    <i class="fas fa-sign-out-alt"></i> CERRAR SESION
+                </button>
+            </div>
+        </nav>
+
+        <!-- Main Content -->
+        <main id="main-content" class="min-h-screen p-4 md:p-8 pt-20">
+            <header class="flex justify-end items-center mb-8">
+                <div class="text-right">
+                    <h2 id="current-section-title" class="text-xl font-bold silver-text uppercase tracking-widest">MIEMBROS</h2>
+                    <p id="user-display-name" class="text-xs text-gray-500"></p>
+                </div>
+            </header>
+
+            <!-- Sección: MIEMBROS -->
+            <section id="section-miembros" class="section-content active-section">
+                <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards de miembros se cargan aquí -->
+                </div>
+            </section>
+
+            <!-- Sección: CANCIONERO -->
+            <section id="section-cancionero" class="section-content hidden-section">
+                <div class="mb-6">
+                    <select id="filter-singer" onchange="renderSongbook()" class="w-full md:w-64">
+                        <option value="all">Todos los cantantes</option>
+                        <option value="Diana">Diana</option>
+                        <option value="Mery">Mery</option>
+                        <option value="Marianny">Marianny</option>
+                        <option value="Nelly">Nelly</option>
+                        <option value="Nicole">Nicole</option>
+                    </select>
+                </div>
+                <div class="overflow-x-auto glass-panel">
+                    <table class="w-full text-left">
+                        <thead class="bg-black/40 silver-text">
+                            <tr>
+                                <th class="p-4">Canción</th>
+                                <th class="p-4">Autor</th>
+                                <th class="p-4">Cantante</th>
+                            </tr>
+                        </thead>
+                        <tbody id="song-list" class="divide-y divide-white/10 text-gray-300">
+                            <!-- Canciones -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Sección: PLANIFICACION -->
+            <section id="section-planificacion" class="section-content hidden-section">
+                <div class="flex flex-col md:flex-row gap-8">
+                    <div class="flex-1 glass-panel p-6">
+                        <div class="flex justify-between items-center mb-6">
+                            <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
+                            <h3 id="calendar-month-year" class="text-xl font-bold"></h3>
+                            <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                        </div>
+                        <div class="grid grid-cols-7 text-center text-xs font-bold text-gray-500 mb-2">
+                            <div>DOM</div><div>LUN</div><div>MAR</div><div>MIE</div><div>JUE</div><div>VIE</div><div>SAB</div>
+                        </div>
+                        <div id="calendar-days" class="calendar-grid"></div>
+                    </div>
+                    <div id="day-details" class="flex-1 glass-panel p-6 border-l-4 border-silver hidden">
+                        <h3 id="detail-date" class="text-xl font-bold silver-text mb-4"></h3>
+                        <div id="detail-content"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección: INGRESO -->
+            <section id="section-ingreso" class="section-content hidden-section">
+                <div class="glass-panel p-6 max-w-2xl mx-auto">
+                    <h3 class="text-xl font-bold mb-6 silver-text border-b border-white/10 pb-2">NUEVA ACTIVIDAD</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs text-gray-400 block mb-1">FECHA</label>
+                                <input type="date" id="form-date" class="w-full">
+                            </div>
+                            <div>
+                                <label class="text-xs text-gray-400 block mb-1">NOMBRE ACTIVIDAD</label>
+                                <input type="text" id="form-activity" placeholder="Ej: Servicio de Domingo" class="w-full">
+                            </div>
+                        </div>
+
+                        <div class="p-4 bg-white/5 rounded-lg border border-white/10">
+                            <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
+                            <div id="repertorio-inputs" class="space-y-2 mb-3">
+                                <div class="grid grid-cols-3 gap-2">
+                                    <input type="text" placeholder="Canción" class="col-span-1 text-sm">
+                                    <input type="text" placeholder="Autor" class="col-span-1 text-sm">
+                                    <select class="col-span-1 text-sm">
+                                        <option value="Diana">Diana</option>
+                                        <option value="Mery">Mery</option>
+                                        <option value="Marianny">Marianny</option>
+                                        <option value="Nelly">Nelly</option>
+                                        <option value="Nicole">Nicole</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="addRepertorioRow()" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
+                        </div>
+
+                        <div class="p-4 bg-white/5 rounded-lg border border-white/10">
+                            <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO DE TRABAJO</h4>
+                            <div id="equipo-inputs" class="space-y-2 mb-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" placeholder="Nombre" class="col-span-1 text-sm">
+                                    <select class="col-span-1 text-sm">
+                                        <option value="baterista">Baterista</option>
+                                        <option value="bajista">Bajista</option>
+                                        <option value="tecladista">Tecladista</option>
+                                        <option value="violinista">Violinista</option>
+                                        <option value="guitarrista">Guitarrista</option>
+                                        <option value="coro">Coro</option>
+                                        <option value="director">Director</option>
+                                        <option value="sonidista">Sonidista</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <button onclick="addEquipoRow()" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
+                        </div>
+
+                        <button onclick="saveActivity()" class="w-full btn-silver p-3 rounded-lg mt-4">GUARDAR PLANIFICACIÓN</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Sección: USUARIOS ADMIN -->
+            <section id="section-usuarios-admin" class="section-content hidden-section">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-1 glass-panel p-6">
+                        <h3 class="text-xl font-bold mb-6 silver-text">NUEVO MIEMBRO/USUARIO</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="user-full-name" placeholder="Nombre Completo" class="w-full">
+                            <input type="date" id="user-birth" class="w-full">
+                            <input type="text" id="user-job" placeholder="Ocupación" class="w-full">
+                            <select id="user-role" class="w-full">
+                                <option value="MIEMBRO">Rol: MIEMBRO</option>
+                                <option value="LIDER">Rol: LIDER</option>
+                            </select>
+                            <input type="text" id="user-photo" placeholder="URL Foto" class="w-full">
+                            <button onclick="saveUser()" class="w-full btn-silver p-3 rounded-lg mt-4">CREAR USUARIO</button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-2 glass-panel p-6">
+                        <h3 class="text-xl font-bold mb-6 silver-text">GESTIONAR LISTADO</h3>
+                        <div id="admin-user-list" class="space-y-3">
+                            <!-- Lista de usuarios -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Firebase SDK Logic -->
+    <script type="module">
+        import { initializeApp } from "firebase/app";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+
+        const firebaseConfig = {
+  apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
+  authDomain: "gerencia-de-energia.firebaseapp.com",
+  projectId: "gerencia-de-energia",
+  storageBucket: "gerencia-de-energia.firebasestorage.app",
+  messagingSenderId: "347966041919",
+  appId: "1:347966041919:web:71c81a1b60013478712d8a",
+  measurementId: "G-9X5RMXJB0T"
+};
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
+
+        window.currentUser = null;
+        window.allUsers = [];
+        window.activities = [];
+        window.currentDate = new Date();
+
+        const initializeAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                startFirestoreListeners();
+            }
+        });
+
+        const startFirestoreListeners = () => {
+            const qUsers = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'));
+            onSnapshot(qUsers, (snapshot) => {
+                window.allUsers = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                renderMembers();
+                renderAdminUsers();
+            }, (err) => console.error("Error users listener:", err));
+
+            const qActs = query(collection(db, 'artifacts', appId, 'public', 'data', 'activities'));
+            onSnapshot(qActs, (snapshot) => {
+                window.activities = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                renderCalendar();
+                renderSongbook();
+            }, (err) => console.error("Error activities listener:", err));
+        };
+
+        window.handleLogin = async () => {
+            const user = document.getElementById('login-user').value;
+            const pass = document.getElementById('login-pass').value;
+
+            if (user === 'Admin' && pass === 'admin123') {
+                proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
+            } else {
+                const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
+                if(found && pass === 'ruach123') {
+                    proceedLogin({ ...found, uid: found.id });
+                } else {
+                    document.getElementById('login-error').classList.remove('hidden');
+                }
+            }
+        };
+
+        const proceedLogin = (userData) => {
+            window.currentUser = userData;
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('app-container').classList.remove('hidden-section');
+            document.getElementById('user-display-name').innerText = `Sesión: ${userData.name}`;
+            setupPermissions();
+            renderAll();
+        };
+
+        window.handleLogout = () => {
+            location.reload();
+        };
+
+        const setupPermissions = () => {
+            if(window.currentUser?.role === 'LIDER') {
+                document.getElementById('menu-ingreso').classList.remove('hidden');
+                document.getElementById('menu-usuario').classList.remove('hidden');
+            }
+        };
+
+        window.saveUser = async () => {
+            if (!auth.currentUser) return;
+            const name = document.getElementById('user-full-name').value;
+            const birth = document.getElementById('user-birth').value;
+            const job = document.getElementById('user-job').value;
+            const role = document.getElementById('user-role').value;
+            const photo = document.getElementById('user-photo').value || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
+
+            if(!name || !birth) return;
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), {
+                    name, birth, job, role, photo, createdAt: new Date().toISOString()
+                });
+                document.getElementById('user-full-name').value = '';
+                document.getElementById('user-job').value = '';
+            } catch (e) { console.error("Error saving user:", e); }
+        };
+
+        window.deleteUser = async (id) => {
+            if (!auth.currentUser) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
+            } catch (e) { console.error("Error deleting user:", e); }
+        };
+
+        window.saveActivity = async () => {
+            if (!auth.currentUser) return;
+            const date = document.getElementById('form-date').value;
+            const activity = document.getElementById('form-activity').value;
+            if(!date || !activity) return;
+
+            const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { titulo: inputs[0].value, autor: inputs[1].value, cantante: inputs[2].value } : null;
+            }).filter(i => i);
+
+            const equipo = Array.from(document.querySelectorAll('#equipo-inputs > div')).map(row => {
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { nombre: inputs[0].value, rol: inputs[1].value } : null;
+            }).filter(i => i);
+
+            try {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activities'), {
+                    date, activity, canciones, equipo
+                });
+                showSection('planificacion');
+            } catch (e) { console.error("Error saving activity:", e); }
+        };
+
+        window.deleteActivity = async (id) => {
+            if (!auth.currentUser) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id));
+                document.getElementById('day-details').classList.add('hidden');
+            } catch (e) { console.error("Error deleting activity:", e); }
+        };
+
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const main = document.getElementById('main-content');
+            sb.classList.toggle('closed');
+            if(window.innerWidth > 768) {
+                main.style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
+            }
+        };
+
+        window.showSection = (sectionId) => {
+            // Ocultar todas las secciones
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
+            
+            // Mostrar solo la sección solicitada
+            const targetSection = document.getElementById(`section-${sectionId}`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden-section');
+            }
+            
+            // Actualizar título
+            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
+            
+            // Auto-cerrar sidebar en móviles tras elegir opción
+            if(window.innerWidth < 1024) {
+                const sb = document.getElementById('sidebar');
+                if(!sb.classList.contains('closed')) toggleSidebar();
+            }
+        };
+
+        const renderMembers = () => {
+            const container = document.getElementById('members-list');
+            container.innerHTML = window.allUsers.map(user => `
+                <div class="glass-panel p-4 flex items-center gap-4">
+                    <img src="${user.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
+                    <div>
+                        <h4 class="font-bold text-white">${user.name}</h4>
+                        <p class="text-xs text-gray-400">Nac: ${user.birth}</p>
+                        <p class="text-xs text-silver-text uppercase font-bold mt-1">${user.job || 'Miembro'}</p>
+                    </div>
+                </div>
+            `).join('');
+        };
+
+        const renderAdminUsers = () => {
+            const container = document.getElementById('admin-user-list');
+            container.innerHTML = window.allUsers.map(user => `
+                <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
+                    <span>${user.name} (${user.role})</span>
+                    <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
+        };
+
+        window.renderSongbook = () => {
+            const filter = document.getElementById('filter-singer').value;
+            const container = document.getElementById('song-list');
+            let todas = [];
+            window.activities.forEach(act => { if(act.canciones) todas = [...todas, ...act.canciones]; });
+            if(filter !== 'all') todas = todas.filter(s => s.cantante === filter);
+
+            container.innerHTML = todas.length ? todas.map(song => `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-4 font-bold">${song.titulo}</td>
+                    <td class="p-4 text-sm text-gray-400">${song.autor}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-silver/20 rounded-full text-xs">${song.cantante}</span></td>
+                </tr>
+            `).join('') : '<tr><td colspan="3" class="p-4 text-center text-gray-500">No hay canciones</td></tr>';
+        };
+
+        window.changeMonth = (delta) => {
+            window.currentDate.setMonth(window.currentDate.getMonth() + delta);
+            renderCalendar();
+        };
+
+        const renderCalendar = () => {
+            const monthNames = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+            const month = window.currentDate.getMonth();
+            const year = window.currentDate.getFullYear();
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calendarEl = document.getElementById('calendar-days');
+            calendarEl.innerHTML = '';
+            for(let i=0; i<firstDay; i++) calendarEl.innerHTML += '<div></div>';
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const hasEvent = window.activities.find(a => a.date === dateStr);
+                calendarEl.innerHTML += `<div class="calendar-day ${hasEvent ? 'has-event' : ''}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
+            }
+        };
+
+        window.showDayDetails = (dateStr) => {
+            const act = window.activities.find(a => a.date === dateStr);
+            const detailPanel = document.getElementById('day-details');
+            const content = document.getElementById('detail-content');
+            document.getElementById('detail-date').innerText = dateStr;
+            detailPanel.classList.remove('hidden');
+            if(act) {
+                content.innerHTML = `
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500">ACTIVIDAD</p>
+                        <h4 class="text-xl font-bold mb-2">${act.activity}</h4>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500 mb-2">REPERTORIO</p>
+                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante})</li>`).join('') || 'Sin canciones'}</ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs text-gray-500 mb-2">EQUIPO</p>
+                        <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div>
+                    </div>
+                    ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-xs border border-red-500/30 px-3 py-2 rounded hover:bg-red-500/10 w-full transition-all">ELIMINAR</button>` : ''}
+                `;
+            } else content.innerHTML = `<p class="text-gray-500 italic">Sin actividades.</p>`;
+        };
+
+        window.addRepertorioRow = () => {
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-3 gap-2";
+            div.innerHTML = `<input type="text" placeholder="Canción" class="text-sm"><input type="text" placeholder="Autor" class="text-sm"><select class="text-sm"><option value="Diana">Diana</option><option value="Mery">Mery</option><option value="Marianny">Marianny</option><option value="Nelly">Nelly</option><option value="Nicole">Nicole</option></select>`;
+            document.getElementById('repertorio-inputs').appendChild(div);
+        };
+
+        window.addEquipoRow = () => {
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-2 gap-2";
+            div.innerHTML = `<input type="text" placeholder="Nombre" class="text-sm"><select class="text-sm"><option value="baterista">Baterista</option><option value="bajista">Bajista</option><option value="tecladista">Tecladista</option><option value="violinista">Violinista</option><option value="guitarrista">Guitarrista</option><option value="coro">Coro</option><option value="director">Director</option><option value="sonidista">Sonidista</option></select>`;
+            document.getElementById('equipo-inputs').appendChild(div);
+        };
+
+        const renderAll = () => { renderMembers(); renderAdminUsers(); renderCalendar(); renderSongbook(); };
+
+        initializeAuth();
+
+    </script>
+</body>
+</html>
