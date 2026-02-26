@@ -125,7 +125,7 @@
             <div class="space-y-4">
                 <input type="text" id="login-user" placeholder="Usuario" class="w-full">
                 <input type="password" id="login-pass" placeholder="Contraseña" class="w-full">
-                <button onclick="handleLogin()" class="w-full btn-silver p-3 rounded-lg mt-4">INGRESAR</button>
+                <button id="login-btn" onclick="handleLogin()" class="w-full btn-silver p-3 rounded-lg mt-4">INGRESAR</button>
             </div>
             <p id="login-error" class="text-red-500 mt-4 text-sm hidden">Credenciales incorrectas.</p>
         </div>
@@ -325,63 +325,23 @@
 
     <!-- Firebase SDK Logic -->
     <script type="module">
-        import { initializeApp } from "firebase/app";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-  apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
-  authDomain: "gerencia-de-energia.firebaseapp.com",
-  projectId: "gerencia-de-energia",
-  storageBucket: "gerencia-de-energia.firebasestorage.app",
-  messagingSenderId: "347966041919",
-  appId: "1:347966041919:web:71c81a1b60013478712d8a",
-  measurementId: "G-9X5RMXJB0T"
-};
+        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
 
+        // Global State
         window.currentUser = null;
         window.allUsers = [];
         window.activities = [];
         window.currentDate = new Date();
 
-        const initializeAuth = async () => {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-            } catch (error) {
-                console.error("Auth error:", error);
-            }
-        };
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                startFirestoreListeners();
-            }
-        });
-
-        const startFirestoreListeners = () => {
-            const qUsers = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'));
-            onSnapshot(qUsers, (snapshot) => {
-                window.allUsers = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
-                renderMembers();
-                renderAdminUsers();
-            }, (err) => console.error("Error users listener:", err));
-
-            const qActs = query(collection(db, 'artifacts', appId, 'public', 'data', 'activities'));
-            onSnapshot(qActs, (snapshot) => {
-                window.activities = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
-                renderCalendar();
-                renderSongbook();
-            }, (err) => console.error("Error activities listener:", err));
-        };
-
+        // Bind functions to window to fix ReferenceErrors
         window.handleLogin = async () => {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
@@ -434,6 +394,7 @@
                 });
                 document.getElementById('user-full-name').value = '';
                 document.getElementById('user-job').value = '';
+                document.getElementById('user-photo').value = '';
             } catch (e) { console.error("Error saving user:", e); }
         };
 
@@ -464,7 +425,7 @@
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activities'), {
                     date, activity, canciones, equipo
                 });
-                showSection('planificacion');
+                window.showSection('planificacion');
             } catch (e) { console.error("Error saving activity:", e); }
         };
 
@@ -486,27 +447,21 @@
         };
 
         window.showSection = (sectionId) => {
-            // Ocultar todas las secciones
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
-            
-            // Mostrar solo la sección solicitada
             const targetSection = document.getElementById(`section-${sectionId}`);
             if (targetSection) {
                 targetSection.classList.remove('hidden-section');
             }
-            
-            // Actualizar título
             document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
-            
-            // Auto-cerrar sidebar en móviles tras elegir opción
             if(window.innerWidth < 1024) {
                 const sb = document.getElementById('sidebar');
-                if(!sb.classList.contains('closed')) toggleSidebar();
+                if(!sb.classList.contains('closed')) window.toggleSidebar();
             }
         };
 
-        const renderMembers = () => {
+        window.renderMembers = () => {
             const container = document.getElementById('members-list');
+            if (!container) return;
             container.innerHTML = window.allUsers.map(user => `
                 <div class="glass-panel p-4 flex items-center gap-4">
                     <img src="${user.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
@@ -519,8 +474,9 @@
             `).join('');
         };
 
-        const renderAdminUsers = () => {
+        window.renderAdminUsers = () => {
             const container = document.getElementById('admin-user-list');
+            if (!container) return;
             container.innerHTML = window.allUsers.map(user => `
                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
                     <span>${user.name} (${user.role})</span>
@@ -532,6 +488,7 @@
         window.renderSongbook = () => {
             const filter = document.getElementById('filter-singer').value;
             const container = document.getElementById('song-list');
+            if (!container) return;
             let todas = [];
             window.activities.forEach(act => { if(act.canciones) todas = [...todas, ...act.canciones]; });
             if(filter !== 'all') todas = todas.filter(s => s.cantante === filter);
@@ -547,17 +504,21 @@
 
         window.changeMonth = (delta) => {
             window.currentDate.setMonth(window.currentDate.getMonth() + delta);
-            renderCalendar();
+            window.renderCalendar();
         };
 
-        const renderCalendar = () => {
+        window.renderCalendar = () => {
             const monthNames = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
             const month = window.currentDate.getMonth();
             const year = window.currentDate.getFullYear();
-            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+            const titleEl = document.getElementById('calendar-month-year');
+            if (titleEl) titleEl.innerText = `${monthNames[month]} ${year}`;
+            
             const firstDay = new Date(year, month, 1).getDay();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
             const calendarEl = document.getElementById('calendar-days');
+            if (!calendarEl) return;
+            
             calendarEl.innerHTML = '';
             for(let i=0; i<firstDay; i++) calendarEl.innerHTML += '<div></div>';
             for(let d=1; d<=daysInMonth; d++) {
@@ -606,7 +567,46 @@
             document.getElementById('equipo-inputs').appendChild(div);
         };
 
-        const renderAll = () => { renderMembers(); renderAdminUsers(); renderCalendar(); renderSongbook(); };
+        const renderAll = () => { 
+            window.renderMembers(); 
+            window.renderAdminUsers(); 
+            window.renderCalendar(); 
+            window.renderSongbook(); 
+        };
+
+        const startFirestoreListeners = () => {
+            const qUsers = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'));
+            onSnapshot(qUsers, (snapshot) => {
+                window.allUsers = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                window.renderMembers();
+                window.renderAdminUsers();
+            }, (err) => console.error("Error users listener:", err));
+
+            const qActs = query(collection(db, 'artifacts', appId, 'public', 'data', 'activities'));
+            onSnapshot(qActs, (snapshot) => {
+                window.activities = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                window.renderCalendar();
+                window.renderSongbook();
+            }, (err) => console.error("Error activities listener:", err));
+        };
+
+        const initializeAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                startFirestoreListeners();
+            }
+        });
 
         initializeAuth();
 
