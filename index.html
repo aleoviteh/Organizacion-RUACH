@@ -192,11 +192,9 @@
                 <div class="mb-6">
                     <select id="filter-singer" onchange="renderSongbook()" class="w-full md:w-64">
                         <option value="all">Todos los cantantes</option>
-                        <option value="Alejandro">Alejandro</option>
                         <option value="Diana">Diana</option>
                         <option value="Mery">Mery</option>
                         <option value="Marianny">Marianny</option>
-                        <option value="Alejandra">Alejandra</option>
                         <option value="Nelly">Nelly</option>
                         <option value="Nicole">Nicole</option>
                     </select>
@@ -261,13 +259,11 @@
                                     <input type="text" placeholder="Canción" class="col-span-1 text-sm">
                                     <input type="text" placeholder="Autor" class="col-span-1 text-sm">
                                     <select class="col-span-1 text-sm">
-                        <option value="Alejandro">Alejandro</option>
-                        <option value="Diana">Diana</option>
-                        <option value="Mery">Mery</option>
-                        <option value="Marianny">Marianny</option>
-                        <option value="Alejandra">Alejandra</option>
-                        <option value="Nelly">Nelly</option>
-                        <option value="Nicole">Nicole</option>
+                                        <option value="Diana">Diana</option>
+                                        <option value="Mery">Mery</option>
+                                        <option value="Marianny">Marianny</option>
+                                        <option value="Nelly">Nelly</option>
+                                        <option value="Nicole">Nicole</option>
                                     </select>
                                 </div>
                             </div>
@@ -312,8 +308,11 @@
                                 <option value="MIEMBRO">Rol: MIEMBRO</option>
                                 <option value="LIDER">Rol: LIDER</option>
                             </select>
-                            <input type="text" id="user-photo" placeholder="URL Foto" class="w-full">
-                            <button onclick="saveUser()" class="w-full btn-silver p-3 rounded-lg mt-4">CREAR USUARIO</button>
+                            <div class="space-y-1">
+                                <label class="text-[10px] text-gray-500 ml-1">FOTO DE PERFIL</label>
+                                <input type="file" id="user-photo-file" accept="image/*" class="w-full text-xs">
+                            </div>
+                            <button id="btn-save-user" onclick="saveUser()" class="w-full btn-silver p-3 rounded-lg mt-4">CREAR USUARIO</button>
                         </div>
                     </div>
                     <div class="lg:col-span-2 glass-panel p-6">
@@ -381,7 +380,7 @@
             window.currentUser = userData;
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden-section');
-            document.getElementById('user-display-name').innerText = `Sesión: ${userData.name}`;
+            document.getElementById('user-display-name').innerText = `Sesión: ${userData.name} (${userData.role})`;
             setupPermissions();
             renderAll();
         };
@@ -391,41 +390,85 @@
         };
 
         const setupPermissions = () => {
-            if(window.currentUser?.role === 'LIDER') {
+            const isLider = window.currentUser?.role === 'LIDER';
+            
+            // Mostrar u ocultar menús según rol
+            if(isLider) {
                 document.getElementById('menu-ingreso').classList.remove('hidden');
                 document.getElementById('menu-usuario').classList.remove('hidden');
+            } else {
+                document.getElementById('menu-ingreso').classList.add('hidden');
+                document.getElementById('menu-usuario').classList.add('hidden');
             }
         };
 
+        // Función auxiliar para convertir imagen a Base64
+        const fileToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => reject(error);
+            });
+        };
+
         window.saveUser = async () => {
-            if (!auth.currentUser) return;
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            
             const name = document.getElementById('user-full-name').value;
             const birth = document.getElementById('user-birth').value;
             const job = document.getElementById('user-job').value;
             const role = document.getElementById('user-role').value;
-            const photo = document.getElementById('user-photo').value || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
+            const fileInput = document.getElementById('user-photo-file');
+            
+            if(!name || !birth) {
+                return;
+            }
 
-            if(!name || !birth) return;
+            const btn = document.getElementById('btn-save-user');
+            btn.disabled = true;
+            btn.innerText = "PROCESANDO...";
+
+            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'; // Default
 
             try {
+                // Si hay un archivo seleccionado, lo convertimos
+                if (fileInput.files && fileInput.files[0]) {
+                    photoBase64 = await fileToBase64(fileInput.files[0]);
+                }
+
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), {
-                    name, birth, job, role, photo, createdAt: new Date().toISOString()
+                    name, 
+                    birth, 
+                    job, 
+                    role, 
+                    photo: photoBase64, 
+                    createdAt: new Date().toISOString()
                 });
+
+                // Reset form
                 document.getElementById('user-full-name').value = '';
+                document.getElementById('user-birth').value = '';
                 document.getElementById('user-job').value = '';
-                document.getElementById('user-photo').value = '';
-            } catch (e) { console.error("Error saving user:", e); }
+                fileInput.value = '';
+                
+            } catch (e) { 
+                console.error("Error saving user:", e); 
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "CREAR USUARIO";
+            }
         };
 
         window.deleteUser = async (id) => {
-            if (!auth.currentUser) return;
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
             } catch (e) { console.error("Error deleting user:", e); }
         };
 
         window.saveActivity = async () => {
-            if (!auth.currentUser) return;
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const date = document.getElementById('form-date').value;
             const activity = document.getElementById('form-activity').value;
             if(!date || !activity) return;
@@ -449,7 +492,7 @@
         };
 
         window.deleteActivity = async (id) => {
-            if (!auth.currentUser) return;
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             try {
                 await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id));
                 document.getElementById('day-details').classList.add('hidden');
@@ -466,6 +509,11 @@
         };
 
         window.showSection = (sectionId) => {
+            // Bloqueo de seguridad adicional por si intentan acceder vía consola
+            if((sectionId === 'ingreso' || sectionId === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') {
+                return;
+            }
+
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
             const targetSection = document.getElementById(`section-${sectionId}`);
             if (targetSection) {
@@ -498,7 +546,10 @@
             if (!container) return;
             container.innerHTML = window.allUsers.map(user => `
                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
-                    <span>${user.name} (${user.role})</span>
+                    <div class="flex items-center gap-3">
+                        <img src="${user.photo}" class="w-8 h-8 rounded-full border border-white/20">
+                        <span>${user.name} (${user.role})</span>
+                    </div>
                     <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
@@ -632,5 +683,3 @@
     </script>
 </body>
 </html>
-
-
