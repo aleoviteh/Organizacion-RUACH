@@ -513,7 +513,15 @@
         };
 
         window.confirmDeleteSong = async (key) => {
-            const song = JSON.parse(decodeURIComponent(key));
+const firebaseConfig = {
+  apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
+  authDomain: "gerencia-de-energia.firebaseapp.com",
+  projectId: "gerencia-de-energia",
+  storageBucket: "gerencia-de-energia.firebasestorage.app",
+  messagingSenderId: "347966041919",
+  appId: "1:347966041919:web:71c81a1b60013478712d8a",
+  measurementId: "G-9X5RMXJB0T"
+};
             if(!confirm(`¿Desea eliminar "${song.titulo}" del cancionero?`)) return;
 
             for(const act of window.activities) {
@@ -698,3 +706,4 @@
     </script>
 </body>
 </html>
+
