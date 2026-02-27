@@ -189,11 +189,9 @@
 
             <!-- Sección: CANCIONERO -->
             <section id="section-cancionero" class="section-content hidden-section">
-                <div class="mb-8">
+                <div class="mb-6">
                     <select id="filter-singer" onchange="renderSongbook()" class="w-full md:w-64">
                         <option value="all">Todos los cantantes</option>
-                         <option value="Alejandro">Alejandro</option>
-                         <option value="Alejandra">Alejandra</option>
                         <option value="Diana">Diana</option>
                         <option value="Mery">Mery</option>
                         <option value="Marianny">Marianny</option>
@@ -258,18 +256,7 @@
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
                             <div id="repertorio-inputs" class="space-y-2 mb-3">
-                                <div class="grid grid-cols-3 gap-2">
-                                    <input type="text" placeholder="Canción" class="col-span-1 text-sm">
-                                    <input type="text" placeholder="Autor" class="col-span-1 text-sm"><select class="col-span-1 text-sm">
-                        <option value="Alejandro">Alejandro</option>
-                        <option value="Diana">Diana</option>
-                        <option value="Mery">Mery</option>
-                        <option value="Marianny">Marianny</option>
-                        <option value="Alejandra">Alejandra</option>
-                        <option value="Nelly">Nelly</option>
-                        <option value="Nicole">Nicole</option>
-                                    </select>
-                                </div>
+                                <!-- La fila inicial se genera vía JS para mantener consistencia con las nuevas filas -->
                             </div>
                             <button onclick="addRepertorioRow()" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
                         </div>
@@ -336,15 +323,7 @@
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = {
-  apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
-  authDomain: "gerencia-de-energia.firebaseapp.com",
-  projectId: "gerencia-de-energia",
-  storageBucket: "gerencia-de-energia.firebasestorage.app",
-  messagingSenderId: "347966041919",
-  appId: "1:347966041919:web:71c81a1b60013478712d8a",
-  measurementId: "G-9X5RMXJB0T"
-};
+        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
@@ -356,21 +335,18 @@
         window.activities = [];
         window.currentDate = new Date();
         const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
-        
+
         // Bind functions to window to fix ReferenceErrors
         window.handleLogin = async () => {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
 
-            // Lógica de Usuario Administrador (Líder)
             if (user === 'Admin' && pass === 'admin123') {
                 proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
             } 
-            // NUEVO: Lógica de Usuario Observador
             else if (user === 'ruach' && pass === 'ruach123') {
                 proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
             }
-            // Lógica de Usuarios de la Base de Datos
             else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
                 if(found && pass === 'ruach123') {
@@ -388,6 +364,8 @@
             document.getElementById('user-display-name').innerText = `Sesión: ${userData.name} (${userData.role})`;
             setupPermissions();
             renderAll();
+            // Iniciar fila de repertorio
+            if(document.getElementById('repertorio-inputs').children.length === 0) window.addRepertorioRow();
         };
 
         window.handleLogout = () => {
@@ -396,8 +374,6 @@
 
         const setupPermissions = () => {
             const isLider = window.currentUser?.role === 'LIDER';
-            
-            // Mostrar u ocultar menús según rol
             if(isLider) {
                 document.getElementById('menu-ingreso').classList.remove('hidden');
                 document.getElementById('menu-usuario').classList.remove('hidden');
@@ -407,7 +383,6 @@
             }
         };
 
-        // Función auxiliar para convertir imagen a Base64
         const fileToBase64 = (file) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -419,47 +394,32 @@
 
         window.saveUser = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            
             const name = document.getElementById('user-full-name').value;
             const birth = document.getElementById('user-birth').value;
             const job = document.getElementById('user-job').value;
             const role = document.getElementById('user-role').value;
             const fileInput = document.getElementById('user-photo-file');
             
-            if(!name || !birth) {
-                return;
-            }
+            if(!name || !birth) return;
 
             const btn = document.getElementById('btn-save-user');
             btn.disabled = true;
             btn.innerText = "PROCESANDO...";
-
-            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'; // Default
+            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
 
             try {
-                // Si hay un archivo seleccionado, lo convertimos
                 if (fileInput.files && fileInput.files[0]) {
                     photoBase64 = await fileToBase64(fileInput.files[0]);
                 }
-
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), {
-                    name, 
-                    birth, 
-                    job, 
-                    role, 
-                    photo: photoBase64, 
-                    createdAt: new Date().toISOString()
+                    name, birth, job, role, photo: photoBase64, createdAt: new Date().toISOString()
                 });
-
-                // Reset form
                 document.getElementById('user-full-name').value = '';
                 document.getElementById('user-birth').value = '';
                 document.getElementById('user-job').value = '';
                 fileInput.value = '';
-                
-            } catch (e) { 
-                console.error("Error saving user:", e); 
-            } finally {
+            } catch (e) { console.error("Error saving user:", e); } 
+            finally {
                 btn.disabled = false;
                 btn.innerText = "CREAR USUARIO";
             }
@@ -467,9 +427,7 @@
 
         window.deleteUser = async (id) => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            try {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
-            } catch (e) { console.error("Error deleting user:", e); }
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)); } catch (e) { console.error("Error deleting user:", e); }
         };
 
         window.saveActivity = async () => {
@@ -480,7 +438,12 @@
 
             const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
                 const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { titulo: inputs[0].value, autor: inputs[1].value, cantante: inputs[2].value } : null;
+                return inputs[0].value ? { 
+                    titulo: inputs[0].value, 
+                    autor: inputs[1].value, 
+                    cantante: inputs[2].value,
+                    tonalidad: inputs[3].value
+                } : null;
             }).filter(i => i);
 
             const equipo = Array.from(document.querySelectorAll('#equipo-inputs > div')).map(row => {
@@ -514,16 +477,10 @@
         };
 
         window.showSection = (sectionId) => {
-            // Bloqueo de seguridad adicional por si intentan acceder vía consola
-            if((sectionId === 'ingreso' || sectionId === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') {
-                return;
-            }
-
+            if((sectionId === 'ingreso' || sectionId === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') return;
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
             const targetSection = document.getElementById(`section-${sectionId}`);
-            if (targetSection) {
-                targetSection.classList.remove('hidden-section');
-            }
+            if (targetSection) targetSection.classList.remove('hidden-section');
             document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
             if(window.innerWidth < 1024) {
                 const sb = document.getElementById('sidebar');
@@ -534,7 +491,9 @@
         window.renderMembers = () => {
             const container = document.getElementById('members-list');
             if (!container) return;
-            container.innerHTML = window.allUsers.map(user => `
+            // Ordenar alfabéticamente por nombre
+            const sortedUsers = [...window.allUsers].sort((a, b) => a.name.localeCompare(b.name));
+            container.innerHTML = sortedUsers.map(user => `
                 <div class="glass-panel p-4 flex items-center gap-4">
                     <img src="${user.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
                     <div>
@@ -549,7 +508,8 @@
         window.renderAdminUsers = () => {
             const container = document.getElementById('admin-user-list');
             if (!container) return;
-            container.innerHTML = window.allUsers.map(user => `
+            const sortedUsers = [...window.allUsers].sort((a, b) => a.name.localeCompare(b.name));
+            container.innerHTML = sortedUsers.map(user => `
                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
                     <div class="flex items-center gap-3">
                         <img src="${user.photo}" class="w-8 h-8 rounded-full border border-white/20">
@@ -573,8 +533,9 @@
                     <td class="p-4 font-bold">${song.titulo}</td>
                     <td class="p-4 text-sm text-gray-400">${song.autor}</td>
                     <td class="p-4"><span class="px-2 py-1 bg-silver/20 rounded-full text-xs">${song.cantante}</span></td>
+                    <td class="p-4 text-silver-text font-bold">${song.tonalidad || '-'}</td>
                 </tr>
-            `).join('') : '<tr><td colspan="3" class="p-4 text-center text-gray-500">No hay canciones</td></tr>';
+            `).join('') : '<tr><td colspan="4" class="p-4 text-center text-gray-500">No hay canciones</td></tr>';
         };
 
         window.changeMonth = (delta) => {
@@ -602,12 +563,6 @@
                 calendarEl.innerHTML += `<div class="calendar-day ${hasEvent ? 'has-event' : ''}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
             }
         };
-        // Global State
-        window.currentUser = null;
-        window.allUsers = [];
-        window.activities = [];
-        window.currentDate = new Date();
-        const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
 
         window.showDayDetails = (dateStr) => {
             const act = window.activities.find(a => a.date === dateStr);
@@ -623,7 +578,7 @@
                     </div>
                     <div class="mb-4">
                         <p class="text-xs text-gray-500 mb-2">REPERTORIO</p>
-                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante})</li>`).join('') || 'Sin canciones'}</ul>
+                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul>
                     </div>
                     <div class="mb-6">
                         <p class="text-xs text-gray-500 mb-2">EQUIPO</p>
@@ -636,8 +591,24 @@
 
         window.addRepertorioRow = () => {
             const div = document.createElement('div');
-            div.className = "grid grid-cols-3 gap-2";
-            div.innerHTML = `<input type="text" placeholder="Canción" class="text-sm"><input type="text" placeholder="Autor" class="text-sm"><select class="text-sm"><option value="Alejandra">Alejandra</option><option value="Alejandro">Alejandro</option><option value="Diana">Diana</option><option value="Mery">Mery</option><option value="Marianny">Marianny</option><option value="Nelly">Nelly</option><option value="Nicole">Nicole</option></select><select class="text-sm"><option value="C">C</option></select><option value="C#">C#</option></select><option value="D">D</option></select><option value="D#">D#</option></select><option value="E">E</option></select><option value="F">F</option></select><option value="F#">F#</option></select><option value="G">G</option></select><option value="G#">G#</option></select><option value="A">A</option></select><option value="A#">A#</option></select><option value="B">B</option></select>`;
+            div.className = "grid grid-cols-4 gap-2";
+            div.innerHTML = `
+                <input type="text" placeholder="Canción" class="text-xs">
+                <input type="text" placeholder="Autor" class="text-xs">
+                <select class="text-xs">
+                        <option value="Alejandro">Alejandro</option>
+                        <option value="Alejandra">Alejandra</option>
+                        <option value="Diana">Diana</option>
+                        <option value="Mery">Mery</option>
+                        <option value="Marianny">Marianny</option>
+                        <option value="Nelly">Nelly</option>
+                        <option value="Nicole">Nicole</option>
+                </select>
+                <select class="text-xs">
+                    <option value="">Ton</option>
+                    ${TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('')}
+                </select>
+            `;
             document.getElementById('repertorio-inputs').appendChild(div);
         };
 
@@ -678,27 +649,12 @@
                 } else {
                     await signInAnonymously(auth);
                 }
-            } catch (error) {
-                console.error("Auth error:", error);
-            }
+            } catch (error) { console.error("Auth error:", error); }
         };
 
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                startFirestoreListeners();
-            }
-        });
-
+        onAuthStateChanged(auth, (user) => { if (user) startFirestoreListeners(); });
         initializeAuth();
 
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
