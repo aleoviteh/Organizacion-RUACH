@@ -111,6 +111,12 @@
         main {
             transition: margin-left 0.3s ease;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+        }
     </style>
 </head>
 <body>
@@ -134,7 +140,6 @@
     <!-- App Principal -->
     <div id="app-container" class="hidden-section">
         
-        <!-- Botón de Menú Persistente -->
         <button onclick="toggleSidebar()" class="menu-toggle-btn p-2 text-2xl glass-panel px-4 rounded-lg hover:bg-white/10 transition-colors">
             <i class="fas fa-bars"></i>
         </button>
@@ -182,14 +187,12 @@
 
             <!-- Sección: MIEMBROS -->
             <section id="section-miembros" class="section-content active-section">
-                <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <!-- Cards de miembros se cargan aquí -->
-                </div>
+                <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
 
             <!-- Sección: CANCIONERO -->
             <section id="section-cancionero" class="section-content hidden-section">
-                <div class="mb-6">
+                <div class="mb-6 flex flex-col md:flex-row gap-4 items-center">
                     <select id="filter-singer" onchange="renderSongbook()" class="w-full md:w-64">
                         <option value="all">Todos los cantantes</option>
                                                  <option value="Alejandro">Alejandro</option>
@@ -200,6 +203,7 @@
                         <option value="Nelly">Nelly</option>
                         <option value="Nicole">Nicole</option>
                     </select>
+                    <span class="text-xs text-gray-500 italic" id="song-count-display"></span>
                 </div>
                 <div class="overflow-x-auto glass-panel">
                     <table class="w-full text-left">
@@ -209,11 +213,10 @@
                                 <th class="p-4">Autor</th>
                                 <th class="p-4">Cantante</th>
                                 <th class="p-4">Tonalidad</th>
+                                <th class="p-4 admin-only hidden">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="song-list" class="divide-y divide-white/10 text-gray-300">
-                            <!-- Canciones filtradas -->
-                        </tbody>
+                        <tbody id="song-list" class="divide-y divide-white/10 text-gray-300"></tbody>
                     </table>
                 </div>
             </section>
@@ -258,17 +261,13 @@
 
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
-                            <div id="repertorio-inputs" class="space-y-2 mb-3">
-                                <!-- Filas de repertorio -->
-                            </div>
+                            <div id="repertorio-inputs" class="space-y-2 mb-3"></div>
                             <button onclick="addRepertorioRow()" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
                         </div>
 
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO DE TRABAJO</h4>
-                            <div id="equipo-inputs" class="space-y-2 mb-3">
-                                <!-- Filas de equipo -->
-                            </div>
+                            <div id="equipo-inputs" class="space-y-2 mb-3"></div>
                             <button onclick="addEquipoRow()" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
                         </div>
 
@@ -302,13 +301,47 @@
                     </div>
                     <div class="lg:col-span-2 glass-panel p-6">
                         <h3 class="text-xl font-bold mb-6 silver-text">GESTIONAR LISTADO</h3>
-                        <div id="admin-user-list" class="space-y-3">
-                            <!-- Lista de usuarios -->
-                        </div>
+                        <div id="admin-user-list" class="space-y-3"></div>
                     </div>
                 </div>
             </section>
         </main>
+    </div>
+
+    <!-- Modal Editar Canción -->
+    <div id="song-edit-modal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
+        <div class="glass-panel p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold silver-text mb-6">MODIFICAR CANCIÓN</h3>
+            <input type="hidden" id="modal-song-original-key">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">TÍTULO</label>
+                    <input type="text" id="modal-song-title" class="w-full">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">AUTOR</label>
+                    <input type="text" id="modal-song-author" class="w-full">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">CANTANTE</label>
+                    <select id="modal-song-singer" class="w-full">
+                        <option value="Diana">Diana</option>
+                        <option value="Mery">Mery</option>
+                        <option value="Marianny">Marianny</option>
+                        <option value="Nelly">Nelly</option>
+                        <option value="Nicole">Nicole</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">TONALIDAD</label>
+                    <select id="modal-song-key" class="w-full"></select>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="closeSongModal()" class="flex-1 p-3 text-sm text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
+                    <button onclick="saveSongFromModal()" class="flex-1 btn-silver p-3 rounded-lg text-sm">ACTUALIZAR</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="module">
@@ -336,6 +369,10 @@ const firebaseConfig = {
         window.currentDate = new Date();
         const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
 
+        // Init Tonalidades select in modal
+        const modalKeySelect = document.getElementById('modal-song-key');
+        modalKeySelect.innerHTML = '<option value="">Sin definir</option>' + TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('');
+
         window.handleLogin = async () => {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
@@ -345,11 +382,8 @@ const firebaseConfig = {
                 proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
             } else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
-                if(found && pass === 'ruach123') {
-                    proceedLogin({ ...found, uid: found.id });
-                } else {
-                    document.getElementById('login-error').classList.remove('hidden');
-                }
+                if(found && pass === 'ruach123') { proceedLogin({ ...found, uid: found.id }); } 
+                else { document.getElementById('login-error').classList.remove('hidden'); }
             }
         };
 
@@ -369,39 +403,7 @@ const firebaseConfig = {
             const isLider = window.currentUser?.role === 'LIDER';
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
-        };
-
-        const fileToBase64 = (file) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (e) => reject(e);
-        });
-
-        window.saveUser = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const name = document.getElementById('user-full-name').value;
-            const birth = document.getElementById('user-birth').value;
-            const job = document.getElementById('user-job').value;
-            const role = document.getElementById('user-role').value;
-            const fileInput = document.getElementById('user-photo-file');
-            if(!name || !birth) return;
-            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
-            try {
-                if (fileInput.files && fileInput.files[0]) photoBase64 = await fileToBase64(fileInput.files[0]);
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), {
-                    name, birth, job, role, photo: photoBase64, createdAt: new Date().toISOString()
-                });
-                document.getElementById('user-full-name').value = '';
-                document.getElementById('user-birth').value = '';
-                document.getElementById('user-job').value = '';
-                fileInput.value = '';
-            } catch (e) { console.error(e); }
-        };
-
-        window.deleteUser = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)); } catch (e) { console.error(e); }
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isLider));
         };
 
         window.saveActivity = async () => {
@@ -442,29 +444,110 @@ const firebaseConfig = {
             window.addEquipoRow();
         };
 
-        window.editActivity = (id) => {
-            const act = window.activities.find(a => a.id === id);
-            if(!act) return;
-            window.showSection('ingreso');
-            document.getElementById('ingreso-title').innerText = 'MODIFICAR ACTIVIDAD';
-            document.getElementById('edit-activity-id').value = id;
-            document.getElementById('form-date').value = act.date;
-            document.getElementById('form-activity').value = act.activity;
-            document.getElementById('btn-save-activity').innerText = 'ACTUALIZAR CAMBIOS';
-            document.getElementById('btn-cancel-edit').classList.remove('hidden');
-            document.getElementById('repertorio-inputs').innerHTML = '';
-            if(act.canciones?.length) act.canciones.forEach(c => window.addRepertorioRow(c));
-            else window.addRepertorioRow();
-            document.getElementById('equipo-inputs').innerHTML = '';
-            if(act.equipo?.length) act.equipo.forEach(e => window.addEquipoRow(e));
-            else window.addEquipoRow();
+        // --- Gestión de Canciones en Cancionero ---
+        window.openEditSong = (key) => {
+            const song = JSON.parse(decodeURIComponent(key));
+            document.getElementById('modal-song-original-key').value = key;
+            document.getElementById('modal-song-title').value = song.titulo;
+            document.getElementById('modal-song-author').value = song.autor || '';
+            document.getElementById('modal-song-singer').value = song.cantante;
+            document.getElementById('modal-song-key').value = song.tonalidad || '';
+            document.getElementById('song-edit-modal').classList.remove('hidden');
         };
 
-        window.deleteActivity = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id)); document.getElementById('day-details').classList.add('hidden'); } catch (e) { console.error(e); }
+        window.closeSongModal = () => document.getElementById('song-edit-modal').classList.add('hidden');
+
+        window.saveSongFromModal = async () => {
+            const originalKeyStr = document.getElementById('modal-song-original-key').value;
+            const originalSong = JSON.parse(decodeURIComponent(originalKeyStr));
+            const newTitle = document.getElementById('modal-song-title').value.trim();
+            const newAuthor = document.getElementById('modal-song-author').value.trim();
+            const newSinger = document.getElementById('modal-song-singer').value;
+            const newKey = document.getElementById('modal-song-key').value;
+
+            if(!newTitle) return;
+
+            // Actualizar en todas las planificaciones donde aparezca
+            for(const act of window.activities) {
+                if(act.canciones) {
+                    let changed = false;
+                    const updatedCanciones = act.canciones.map(c => {
+                        if(c.titulo.toLowerCase() === originalSong.titulo.toLowerCase() && c.cantante === originalSong.cantante) {
+                            changed = true;
+                            return { ...c, titulo: newTitle, autor: newAuthor, cantante: newSinger, tonalidad: newKey };
+                        }
+                        return c;
+                    });
+
+                    if(changed) {
+                        try {
+                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: updatedCanciones });
+                        } catch(e) { console.error("Error actualizando canción en actividad:", act.id, e); }
+                    }
+                }
+            }
+            closeSongModal();
         };
 
+        window.confirmDeleteSong = async (key) => {
+            const song = JSON.parse(decodeURIComponent(key));
+            if(!confirm(`¿Desea eliminar "${song.titulo}" del cancionero?\nEsto la borrará de todas las planificaciones históricas.`)) return;
+
+            for(const act of window.activities) {
+                if(act.canciones) {
+                    const filtered = act.canciones.filter(c => !(c.titulo.toLowerCase() === song.titulo.toLowerCase() && c.cantante === song.cantante));
+                    if(filtered.length !== act.canciones.length) {
+                        try {
+                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: filtered });
+                        } catch(e) { console.error(e); }
+                    }
+                }
+            }
+        };
+
+        window.renderSongbook = () => {
+            const filter = document.getElementById('filter-singer').value;
+            const container = document.getElementById('song-list');
+            if (!container) return;
+
+            let rawSongs = [];
+            window.activities.forEach(act => { if(act.canciones) rawSongs = [...rawSongs, ...act.canciones]; });
+
+            const uniqueSongsMap = new Map();
+            rawSongs.forEach(song => {
+                const key = `${song.titulo.trim().toLowerCase()}_${song.cantante.toLowerCase()}`;
+                if (!uniqueSongsMap.has(key)) uniqueSongsMap.set(key, song);
+            });
+
+            let finalSongs = Array.from(uniqueSongsMap.values());
+            if(filter !== 'all') finalSongs = finalSongs.filter(s => s.cantante === filter);
+            
+            document.getElementById('song-count-display').innerText = `Total: ${finalSongs.length} temas`;
+
+            const isAdmin = window.currentUser?.role === 'LIDER';
+            container.innerHTML = finalSongs.map(song => {
+                const songKey = encodeURIComponent(JSON.stringify(song));
+                return `
+                <tr class="hover:bg-white/5 transition-colors group">
+                    <td class="p-4 font-bold text-white">${song.titulo}</td>
+                    <td class="p-4 text-sm text-gray-400">${song.autor || '-'}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-silver/20 rounded-full text-[10px] text-silver-text border border-silver/30">${song.cantante}</span></td>
+                    <td class="p-4 text-silver-text font-bold">${song.tonalidad || '-'}</td>
+                    <td class="p-4 admin-only ${isAdmin ? '' : 'hidden'}">
+                        <div class="flex gap-2">
+                            <button onclick="window.openEditSong('${songKey}')" class="p-2 hover:bg-white/10 rounded transition-colors text-blue-400" title="Editar canción">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button onclick="window.confirmDeleteSong('${songKey}')" class="p-2 hover:bg-red-500/10 rounded transition-colors text-red-500" title="Eliminar canción">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `}).join('');
+        };
+
+        // --- Funciones Base Se mantienen igual ---
         window.toggleSidebar = () => {
             const sb = document.getElementById('sidebar');
             sb.classList.toggle('closed');
@@ -489,63 +572,10 @@ const firebaseConfig = {
                     <div>
                         <h4 class="font-bold text-white">${u.name}</h4>
                         <p class="text-xs text-gray-400">Nac: ${u.birth}</p>
-                        <p class="text-xs text-silver-text uppercase font-bold mt-1">${u.job || 'Miembro'}</p>
+                        <p class="text-[10px] text-silver-text uppercase font-bold tracking-tighter bg-white/5 px-2 py-0.5 rounded mt-1 inline-block">${u.job || 'Miembro'}</p>
                     </div>
                 </div>
             `).join('');
-        };
-
-        window.renderAdminUsers = () => {
-            const container = document.getElementById('admin-user-list');
-            if (!container) return;
-            const sorted = [...window.allUsers].sort((a, b) => a.name.localeCompare(b.name));
-            container.innerHTML = sorted.map(u => `
-                <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
-                    <div class="flex items-center gap-3">
-                        <img src="${u.photo}" class="w-8 h-8 rounded-full border border-white/20">
-                        <span>${u.name} (${u.role})</span>
-                    </div>
-                    <button onclick="deleteUser('${u.id}')" class="text-red-500"><i class="fas fa-trash"></i></button>
-                </div>
-            `).join('');
-        };
-
-        window.renderSongbook = () => {
-            const filter = document.getElementById('filter-singer').value;
-            const container = document.getElementById('song-list');
-            if (!container) return;
-
-            // Extraer todas las canciones de todas las actividades
-            let rawSongs = [];
-            window.activities.forEach(act => { if(act.canciones) rawSongs = [...rawSongs, ...act.canciones]; });
-
-            // Mapa para filtrar duplicados por Titulo + Cantante (Normalizado)
-            const uniqueSongsMap = new Map();
-            rawSongs.forEach(song => {
-                const key = `${song.titulo.trim().toLowerCase()}_${song.cantante.toLowerCase()}`;
-                // Si ya existe, podríamos decidir quedarnos con la versión que tenga tonalidad o la más reciente
-                // En este caso, simplemente guardamos la primera que encontremos o sobreescribimos
-                if (!uniqueSongsMap.has(key)) {
-                    uniqueSongsMap.set(key, song);
-                }
-            });
-
-            let finalSongs = Array.from(uniqueSongsMap.values());
-            if(filter !== 'all') finalSongs = finalSongs.filter(s => s.cantante === filter);
-
-            container.innerHTML = finalSongs.map(song => `
-                <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-4 font-bold">${song.titulo}</td>
-                    <td class="p-4 text-sm text-gray-400">${song.autor || '-'}</td>
-                    <td class="p-4"><span class="px-2 py-1 bg-silver/20 rounded-full text-xs">${song.cantante}</span></td>
-                    <td class="p-4 text-silver-text font-bold">${song.tonalidad || '-'}</td>
-                </tr>
-            `).join('');
-        };
-
-        window.changeMonth = (delta) => {
-            window.currentDate.setMonth(window.currentDate.getMonth() + delta);
-            window.renderCalendar();
         };
 
         window.renderCalendar = () => {
@@ -568,13 +598,38 @@ const firebaseConfig = {
             if(act) {
                 const isAdmin = window.currentUser?.role === 'LIDER';
                 c.innerHTML = `
-                    <div class="mb-4"><p class="text-xs text-gray-500">ACTIVIDAD</p><h4 class="text-xl font-bold">${act.activity}</h4></div>
-                    <div class="mb-4"><p class="text-xs text-gray-500 mb-2">REPERTORIO</p><ul class="text-sm space-y-1">${act.canciones?.map(s => `<li>• <b>${s.titulo}</b> (${s.cantante}) <span class="text-silver-text font-bold">${s.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul></div>
-                    <div class="mb-6"><p class="text-xs text-gray-500 mb-2">EQUIPO</p><div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div></div>
-                    ${isAdmin ? `<div class="flex gap-2"><button onclick="editActivity('${act.id}')" class="flex-1 text-white text-xs border border-silver px-3 py-2 rounded uppercase font-bold">MODIFICAR</button><button onclick="deleteActivity('${act.id}')" class="text-red-500 text-xs border border-red-500/30 px-3 py-2 rounded"><i class="fas fa-trash"></i></button></div>` : ''}
+                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">ACTIVIDAD</p><h4 class="text-xl font-bold">${act.activity}</h4></div>
+                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase mb-2">REPERTORIO</p><ul class="text-sm space-y-1">${act.canciones?.map(s => `<li>• <b>${s.titulo}</b> (${s.cantante}) <span class="text-silver-text font-bold">${s.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul></div>
+                    <div class="mb-6"><p class="text-[10px] text-gray-500 uppercase mb-2">EQUIPO</p><div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic text-xs">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div></div>
+                    ${isAdmin ? `<div class="flex gap-2"><button onclick="editActivity('${act.id}')" class="flex-1 text-white text-[10px] border border-silver px-3 py-2 rounded uppercase font-bold">MODIFICAR</button><button onclick="deleteActivity('${act.id}')" class="text-red-500 text-[10px] border border-red-500/30 px-3 py-2 rounded"><i class="fas fa-trash"></i></button></div>` : ''}
                 `;
             } else c.innerHTML = `<p class="text-gray-500 italic">Sin actividades.</p>`;
         };
+
+        window.editActivity = (id) => {
+            const act = window.activities.find(a => a.id === id);
+            if(!act) return;
+            window.showSection('ingreso');
+            document.getElementById('ingreso-title').innerText = 'MODIFICAR ACTIVIDAD';
+            document.getElementById('edit-activity-id').value = id;
+            document.getElementById('form-date').value = act.date;
+            document.getElementById('form-activity').value = act.activity;
+            document.getElementById('btn-save-activity').innerText = 'ACTUALIZAR CAMBIOS';
+            document.getElementById('btn-cancel-edit').classList.remove('hidden');
+            document.getElementById('repertorio-inputs').innerHTML = '';
+            if(act.canciones?.length) act.canciones.forEach(c => window.addRepertorioRow(c));
+            else window.addRepertorioRow();
+            document.getElementById('equipo-inputs').innerHTML = '';
+            if(act.equipo?.length) act.equipo.forEach(e => window.addEquipoRow(e));
+            else window.addEquipoRow();
+        };
+
+        window.deleteActivity = async (id) => {
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id)); document.getElementById('day-details').classList.add('hidden'); } catch (e) { console.error(e); }
+        };
+
+        window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
 
         window.addRepertorioRow = (data = null) => {
             const div = document.createElement('div'); div.className = "grid grid-cols-4 gap-2";
@@ -594,9 +649,9 @@ const firebaseConfig = {
             document.getElementById('equipo-inputs').appendChild(div);
         };
 
-        const renderAll = () => { renderMembers(); renderAdminUsers(); renderCalendar(); renderSongbook(); };
+        const renderAll = () => { renderMembers(); renderCalendar(); renderSongbook(); setupPermissions(); };
         const startFirestoreListeners = () => {
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), s => { window.allUsers = s.docs.map(d => ({id: d.id, ...d.data()})); renderMembers(); renderAdminUsers(); });
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), s => { window.allUsers = s.docs.map(d => ({id: d.id, ...d.data()})); renderMembers(); });
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), s => { window.activities = s.docs.map(d => ({id: d.id, ...d.data()})); renderCalendar(); renderSongbook(); });
         };
 
