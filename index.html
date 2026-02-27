@@ -208,6 +208,7 @@
                                 <th class="p-4">Canción</th>
                                 <th class="p-4">Autor</th>
                                 <th class="p-4">Cantante</th>
+                                <th class="p-4">Tonalidad</th>
                             </tr>
                         </thead>
                         <tbody id="song-list" class="divide-y divide-white/10 text-gray-300">
@@ -600,6 +601,12 @@
                 calendarEl.innerHTML += `<div class="calendar-day ${hasEvent ? 'has-event' : ''}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
             }
         };
+        // Global State
+        window.currentUser = null;
+        window.allUsers = [];
+        window.activities = [];
+        window.currentDate = new Date();
+        const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
 
         window.showDayDetails = (dateStr) => {
             const act = window.activities.find(a => a.date === dateStr);
@@ -686,6 +693,7 @@
     </script>
 </body>
 </html>
+
 
 
 
