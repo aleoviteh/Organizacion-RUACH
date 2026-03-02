@@ -575,6 +575,7 @@
                     <td class="p-4 font-bold">${song.titulo}</td>
                     <td class="p-4 text-sm text-gray-400">${song.autor}</td>
                     <td class="p-4"><span class="px-2 py-1 bg-silver/20 rounded-full text-xs">${song.cantante}</span></td>
+                    <td class="p-4 text-sm text-gray-400">${song.tonalidad}</td>
                 </tr>
             `).join('') : '<tr><td colspan="3" class="p-4 text-center text-gray-500">No hay canciones</td></tr>';
         };
@@ -619,7 +620,7 @@
                     </div>
                     <div class="mb-4">
                         <p class="text-xs text-gray-500 mb-2">REPERTORIO</p>
-                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante})</li>`).join('') || 'Sin canciones'}</ul>
+                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante}) (${c.tonalidad})</li>`).join('') || 'Sin canciones'}</ul>
                     </div>
                     <div class="mb-6">
                         <p class="text-xs text-gray-500 mb-2">EQUIPO</p>
@@ -690,6 +691,7 @@
     </script>
 </body>
 </html>
+
 
 
 
