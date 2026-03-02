@@ -240,10 +240,10 @@
                 </div>
             </section>
 
-            <!-- Sección: INGRESO -->
-            <section id="section-ingreso" class="section-content hidden-section">
+           <section id="section-ingreso" class="section-content hidden-section">
                 <div class="glass-panel p-6 max-w-2xl mx-auto">
-                    <h3 class="text-xl font-bold mb-6 silver-text border-b border-white/10 pb-2">NUEVA ACTIVIDAD</h3>
+                    <h3 id="ingreso-title" class="text-xl font-bold mb-6 silver-text border-b border-white/10 pb-2">NUEVA ACTIVIDAD</h3>
+                    <input type="hidden" id="edit-activity-id">
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -258,45 +258,20 @@
 
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
-                            <div id="repertorio-inputs" class="space-y-2 mb-3">
-                                <div class="grid grid-cols-3 gap-2">
-                                    <input type="text" placeholder="Canción" class="col-span-1 text-sm">
-                                    <input type="text" placeholder="Autor" class="col-span-1 text-sm">
-                                    <select class="col-span-1 text-sm">
-                                        <option value="Alejandro">Alejandro</option>
-                                        <option value="Alejandra">Alejandra</option>
-                                        <option value="Diana">Diana</option>
-                                        <option value="Mery">Mery</option>
-                                        <option value="Marianny">Marianny</option>
-                                        <option value="Nelly">Nelly</option>
-                                        <option value="Nicole">Nicole</option>
-                                    </select>
-                                </div>
-                            </div>
+                            <div id="repertorio-inputs" class="space-y-2 mb-3"></div>
                             <button onclick="addRepertorioRow()" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
                         </div>
 
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO DE TRABAJO</h4>
-                            <div id="equipo-inputs" class="space-y-2 mb-3">
-                                <div class="grid grid-cols-2 gap-2">
-                                    <input type="text" placeholder="Nombre" class="col-span-1 text-sm">
-                                    <select class="col-span-1 text-sm">
-                                        <option value="baterista">Baterista</option>
-                                        <option value="bajista">Bajista</option>
-                                        <option value="tecladista">Tecladista</option>
-                                        <option value="violinista">Violinista</option>
-                                        <option value="guitarrista">Guitarrista</option>
-                                        <option value="coro">Coro</option>
-                                        <option value="director">Director</option>
-                                        <option value="sonidista">Sonidista</option>
-                                    </select>
-                                </div>
-                            </div>
+                            <div id="equipo-inputs" class="space-y-2 mb-3"></div>
                             <button onclick="addEquipoRow()" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
                         </div>
 
-                        <button onclick="saveActivity()" class="w-full btn-silver p-3 rounded-lg mt-4">GUARDAR PLANIFICACIÓN</button>
+                        <div class="flex gap-2">
+                            <button id="btn-save-activity" onclick="saveActivity()" class="flex-1 btn-silver p-3 rounded-lg mt-4 uppercase">GUARDAR PLANIFICACIÓN</button>
+                            <button id="btn-cancel-edit" onclick="resetIngresoForm()" class="hidden btn-silver p-3 rounded-lg mt-4 bg-none border border-white/20 text-white hover:bg-white/10">CANCELAR</button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -331,7 +306,44 @@
             </section>
         </main>
     </div>
-
+<!-- Modal Editar Canción -->
+    <div id="song-edit-modal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
+        <div class="glass-panel p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold silver-text mb-6">MODIFICAR CANCIÓN</h3>
+            <input type="hidden" id="modal-song-original-key">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">TÍTULO</label>
+                    <input type="text" id="modal-song-title" class="w-full">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">AUTOR</label>
+                    <input type="text" id="modal-song-author" class="w-full">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">CANTANTE</label>
+                    <select id="modal-song-singer" class="w-full">
+                                                <option value="Alejandro">Alejandro</option>
+                        <option value="Alejandra">Alejandra</option>
+                        <option value="Diana">Diana</option>
+                        <option value="Mery">Mery</option>
+                        <option value="Marianny">Marianny</option>
+                        <option value="Nelly">Nelly</option>
+                        <option value="Nicole">Nicole</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-400 block mb-1">TONALIDAD</label>
+                    <select id="modal-song-key" class="w-full"></select>
+                </div>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="closeSongModal()" class="flex-1 p-3 text-sm text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
+                    <button onclick="saveSongFromModal()" class="flex-1 btn-silver p-3 rounded-lg text-sm">ACTUALIZAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -351,6 +363,16 @@
         const db = getFirestore(app);
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
+
+        window.currentUser = null;
+        window.allUsers = [];
+        window.activities = [];
+        window.currentDate = new Date();
+        const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
+
+        // Init Tonalidades select in modal
+        const modalKeySelect = document.getElementById('modal-song-key');
+        modalKeySelect.innerHTML = '<option value="">Sin definir</option>' + TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('');
 
         // Global State
         window.currentUser = null;
@@ -531,7 +553,27 @@
                 if(!sb.classList.contains('closed')) window.toggleSidebar();
             }
         };
+  window.deleteUser = async (id) => {
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)); } catch (e) { console.error(e); }
+        };
+ window.saveActivity = async () => {
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            const date = document.getElementById('form-date').value;
+            const activity = document.getElementById('form-activity').value;
+            const editId = document.getElementById('edit-activity-id').value;
+            if(!date || !activity) return;
 
+            const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
+                const i = row.querySelectorAll('input, select');
+                return i[0].value ? { titulo: i[0].value, autor: i[1].value, cantante: i[2].value, tonalidad: i[3].value } : null;
+            }).filter(i => i);
+
+            const equipo = Array.from(document.querySelectorAll('#equipo-inputs > div')).map(row => {
+                const i = row.querySelectorAll('input, select');
+                return i[0].value ? { nombre: i[0].value, rol: i[1].value } : null;
+            }).filter(i => i);
+     
         window.renderMembers = () => {
             const container = document.getElementById('members-list');
             if (!container) return;
@@ -689,4 +731,5 @@
     </script>
 </body>
 </html>
+
 
