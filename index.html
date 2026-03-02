@@ -111,11 +111,6 @@
         main {
             transition: margin-left 0.3s ease;
         }
-
-        .modal-overlay {
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
-        }
     </style>
 </head>
 <body>
@@ -139,6 +134,7 @@
     <!-- App Principal -->
     <div id="app-container" class="hidden-section">
         
+        <!-- Botón de Menú Persistente -->
         <button onclick="toggleSidebar()" class="menu-toggle-btn p-2 text-2xl glass-panel px-4 rounded-lg hover:bg-white/10 transition-colors">
             <i class="fas fa-bars"></i>
         </button>
@@ -186,23 +182,24 @@
 
             <!-- Sección: MIEMBROS -->
             <section id="section-miembros" class="section-content active-section">
-                <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+                <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Cards de miembros se cargan aquí -->
+                </div>
             </section>
 
             <!-- Sección: CANCIONERO -->
             <section id="section-cancionero" class="section-content hidden-section">
-                <div class="mb-6 flex flex-col md:flex-row gap-4 items-center">
+                <div class="mb-6">
                     <select id="filter-singer" onchange="renderSongbook()" class="w-full md:w-64">
                         <option value="all">Todos los cantantes</option>
-                                                <option value="Alejandro">Alejandro</option>
-                        <option value="Alejandra">Alejandra</option>
+                         <option value="Alejandro">Alejandro</option>
+                         <option value="Alejandra">Alejandra</option>
                         <option value="Diana">Diana</option>
                         <option value="Mery">Mery</option>
                         <option value="Marianny">Marianny</option>
                         <option value="Nelly">Nelly</option>
                         <option value="Nicole">Nicole</option>
                     </select>
-                    <span class="text-xs text-gray-500 italic" id="song-count-display"></span>
                 </div>
                 <div class="overflow-x-auto glass-panel">
                     <table class="w-full text-left">
@@ -211,11 +208,11 @@
                                 <th class="p-4">Canción</th>
                                 <th class="p-4">Autor</th>
                                 <th class="p-4">Cantante</th>
-                                <th class="p-4">Tonalidad</th>
-                                <th class="p-4 admin-only hidden">Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="song-list" class="divide-y divide-white/10 text-gray-300"></tbody>
+                        <tbody id="song-list" class="divide-y divide-white/10 text-gray-300">
+                            <!-- Canciones -->
+                        </tbody>
                     </table>
                 </div>
             </section>
@@ -244,8 +241,7 @@
             <!-- Sección: INGRESO -->
             <section id="section-ingreso" class="section-content hidden-section">
                 <div class="glass-panel p-6 max-w-2xl mx-auto">
-                    <h3 id="ingreso-title" class="text-xl font-bold mb-6 silver-text border-b border-white/10 pb-2">NUEVA ACTIVIDAD</h3>
-                    <input type="hidden" id="edit-activity-id">
+                    <h3 class="text-xl font-bold mb-6 silver-text border-b border-white/10 pb-2">NUEVA ACTIVIDAD</h3>
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
@@ -260,20 +256,45 @@
 
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
-                            <div id="repertorio-inputs" class="space-y-2 mb-3"></div>
+                            <div id="repertorio-inputs" class="space-y-2 mb-3">
+                                <div class="grid grid-cols-3 gap-2">
+                                    <input type="text" placeholder="Canción" class="col-span-1 text-sm">
+                                    <input type="text" placeholder="Autor" class="col-span-1 text-sm">
+                                    <select class="col-span-1 text-sm">
+                                        <option value="Alejandro">Alejandro</option>
+                                        <option value="Alejandra">Alejandra</option>
+                                        <option value="Diana">Diana</option>
+                                        <option value="Mery">Mery</option>
+                                        <option value="Marianny">Marianny</option>
+                                        <option value="Nelly">Nelly</option>
+                                        <option value="Nicole">Nicole</option>
+                                    </select>
+                                </div>
+                            </div>
                             <button onclick="addRepertorioRow()" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
                         </div>
 
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO DE TRABAJO</h4>
-                            <div id="equipo-inputs" class="space-y-2 mb-3"></div>
+                            <div id="equipo-inputs" class="space-y-2 mb-3">
+                                <div class="grid grid-cols-2 gap-2">
+                                    <input type="text" placeholder="Nombre" class="col-span-1 text-sm">
+                                    <select class="col-span-1 text-sm">
+                                        <option value="baterista">Baterista</option>
+                                        <option value="bajista">Bajista</option>
+                                        <option value="tecladista">Tecladista</option>
+                                        <option value="violinista">Violinista</option>
+                                        <option value="guitarrista">Guitarrista</option>
+                                        <option value="coro">Coro</option>
+                                        <option value="director">Director</option>
+                                        <option value="sonidista">Sonidista</option>
+                                    </select>
+                                </div>
+                            </div>
                             <button onclick="addEquipoRow()" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
                         </div>
 
-                        <div class="flex gap-2">
-                            <button id="btn-save-activity" onclick="saveActivity()" class="flex-1 btn-silver p-3 rounded-lg mt-4 uppercase">GUARDAR PLANIFICACIÓN</button>
-                            <button id="btn-cancel-edit" onclick="resetIngresoForm()" class="hidden btn-silver p-3 rounded-lg mt-4 bg-none border border-white/20 text-white hover:bg-white/10">CANCELAR</button>
-                        </div>
+                        <button onclick="saveActivity()" class="w-full btn-silver p-3 rounded-lg mt-4">GUARDAR PLANIFICACIÓN</button>
                     </div>
                 </div>
             </section>
@@ -300,83 +321,62 @@
                     </div>
                     <div class="lg:col-span-2 glass-panel p-6">
                         <h3 class="text-xl font-bold mb-6 silver-text">GESTIONAR LISTADO</h3>
-                        <div id="admin-user-list" class="space-y-3 text-white"></div>
+                        <div id="admin-user-list" class="space-y-3">
+                            <!-- Lista de usuarios -->
+                        </div>
                     </div>
                 </div>
             </section>
         </main>
     </div>
 
-    <!-- Modal Editar Canción -->
-    <div id="song-edit-modal" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
-        <div class="glass-panel p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold silver-text mb-6">MODIFICAR CANCIÓN</h3>
-            <input type="hidden" id="modal-song-original-key">
-            <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] text-gray-400 block mb-1">TÍTULO</label>
-                    <input type="text" id="modal-song-title" class="w-full">
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-400 block mb-1">AUTOR</label>
-                    <input type="text" id="modal-song-author" class="w-full">
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-400 block mb-1">CANTANTE</label>
-                    <select id="modal-song-singer" class="w-full">
-                                                <option value="Alejandro">Alejandro</option>
-                        <option value="Alejandra">Alejandra</option>
-                        <option value="Diana">Diana</option>
-                        <option value="Mery">Mery</option>
-                        <option value="Marianny">Marianny</option>
-                        <option value="Nelly">Nelly</option>
-                        <option value="Nicole">Nicole</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-400 block mb-1">TONALIDAD</label>
-                    <select id="modal-song-key" class="w-full"></select>
-                </div>
-                <div class="flex gap-3 pt-4">
-                    <button onclick="closeSongModal()" class="flex-1 p-3 text-sm text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
-                    <button onclick="saveSongFromModal()" class="flex-1 btn-silver p-3 rounded-lg text-sm">ACTUALIZAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const firebaseConfig = JSON.parse(window.__firebase_config || '{}');
+        const firebaseConfig = {
+  apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
+  authDomain: "gerencia-de-energia.firebaseapp.com",
+  projectId: "gerencia-de-energia",
+  storageBucket: "gerencia-de-energia.firebasestorage.app",
+  messagingSenderId: "347966041919",
+  appId: "1:347966041919:web:71c81a1b60013478712d8a",
+  measurementId: "G-9X5RMXJB0T"
+};
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
 
+        // Global State
         window.currentUser = null;
         window.allUsers = [];
         window.activities = [];
         window.currentDate = new Date();
-        const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
 
-        // Init Tonalidades select in modal
-        const modalKeySelect = document.getElementById('modal-song-key');
-        modalKeySelect.innerHTML = '<option value="">Sin definir</option>' + TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('');
-
+        // Bind functions to window to fix ReferenceErrors
         window.handleLogin = async () => {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
+
+            // Lógica de Usuario Administrador (Líder)
             if (user === 'Admin' && pass === 'admin123') {
                 proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
-            } else if (user === 'ruach' && pass === 'ruach123') {
+            } 
+            // NUEVO: Lógica de Usuario Observador
+            else if (user === 'ruach' && pass === 'ruach123') {
                 proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
-            } else {
+            }
+            // Lógica de Usuarios de la Base de Datos
+            else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
-                if(found && pass === 'ruach123') { proceedLogin({ ...found, uid: found.id }); } 
-                else { document.getElementById('login-error').classList.remove('hidden'); }
+                if(found && pass === 'ruach123') {
+                    proceedLogin({ ...found, uid: found.id });
+                } else {
+                    document.getElementById('login-error').classList.remove('hidden');
+                }
             }
         };
 
@@ -387,207 +387,159 @@
             document.getElementById('user-display-name').innerText = `Sesión: ${userData.name} (${userData.role})`;
             setupPermissions();
             renderAll();
-            resetIngresoForm();
         };
 
-        window.handleLogout = () => location.reload();
+        window.handleLogout = () => {
+            location.reload();
+        };
 
         const setupPermissions = () => {
             const isLider = window.currentUser?.role === 'LIDER';
-            document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
-            document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
-            document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isLider));
+            
+            // Mostrar u ocultar menús según rol
+            if(isLider) {
+                document.getElementById('menu-ingreso').classList.remove('hidden');
+                document.getElementById('menu-usuario').classList.remove('hidden');
+            } else {
+                document.getElementById('menu-ingreso').classList.add('hidden');
+                document.getElementById('menu-usuario').classList.add('hidden');
+            }
         };
 
-        const fileToBase64 = (file) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = (e) => reject(e);
-        });
+        // Función auxiliar para convertir imagen a Base64
+        const fileToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => reject(error);
+            });
+        };
 
-        // FIXED: Exporting saveUser to window
         window.saveUser = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            
             const name = document.getElementById('user-full-name').value;
             const birth = document.getElementById('user-birth').value;
             const job = document.getElementById('user-job').value;
             const role = document.getElementById('user-role').value;
             const fileInput = document.getElementById('user-photo-file');
-            if(!name || !birth) return;
-            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
+            
+            if(!name || !birth) {
+                return;
+            }
+
+            const btn = document.getElementById('btn-save-user');
+            btn.disabled = true;
+            btn.innerText = "PROCESANDO...";
+
+            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100'; // Default
+
             try {
-                if (fileInput.files && fileInput.files[0]) photoBase64 = await fileToBase64(fileInput.files[0]);
+                // Si hay un archivo seleccionado, lo convertimos
+                if (fileInput.files && fileInput.files[0]) {
+                    photoBase64 = await fileToBase64(fileInput.files[0]);
+                }
+
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), {
-                    name, birth, job, role, photo: photoBase64, createdAt: new Date().toISOString()
+                    name, 
+                    birth, 
+                    job, 
+                    role, 
+                    photo: photoBase64, 
+                    createdAt: new Date().toISOString()
                 });
+
+                // Reset form
                 document.getElementById('user-full-name').value = '';
                 document.getElementById('user-birth').value = '';
                 document.getElementById('user-job').value = '';
                 fileInput.value = '';
-            } catch (e) { console.error(e); }
+                
+            } catch (e) { 
+                console.error("Error saving user:", e); 
+            } finally {
+                btn.disabled = false;
+                btn.innerText = "CREAR USUARIO";
+            }
         };
 
         window.deleteUser = async (id) => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)); } catch (e) { console.error(e); }
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id));
+            } catch (e) { console.error("Error deleting user:", e); }
         };
 
         window.saveActivity = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const date = document.getElementById('form-date').value;
             const activity = document.getElementById('form-activity').value;
-            const editId = document.getElementById('edit-activity-id').value;
             if(!date || !activity) return;
 
             const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
-                const i = row.querySelectorAll('input, select');
-                return i[0].value ? { titulo: i[0].value, autor: i[1].value, cantante: i[2].value, tonalidad: i[3].value } : null;
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { titulo: inputs[0].value, autor: inputs[1].value, cantante: inputs[2].value } : null;
             }).filter(i => i);
 
             const equipo = Array.from(document.querySelectorAll('#equipo-inputs > div')).map(row => {
-                const i = row.querySelectorAll('input, select');
-                return i[0].value ? { nombre: i[0].value, rol: i[1].value } : null;
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { nombre: inputs[0].value, rol: inputs[1].value } : null;
             }).filter(i => i);
 
             try {
-                if(editId) await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', editId), { date, activity, canciones, equipo });
-                else await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activities'), { date, activity, canciones, equipo });
-                resetIngresoForm();
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activities'), {
+                    date, activity, canciones, equipo
+                });
                 window.showSection('planificacion');
-            } catch (e) { console.error(e); }
+            } catch (e) { console.error("Error saving activity:", e); }
         };
 
-        window.resetIngresoForm = () => {
-            document.getElementById('edit-activity-id').value = '';
-            document.getElementById('form-date').value = '';
-            document.getElementById('form-activity').value = '';
-            document.getElementById('repertorio-inputs').innerHTML = '';
-            document.getElementById('equipo-inputs').innerHTML = '';
-            document.getElementById('ingreso-title').innerText = 'NUEVA ACTIVIDAD';
-            document.getElementById('btn-save-activity').innerText = 'GUARDAR PLANIFICACIÓN';
-            document.getElementById('btn-cancel-edit').classList.add('hidden');
-            window.addRepertorioRow();
-            window.addEquipoRow();
+        window.deleteActivity = async (id) => {
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id));
+                document.getElementById('day-details').classList.add('hidden');
+            } catch (e) { console.error("Error deleting activity:", e); }
         };
 
-        window.openEditSong = (key) => {
-            const song = JSON.parse(decodeURIComponent(key));
-            document.getElementById('modal-song-original-key').value = key;
-            document.getElementById('modal-song-title').value = song.titulo;
-            document.getElementById('modal-song-author').value = song.autor || '';
-            document.getElementById('modal-song-singer').value = song.cantante;
-            document.getElementById('modal-song-key').value = song.tonalidad || '';
-            document.getElementById('song-edit-modal').classList.remove('hidden');
-        };
-
-        window.closeSongModal = () => document.getElementById('song-edit-modal').classList.add('hidden');
-
-        window.saveSongFromModal = async () => {
-            const originalKeyStr = document.getElementById('modal-song-original-key').value;
-            const originalSong = JSON.parse(decodeURIComponent(originalKeyStr));
-            const newTitle = document.getElementById('modal-song-title').value.trim();
-            const newAuthor = document.getElementById('modal-song-author').value.trim();
-            const newSinger = document.getElementById('modal-song-singer').value;
-            const newKey = document.getElementById('modal-song-key').value;
-
-            if(!newTitle) return;
-
-            for(const act of window.activities) {
-                if(act.canciones) {
-                    let changed = false;
-                    const updatedCanciones = act.canciones.map(c => {
-                        if(c.titulo.toLowerCase() === originalSong.titulo.toLowerCase() && c.cantante === originalSong.cantante) {
-                            changed = true;
-                            return { ...c, titulo: newTitle, autor: newAuthor, cantante: newSinger, tonalidad: newKey };
-                        }
-                        return c;
-                    });
-                    if(changed) {
-                        try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: updatedCanciones }); } 
-                        catch(e) { console.error(e); }
-                    }
-                }
-            }
-            closeSongModal();
-        };
-
-        window.confirmDeleteSong = async (key) => {
-const firebaseConfig = {
-  apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
-  authDomain: "gerencia-de-energia.firebaseapp.com",
-  projectId: "gerencia-de-energia",
-  storageBucket: "gerencia-de-energia.firebasestorage.app",
-  messagingSenderId: "347966041919",
-  appId: "1:347966041919:web:71c81a1b60013478712d8a",
-  measurementId: "G-9X5RMXJB0T"
-};
-            if(!confirm(`¿Desea eliminar "${song.titulo}" del cancionero?`)) return;
-
-            for(const act of window.activities) {
-                if(act.canciones) {
-                    const filtered = act.canciones.filter(c => !(c.titulo.toLowerCase() === song.titulo.toLowerCase() && c.cantante === song.cantante));
-                    if(filtered.length !== act.canciones.length) {
-                        try { await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: filtered }); } 
-                        catch(e) { console.error(e); }
-                    }
-                }
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const main = document.getElementById('main-content');
+            sb.classList.toggle('closed');
+            if(window.innerWidth > 768) {
+                main.style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
             }
         };
 
-        window.renderSongbook = () => {
-            const filter = document.getElementById('filter-singer').value;
-            const container = document.getElementById('song-list');
-            if (!container) return;
+        window.showSection = (sectionId) => {
+            // Bloqueo de seguridad adicional por si intentan acceder vía consola
+            if((sectionId === 'ingreso' || sectionId === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') {
+                return;
+            }
 
-            let rawSongs = [];
-            window.activities.forEach(act => { if(act.canciones) rawSongs = [...rawSongs, ...act.canciones]; });
-
-            const uniqueSongsMap = new Map();
-            rawSongs.forEach(song => {
-                const key = `${song.titulo.trim().toLowerCase()}_${song.cantante.toLowerCase()}`;
-                if (!uniqueSongsMap.has(key)) uniqueSongsMap.set(key, song);
-            });
-
-            let finalSongs = Array.from(uniqueSongsMap.values());
-            if(filter !== 'all') finalSongs = finalSongs.filter(s => s.cantante === filter);
-            
-            document.getElementById('song-count-display').innerText = `Total: ${finalSongs.length} temas`;
-
-            const isAdmin = window.currentUser?.role === 'LIDER';
-            container.innerHTML = finalSongs.map(song => {
-                const songKey = encodeURIComponent(JSON.stringify(song));
-                return `
-                <tr class="hover:bg-white/5 transition-colors group">
-                    <td class="p-4 font-bold text-white">${song.titulo}</td>
-                    <td class="p-4 text-sm text-gray-400">${song.autor || '-'}</td>
-                    <td class="p-4"><span class="px-2 py-1 bg-silver/20 rounded-full text-[10px] text-silver-text border border-silver/30">${song.cantante}</span></td>
-                    <td class="p-4 text-silver-text font-bold">${song.tonalidad || '-'}</td>
-                    <td class="p-4 admin-only ${isAdmin ? '' : 'hidden'}">
-                        <div class="flex gap-2">
-                            <button onclick="window.openEditSong('${songKey}')" class="p-2 hover:bg-white/10 rounded transition-colors text-blue-400">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button onclick="window.confirmDeleteSong('${songKey}')" class="p-2 hover:bg-red-500/10 rounded transition-colors text-red-500">
-                                <i class="fas fa-trash-alt"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `}).join('');
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
+            const targetSection = document.getElementById(`section-${sectionId}`);
+            if (targetSection) {
+                targetSection.classList.remove('hidden-section');
+            }
+            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
+            if(window.innerWidth < 1024) {
+                const sb = document.getElementById('sidebar');
+                if(!sb.classList.contains('closed')) window.toggleSidebar();
+            }
         };
 
         window.renderMembers = () => {
             const container = document.getElementById('members-list');
             if (!container) return;
-            const sorted = [...window.allUsers].sort((a, b) => a.name.localeCompare(b.name));
-            container.innerHTML = sorted.map(u => `
-                <div class="glass-panel p-4 flex items-center gap-4 text-white">
-                    <img src="${u.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
+            container.innerHTML = window.allUsers.map(user => `
+                <div class="glass-panel p-4 flex items-center gap-4">
+                    <img src="${user.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
                     <div>
-                        <h4 class="font-bold">${u.name}</h4>
-                        <p class="text-xs text-gray-400">Nac: ${u.birth}</p>
-                        <p class="text-[10px] text-silver-text uppercase font-bold tracking-tighter bg-white/5 px-2 py-0.5 rounded mt-1 inline-block border border-white/10">${u.job || 'Miembro'}</p>
+                        <h4 class="font-bold text-white">${user.name}</h4>
+                        <p class="text-xs text-gray-400">Nac: ${user.birth}</p>
+                        <p class="text-xs text-silver-text uppercase font-bold mt-1">${user.job || 'Miembro'}</p>
                     </div>
                 </div>
             `).join('');
@@ -596,114 +548,142 @@ const firebaseConfig = {
         window.renderAdminUsers = () => {
             const container = document.getElementById('admin-user-list');
             if (!container) return;
-            const sorted = [...window.allUsers].sort((a, b) => a.name.localeCompare(b.name));
-            container.innerHTML = sorted.map(u => `
+            container.innerHTML = window.allUsers.map(user => `
                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
                     <div class="flex items-center gap-3">
-                        <img src="${u.photo}" class="w-8 h-8 rounded-full border border-white/20">
-                        <span class="text-sm font-medium">${u.name} <span class="text-[10px] text-gray-500 ml-1">(${u.role})</span></span>
+                        <img src="${user.photo}" class="w-8 h-8 rounded-full border border-white/20">
+                        <span>${user.name} (${user.role})</span>
                     </div>
-                    <button onclick="deleteUser('${u.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
+                    <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
         };
 
+        window.renderSongbook = () => {
+            const filter = document.getElementById('filter-singer').value;
+            const container = document.getElementById('song-list');
+            if (!container) return;
+            let todas = [];
+            window.activities.forEach(act => { if(act.canciones) todas = [...todas, ...act.canciones]; });
+            if(filter !== 'all') todas = todas.filter(s => s.cantante === filter);
+
+            container.innerHTML = todas.length ? todas.map(song => `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-4 font-bold">${song.titulo}</td>
+                    <td class="p-4 text-sm text-gray-400">${song.autor}</td>
+                    <td class="p-4"><span class="px-2 py-1 bg-silver/20 rounded-full text-xs">${song.cantante}</span></td>
+                </tr>
+            `).join('') : '<tr><td colspan="3" class="p-4 text-center text-gray-500">No hay canciones</td></tr>';
+        };
+
+        window.changeMonth = (delta) => {
+            window.currentDate.setMonth(window.currentDate.getMonth() + delta);
+            window.renderCalendar();
+        };
+
         window.renderCalendar = () => {
-            const months = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-            const m = window.currentDate.getMonth(), y = window.currentDate.getFullYear();
-            document.getElementById('calendar-month-year').innerText = `${months[m]} ${y}`;
-            const first = new Date(y, m, 1).getDay(), total = new Date(y, m + 1, 0).getDate();
-            const el = document.getElementById('calendar-days'); el.innerHTML = '';
-            for(let i=0; i<first; i++) el.innerHTML += '<div></div>';
-            for(let d=1; d<=total; d++) {
-                const ds = `${y}-${String(m+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                el.innerHTML += `<div class="calendar-day ${window.activities.find(a => a.date === ds) ? 'has-event' : ''}" onclick="showDayDetails('${ds}')">${d}</div>`;
+            const monthNames = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+            const month = window.currentDate.getMonth();
+            const year = window.currentDate.getFullYear();
+            const titleEl = document.getElementById('calendar-month-year');
+            if (titleEl) titleEl.innerText = `${monthNames[month]} ${year}`;
+            
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const calendarEl = document.getElementById('calendar-days');
+            if (!calendarEl) return;
+            
+            calendarEl.innerHTML = '';
+            for(let i=0; i<firstDay; i++) calendarEl.innerHTML += '<div></div>';
+            for(let d=1; d<=daysInMonth; d++) {
+                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                const hasEvent = window.activities.find(a => a.date === dateStr);
+                calendarEl.innerHTML += `<div class="calendar-day ${hasEvent ? 'has-event' : ''}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
             }
         };
 
-        window.showDayDetails = (ds) => {
-            const act = window.activities.find(a => a.date === ds), c = document.getElementById('detail-content');
-            document.getElementById('day-details').classList.remove('hidden');
-            document.getElementById('detail-date').innerText = ds;
+        window.showDayDetails = (dateStr) => {
+            const act = window.activities.find(a => a.date === dateStr);
+            const detailPanel = document.getElementById('day-details');
+            const content = document.getElementById('detail-content');
+            document.getElementById('detail-date').innerText = dateStr;
+            detailPanel.classList.remove('hidden');
             if(act) {
-                const isAdmin = window.currentUser?.role === 'LIDER';
-                c.innerHTML = `
-                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">ACTIVIDAD</p><h4 class="text-xl font-bold">${act.activity}</h4></div>
-                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase mb-2">REPERTORIO</p><ul class="text-sm space-y-1">${act.canciones?.map(s => `<li>• <b>${s.titulo}</b> (${s.cantante}) <span class="text-silver-text font-bold">${s.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul></div>
-                    <div class="mb-6"><p class="text-[10px] text-gray-500 uppercase mb-2">EQUIPO</p><div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic text-xs">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div></div>
-                    ${isAdmin ? `<div class="flex gap-2"><button onclick="editActivity('${act.id}')" class="flex-1 text-white text-[10px] border border-silver px-3 py-2 rounded uppercase font-bold">MODIFICAR</button><button onclick="deleteActivity('${act.id}')" class="text-red-500 text-[10px] border border-red-500/30 px-3 py-2 rounded"><i class="fas fa-trash"></i></button></div>` : ''}
+                content.innerHTML = `
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500">ACTIVIDAD</p>
+                        <h4 class="text-xl font-bold mb-2">${act.activity}</h4>
+                    </div>
+                    <div class="mb-4">
+                        <p class="text-xs text-gray-500 mb-2">REPERTORIO</p>
+                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante})</li>`).join('') || 'Sin canciones'}</ul>
+                    </div>
+                    <div class="mb-6">
+                        <p class="text-xs text-gray-500 mb-2">EQUIPO</p>
+                        <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div>
+                    </div>
+                    ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-xs border border-red-500/30 px-3 py-2 rounded hover:bg-red-500/10 w-full transition-all">ELIMINAR</button>` : ''}
                 `;
-            } else c.innerHTML = `<p class="text-gray-500 italic">Sin actividades.</p>`;
+            } else content.innerHTML = `<p class="text-gray-500 italic">Sin actividades.</p>`;
         };
 
-        window.editActivity = (id) => {
-            const act = window.activities.find(a => a.id === id);
-            if(!act) return;
-            window.showSection('ingreso');
-            document.getElementById('ingreso-title').innerText = 'MODIFICAR ACTIVIDAD';
-            document.getElementById('edit-activity-id').value = id;
-            document.getElementById('form-date').value = act.date;
-            document.getElementById('form-activity').value = act.activity;
-            document.getElementById('btn-save-activity').innerText = 'ACTUALIZAR CAMBIOS';
-            document.getElementById('btn-cancel-edit').classList.remove('hidden');
-            document.getElementById('repertorio-inputs').innerHTML = '';
-            if(act.canciones?.length) act.canciones.forEach(c => window.addRepertorioRow(c));
-            else window.addRepertorioRow();
-            document.getElementById('equipo-inputs').innerHTML = '';
-            if(act.equipo?.length) act.equipo.forEach(e => window.addEquipoRow(e));
-            else window.addEquipoRow();
-        };
-
-        window.deleteActivity = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id)); document.getElementById('day-details').classList.add('hidden'); } catch (e) { console.error(e); }
-        };
-
-        window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
-
-        window.addRepertorioRow = (data = null) => {
-            const div = document.createElement('div'); div.className = "grid grid-cols-4 gap-2";
-            div.innerHTML = `
-                <input type="text" placeholder="Canción" class="text-xs" value="${data?.titulo || ''}">
-                <input type="text" placeholder="Autor" class="text-xs" value="${data?.autor || ''}">
-                <select class="text-xs">${['Alejandro', 'Alejandra', 'Diana', 'Mery', 'Marianny', 'Nelly', 'Nicole'].map(n => `<option value="${n}" ${data?.cantante === n ? 'selected' : ''}>${n}</option>`).join('')}</select>
-                <select class="text-xs"><option value="">Ton</option>${TONALIDADES.map(t => `<option value="${t}" ${data?.tonalidad === t ? 'selected' : ''}>${t}</option>`).join('')}</select>
-            `;
+        window.addRepertorioRow = () => {
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-3 gap-2";
+            div.innerHTML = `<input type="text" placeholder="Canción" class="text-sm"><input type="text" placeholder="Autor" class="text-sm"><select class="text-sm"><option value="Diana">Diana</option><option value="Mery">Mery</option><option value="Marianny">Marianny</option><option value="Nelly">Nelly</option><option value="Nicole">Nicole</option></select>`;
             document.getElementById('repertorio-inputs').appendChild(div);
         };
 
-        window.addEquipoRow = (data = null) => {
-            const div = document.createElement('div'); div.className = "grid grid-cols-2 gap-2";
-            const roles = ['baterista', 'bajista', 'tecladista', 'violinista', 'guitarrista', 'coro', 'director', 'sonidista'];
-            div.innerHTML = `<input type="text" placeholder="Nombre" class="text-sm" value="${data?.nombre || ''}"><select class="text-sm">${roles.map(r => `<option value="${r}" ${data?.rol === r ? 'selected' : ''}>${r.charAt(0).toUpperCase()+r.slice(1)}</option>`).join('')}</select>`;
+        window.addEquipoRow = () => {
+            const div = document.createElement('div');
+            div.className = "grid grid-cols-2 gap-2";
+            div.innerHTML = `<input type="text" placeholder="Nombre" class="text-sm"><select class="text-sm"><option value="baterista">Baterista</option><option value="bajista">Bajista</option><option value="tecladista">Tecladista</option><option value="violinista">Violinista</option><option value="guitarrista">Guitarrista</option><option value="coro">Coro</option><option value="director">Director</option><option value="sonidista">Sonidista</option></select>`;
             document.getElementById('equipo-inputs').appendChild(div);
         };
 
-        window.toggleSidebar = () => {
-            const sb = document.getElementById('sidebar');
-            sb.classList.toggle('closed');
-            if(window.innerWidth > 768) document.getElementById('main-content').style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
+        const renderAll = () => { 
+            window.renderMembers(); 
+            window.renderAdminUsers(); 
+            window.renderCalendar(); 
+            window.renderSongbook(); 
         };
 
-        window.showSection = (id) => {
-            if((id === 'ingreso' || id === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') return;
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
-            document.getElementById(`section-${id}`).classList.remove('hidden-section');
-            document.getElementById('current-section-title').innerText = id.replace('-', ' ');
-            if(window.innerWidth < 1024 && !document.getElementById('sidebar').classList.contains('closed')) window.toggleSidebar();
-        };
-
-        const renderAll = () => { renderMembers(); renderAdminUsers(); renderCalendar(); renderSongbook(); setupPermissions(); };
         const startFirestoreListeners = () => {
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), s => { window.allUsers = s.docs.map(d => ({id: d.id, ...d.data()})); renderMembers(); renderAdminUsers(); });
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), s => { window.activities = s.docs.map(d => ({id: d.id, ...d.data()})); renderCalendar(); renderSongbook(); });
+            const qUsers = query(collection(db, 'artifacts', appId, 'public', 'data', 'users'));
+            onSnapshot(qUsers, (snapshot) => {
+                window.allUsers = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                window.renderMembers();
+                window.renderAdminUsers();
+            }, (err) => console.error("Error users listener:", err));
+
+            const qActs = query(collection(db, 'artifacts', appId, 'public', 'data', 'activities'));
+            onSnapshot(qActs, (snapshot) => {
+                window.activities = snapshot.docs.map(d => ({id: d.id, ...d.data()}));
+                window.renderCalendar();
+                window.renderSongbook();
+            }, (err) => console.error("Error activities listener:", err));
         };
 
-        onAuthStateChanged(auth, async u => { 
-            if (u) startFirestoreListeners(); 
-            else { if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token); else await signInAnonymously(auth); }
+        const initializeAuth = async () => {
+            try {
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+            } catch (error) {
+                console.error("Auth error:", error);
+            }
+        };
+
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                startFirestoreListeners();
+            }
         });
+
+        initializeAuth();
+
     </script>
 </body>
 </html>
-
