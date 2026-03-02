@@ -236,7 +236,12 @@
                         <div id="calendar-days" class="calendar-grid"></div>
                     </div>
                     <div id="day-details" class="flex-1 glass-panel p-6 border-l-4 border-silver hidden">
-                        <h3 id="detail-date" class="text-xl font-bold silver-text mb-4"></h3>
+                        <div class="flex justify-between items-start mb-4">
+                            <h3 id="detail-date" class="text-xl font-bold silver-text"></h3>
+                            <div id="detail-actions" class="hidden flex gap-2">
+                                <button id="btn-edit-activity" class="text-blue-400 text-xs uppercase hover:underline">Editar</button>
+                            </div>
+                        </div>
                         <div id="detail-content"></div>
                     </div>
                 </div>
@@ -261,13 +266,13 @@
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
                             <div id="repertorio-inputs" class="space-y-2 mb-3"></div>
-                            <button onclick="addRepertorioRow()" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
+                            <button onclick="addRepertorioRow('repertorio-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
                         </div>
 
                         <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                             <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO DE TRABAJO</h4>
                             <div id="equipo-inputs" class="space-y-2 mb-3"></div>
-                            <button onclick="addEquipoRow()" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
+                            <button onclick="addEquipoRow('equipo-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
                         </div>
 
                         <button onclick="saveActivity()" class="w-full btn-silver p-3 rounded-lg mt-4">GUARDAR PLANIFICACIÓN</button>
@@ -304,7 +309,7 @@
         </main>
     </div>
 
-    <!-- Modal Editar Canción -->
+    <!-- Modal Editar Canción (Cancionero) -->
     <div id="modal-edit-song" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-md">
             <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider">Editar Canción</h3>
@@ -332,11 +337,48 @@
                 </div>
                 <div>
                     <label class="text-[10px] text-gray-500 block mb-1">TONALIDAD</label>
-                    <select id="edit-song-key" class="w-full"></select>
+                    <select id="edit-song-key" class="w-full edit-key-select"></select>
                 </div>
                 <div class="flex gap-3 pt-4">
                     <button onclick="closeEditModal()" class="flex-1 p-3 text-xs text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
                     <button onclick="processSongUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR CAMBIOS</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Actividad (Planificación) -->
+    <div id="modal-edit-activity" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
+        <div class="glass-panel p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider border-b border-white/10 pb-2">Editar Actividad</h3>
+            <input type="hidden" id="edit-activity-id">
+            <div class="space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">FECHA</label>
+                        <input type="date" id="edit-activity-date" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">NOMBRE</label>
+                        <input type="text" id="edit-activity-name" class="w-full">
+                    </div>
+                </div>
+
+                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
+                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
+                    <div id="edit-repertorio-inputs" class="space-y-2 mb-3"></div>
+                    <button onclick="addRepertorioRow('edit-repertorio-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
+                </div>
+
+                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
+                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO</h4>
+                    <div id="edit-equipo-inputs" class="space-y-2 mb-3"></div>
+                    <button onclick="addEquipoRow('edit-equipo-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
+                </div>
+
+                <div class="flex gap-4 pt-4">
+                    <button onclick="closeEditActivityModal()" class="flex-1 p-3 text-sm text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
+                    <button onclick="processActivityUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-sm">GUARDAR CAMBIOS</button>
                 </div>
             </div>
         </div>
@@ -348,7 +390,7 @@
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-      const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
   authDomain: "gerencia-de-energia.firebaseapp.com",
   projectId: "gerencia-de-energia",
@@ -371,7 +413,7 @@
 
         // Init tonalidad selects
         const initKeySelects = () => {
-            const selects = document.querySelectorAll('#edit-song-key');
+            const selects = document.querySelectorAll('.edit-key-select');
             selects.forEach(s => {
                 s.innerHTML = '<option value="">Sin tono</option>' + TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('');
             });
@@ -412,6 +454,7 @@
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
+            document.getElementById('detail-actions').classList.toggle('hidden', !isLider);
         };
 
         const fileToBase64 = (file) => {
@@ -486,8 +529,8 @@
                 document.getElementById('form-activity').value = '';
                 document.getElementById('repertorio-inputs').innerHTML = '';
                 document.getElementById('equipo-inputs').innerHTML = '';
-                window.addRepertorioRow();
-                window.addEquipoRow();
+                window.addRepertorioRow('repertorio-inputs');
+                window.addEquipoRow('equipo-inputs');
                 window.showSection('planificacion');
             } catch (e) { console.error(e); }
         };
@@ -525,7 +568,6 @@
                 tonalidad: document.getElementById('edit-song-key').value
             };
 
-            // Recorrer todas las actividades para actualizar esta canción en donde aparezca
             for(const act of window.activities) {
                 if(act.canciones) {
                     let changed = false;
@@ -566,6 +608,65 @@
             }
         };
 
+        // --- LÓGICA DE EDICIÓN DE ACTIVIDAD ---
+        window.openEditActivity = (id) => {
+            const act = window.activities.find(a => a.id === id);
+            if (!act) return;
+
+            document.getElementById('edit-activity-id').value = act.id;
+            document.getElementById('edit-activity-date').value = act.date;
+            document.getElementById('edit-activity-name').value = act.activity;
+
+            const repContainer = document.getElementById('edit-repertorio-inputs');
+            repContainer.innerHTML = '';
+            if (act.canciones && act.canciones.length) {
+                act.canciones.forEach(c => addRepertorioRow('edit-repertorio-inputs', c));
+            } else {
+                addRepertorioRow('edit-repertorio-inputs');
+            }
+
+            const eqContainer = document.getElementById('edit-equipo-inputs');
+            eqContainer.innerHTML = '';
+            if (act.equipo && act.equipo.length) {
+                act.equipo.forEach(e => addEquipoRow('edit-equipo-inputs', e));
+            } else {
+                addEquipoRow('edit-equipo-inputs');
+            }
+
+            document.getElementById('modal-edit-activity').classList.remove('hidden');
+        };
+
+        window.closeEditActivityModal = () => document.getElementById('modal-edit-activity').classList.add('hidden');
+
+        window.processActivityUpdate = async () => {
+            const id = document.getElementById('edit-activity-id').value;
+            const date = document.getElementById('edit-activity-date').value;
+            const activity = document.getElementById('edit-activity-name').value;
+
+            const canciones = Array.from(document.querySelectorAll('#edit-repertorio-inputs > div')).map(row => {
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { 
+                    titulo: inputs[0].value.trim(), 
+                    autor: inputs[1].value.trim(), 
+                    cantante: inputs[2].value,
+                    tonalidad: inputs[3].value
+                } : null;
+            }).filter(i => i);
+
+            const equipo = Array.from(document.querySelectorAll('#edit-equipo-inputs > div')).map(row => {
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { nombre: inputs[0].value, rol: inputs[1].value } : null;
+            }).filter(i => i);
+
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id), {
+                    date, activity, canciones, equipo
+                });
+                closeEditActivityModal();
+                showDayDetails(date);
+            } catch (e) { console.error(e); }
+        };
+
         // --- RENDERS ---
         window.renderMembers = () => {
             const container = document.getElementById('members-list');
@@ -601,7 +702,6 @@
             const container = document.getElementById('song-list');
             if (!container) return;
 
-            // Unificar canciones únicas
             let todasMap = new Map();
             window.activities.forEach(act => { 
                 if(act.canciones) {
@@ -659,9 +759,13 @@
             const act = window.activities.find(a => a.date === dateStr);
             const detailPanel = document.getElementById('day-details');
             const content = document.getElementById('detail-content');
+            const editBtn = document.getElementById('btn-edit-activity');
+            
             document.getElementById('detail-date').innerText = dateStr;
             detailPanel.classList.remove('hidden');
+            
             if(act) {
+                editBtn.onclick = () => openEditActivity(act.id);
                 content.innerHTML = `
                     <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">Actividad</p><h4 class="text-xl font-bold mb-2">${act.activity}</h4></div>
                     <div class="mb-4"><p class="text-[10px] text-gray-500 mb-2 uppercase">Repertorio</p>
@@ -672,36 +776,44 @@
                     </div>
                     ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-[10px] font-bold tracking-widest border border-red-500/30 px-3 py-2 rounded hover:bg-red-500/10 w-full transition-all uppercase">Eliminar Actividad</button>` : ''}
                 `;
-            } else content.innerHTML = `<p class="text-gray-500 italic text-sm">Sin actividades registradas.</p>`;
+            } else {
+                content.innerHTML = `<p class="text-gray-500 italic text-sm">Sin actividades registradas.</p>`;
+            }
+            setupPermissions();
         };
 
-        window.addRepertorioRow = () => {
+        window.addRepertorioRow = (targetId, data = null) => {
             const div = document.createElement('div');
             div.className = "grid grid-cols-4 gap-2";
             div.innerHTML = `
-                <input type="text" placeholder="Canción" class="text-xs">
-                <input type="text" placeholder="Autor" class="text-xs">
+                <input type="text" placeholder="Canción" class="text-xs" value="${data ? data.titulo : ''}">
+                <input type="text" placeholder="Autor" class="text-xs" value="${data ? (data.autor || '') : ''}">
                 <select class="text-xs">
-                    <option value="Alejandro">Alejandro</option>
-                    <option value="Alejandra">Alejandra</option>
-                    <option value="Diana">Diana</option>
-                    <option value="Mery">Mery</option>
-                    <option value="Marianny">Marianny</option>
-                    <option value="Nelly">Nelly</option>
-                    <option value="Nicole">Nicole</option>
+                    <option value="Alejandro" ${data && data.cantante === 'Alejandro' ? 'selected' : ''}>Alejandro</option>
+                    <option value="Alejandra" ${data && data.cantante === 'Alejandra' ? 'selected' : ''}>Alejandra</option>
+                    <option value="Diana" ${data && data.cantante === 'Diana' ? 'selected' : ''}>Diana</option>
+                    <option value="Mery" ${data && data.cantante === 'Mery' ? 'selected' : ''}>Mery</option>
+                    <option value="Marianny" ${data && data.cantante === 'Marianny' ? 'selected' : ''}>Marianny</option>
+                    <option value="Nelly" ${data && data.cantante === 'Nelly' ? 'selected' : ''}>Nelly</option>
+                    <option value="Nicole" ${data && data.cantante === 'Nicole' ? 'selected' : ''}>Nicole</option>
                 </select>
-                <select class="text-xs">
+                <select class="text-xs edit-key-select">
                     <option value="">Tono</option>
-                    ${TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('')}
+                    ${TONALIDADES.map(t => `<option value="${t}" ${data && data.tonalidad === t ? 'selected' : ''}>${t}</option>`).join('')}
                 </select>`;
-            document.getElementById('repertorio-inputs').appendChild(div);
+            document.getElementById(targetId).appendChild(div);
         };
 
-        window.addEquipoRow = () => {
+        window.addEquipoRow = (targetId, data = null) => {
+            const roles = ["baterista", "bajista", "tecladista", "violinista", "guitarrista", "coro", "director", "sonidista"];
             const div = document.createElement('div');
             div.className = "grid grid-cols-2 gap-2";
-            div.innerHTML = `<input type="text" placeholder="Nombre" class="text-sm"><select class="text-sm uppercase"><option value="baterista">Baterista</option><option value="bajista">Bajista</option><option value="tecladista">Tecladista</option><option value="violinista">Violinista</option><option value="guitarrista">Guitarrista</option><option value="coro">Coro</option><option value="director">Director</option><option value="sonidista">Sonidista</option></select>`;
-            document.getElementById('equipo-inputs').appendChild(div);
+            div.innerHTML = `
+                <input type="text" placeholder="Nombre" class="text-sm" value="${data ? data.nombre : ''}">
+                <select class="text-sm uppercase">
+                    ${roles.map(r => `<option value="${r}" ${data && data.rol === r ? 'selected' : ''}>${r.charAt(0).toUpperCase() + r.slice(1)}</option>`).join('')}
+                </select>`;
+            document.getElementById(targetId).appendChild(div);
         };
 
         window.toggleSidebar = () => {
@@ -746,8 +858,8 @@
         };
         initializeAuth();
         initKeySelects();
-        window.addRepertorioRow();
-        window.addEquipoRow();
+        window.addRepertorioRow('repertorio-inputs');
+        window.addEquipoRow('equipo-inputs');
     </script>
 </body>
 </html>
