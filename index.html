@@ -271,7 +271,7 @@
                                         <option value="Nelly">Nelly</option>
                                         <option value="Nicole">Nicole</option>
                                     </select
-                             <input type="text" placeholder="Tonalidad" class="col-span-1 text-sm">
+                                    <input type="text" placeholder="Tonalidad" class="col-span-1 text-sm">
                                 </div>
                             </div>
                             <button onclick="addRepertorioRow()" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
@@ -482,7 +482,7 @@
 
             const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
                 const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { titulo: inputs[0].value, autor: inputs[1].value, cantante: inputs[2].value } : null;
+                return inputs[0].value ? { titulo: inputs[0].value, autor: inputs[1].value, cantante: inputs[2].value, Tonalidad: inputs[3].value } : null;
             }).filter(i => i);
 
             const equipo = Array.from(document.querySelectorAll('#equipo-inputs > div')).map(row => {
@@ -633,7 +633,7 @@
         window.addRepertorioRow = () => {
             const div = document.createElement('div');
             div.className = "grid grid-cols-3 gap-2";
-            div.innerHTML = `<input type="text" placeholder="Canción" class="text-sm"><input type="text" placeholder="Autor" class="text-sm"><select class="text-sm"><option value="Diana">Diana</option><option value="Mery">Mery</option><option value="Marianny">Marianny</option><option value="Nelly">Nelly</option><option value="Nicole">Nicole</option></select>`;
+            div.innerHTML = `<input type="text" placeholder="Canción" class="text-sm"><input type="text" placeholder="Autor" class="text-sm"><select class="text-sm"><option value="Alejandro">Alejandro</option><option value="Alejandra">Alejandra</option><option value="Diana">Diana</option><option value="Mery">Mery</option><option value="Marianny">Marianny</option><option value="Nelly">Nelly</option><option value="Nicole">Nicole</option></select>`;
             document.getElementById('repertorio-inputs').appendChild(div);
         };
 
@@ -690,6 +690,7 @@
     </script>
 </body>
 </html>
+
 
 
 
