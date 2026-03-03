@@ -768,6 +768,14 @@ const firebaseConfig = {
                 editBtn.onclick = () => openEditActivity(act.id);
                 content.innerHTML = `
                     <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">Actividad</p><h4 class="text-xl font-bold mb-2">${act.activity}</h4></div>
+                                        
+                    ${act.notes ? `
+                    <div class="mb-4 p-3 bg-silver/5 border border-silver/10 rounded-lg">
+                        <p class="text-[10px] text-silver-text uppercase font-bold mb-1">Nota Especial</p>
+                        <p class="text-xs text-gray-300 italic">${act.notes}</p>
+                    </div>
+                    ` : ''}
+                    
                     <div class="mb-4"><p class="text-[10px] text-gray-500 mb-2 uppercase">Repertorio</p>
                         <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> - ${c.autor} (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul>
                     </div>
@@ -863,5 +871,6 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+
 
 
