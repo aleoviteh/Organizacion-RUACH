@@ -616,6 +616,7 @@ const firebaseConfig = {
             document.getElementById('edit-activity-id').value = act.id;
             document.getElementById('edit-activity-date').value = act.date;
             document.getElementById('edit-activity-name').value = act.activity;
+            document.getElementById('edit-activity-notes').value = act.notes || '';
 
             const repContainer = document.getElementById('edit-repertorio-inputs');
             repContainer.innerHTML = '';
@@ -642,6 +643,7 @@ const firebaseConfig = {
             const id = document.getElementById('edit-activity-id').value;
             const date = document.getElementById('edit-activity-date').value;
             const activity = document.getElementById('edit-activity-name').value;
+            const notes = document.getElementById('edit-activity-notes').value.trim();
 
             const canciones = Array.from(document.querySelectorAll('#edit-repertorio-inputs > div')).map(row => {
                 const inputs = row.querySelectorAll('input, select');
@@ -871,6 +873,7 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+
 
 
 
