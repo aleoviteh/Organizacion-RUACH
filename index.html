@@ -504,6 +504,7 @@ const firebaseConfig = {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const date = document.getElementById('form-date').value;
             const activity = document.getElementById('form-activity').value;
+            const notes = document.getElementById('form-notes').value.trim();
             if(!date || !activity) return;
 
             const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
@@ -523,10 +524,11 @@ const firebaseConfig = {
 
             try {
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activities'), {
-                    date, activity, canciones, equipo
+                    date, activity, canciones, equipo, notes
                 });
                 document.getElementById('form-date').value = '';
                 document.getElementById('form-activity').value = '';
+                document.getElementById('form-notes').value = '';
                 document.getElementById('repertorio-inputs').innerHTML = '';
                 document.getElementById('equipo-inputs').innerHTML = '';
                 window.addRepertorioRow('repertorio-inputs');
@@ -873,6 +875,7 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+
 
 
 
