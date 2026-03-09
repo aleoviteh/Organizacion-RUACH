@@ -116,6 +116,42 @@
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(5px);
         }
+
+        /* Galeria Styles */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 10px;
+            aspect-ratio: 1;
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.1);
+        }
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 10px;
+        }
+        .gallery-item:hover .gallery-overlay {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -161,6 +197,9 @@
                     </li>
                     <li onclick="showSection('planificacion')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-calendar-alt w-6"></i> PLANIFICACION
+                    </li>
+                    <li onclick="showSection('galeria')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
+                        <i class="fas fa-images w-6"></i> GALERIA
                     </li>
                     <li id="menu-ingreso" onclick="showSection('ingreso')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
                         <i class="fas fa-plus-circle w-6 text-green-400"></i> INGRESO
@@ -244,6 +283,27 @@
                         </div>
                         <div id="detail-content"></div>
                     </div>
+                </div>
+            </section>
+
+            <!-- Sección: GALERIA -->
+            <section id="section-galeria" class="section-content hidden-section">
+                <div class="glass-panel p-6 mb-8">
+                    <div class="flex flex-col md:flex-row items-center gap-4 justify-between">
+                        <div>
+                            <h3 class="text-lg font-bold silver-text uppercase">Fotos del Ministerio</h3>
+                            <p class="text-xs text-gray-500">Comparte los mejores momentos del equipo</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <input type="file" id="gallery-upload-input" accept="image/*" class="hidden" onchange="uploadToGallery()">
+                            <button onclick="document.getElementById('gallery-upload-input').click()" class="btn-silver px-4 py-2 rounded-lg text-xs flex items-center gap-2">
+                                <i class="fas fa-upload"></i> SUBIR FOTO
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div id="gallery-container" class="gallery-grid">
+                    <!-- Dinámico -->
                 </div>
             </section>
 
@@ -400,7 +460,7 @@
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-      const firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
   authDomain: "gerencia-de-energia.firebaseapp.com",
   projectId: "gerencia-de-energia",
@@ -418,6 +478,7 @@
         window.currentUser = null;
         window.allUsers = [];
         window.activities = [];
+        window.galleryPhotos = [];
         window.currentDate = new Date();
         const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
 
@@ -476,6 +537,7 @@
             });
         };
 
+        // --- USERS ---
         window.saveUser = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const name = document.getElementById('user-full-name').value;
@@ -510,6 +572,50 @@
             }
         };
 
+        // --- GALERIA ---
+        window.uploadToGallery = async () => {
+            const fileInput = document.getElementById('gallery-upload-input');
+            if (!fileInput.files || !fileInput.files[0]) return;
+            
+            try {
+                const base64 = await fileToBase64(fileInput.files[0]);
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
+                    image: base64,
+                    uploadedBy: window.currentUser?.name || 'Anónimo',
+                    date: new Date().toISOString()
+                });
+                fileInput.value = '';
+            } catch (e) {
+                console.error("Error subiendo foto:", e);
+            }
+        };
+
+        window.deleteFromGallery = async (id) => {
+            if (window.currentUser?.role !== 'LIDER') return;
+            if(confirm("¿Deseas eliminar esta foto de la galería?")) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gallery', id));
+                } catch (e) { console.error(e); }
+            }
+        };
+
+        window.renderGallery = () => {
+            const container = document.getElementById('gallery-container');
+            if (!container) return;
+            const isLider = window.currentUser?.role === 'LIDER';
+            
+            container.innerHTML = window.galleryPhotos.length ? window.galleryPhotos.map(photo => `
+                <div class="gallery-item group">
+                    <img src="${photo.image}" loading="lazy">
+                    <div class="gallery-overlay">
+                        <p class="text-[10px] text-white/80 italic">Subida por: ${photo.uploadedBy}</p>
+                        ${isLider ? `<button onclick="deleteFromGallery('${photo.id}')" class="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full text-[10px] hover:bg-red-600 transition-colors"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="col-span-full py-12 text-center text-gray-500 italic">No hay fotos en la galería todavía. ¡Sube la primera!</div>';
+        };
+
+        // --- PLANIFICACION ---
         window.saveActivity = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const date = document.getElementById('form-date').value;
@@ -791,7 +897,7 @@
                     ` : ''}
 
                     <div class="mb-4"><p class="text-[10px] text-gray-500 mb-2 uppercase">Repertorio</p>
-                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> - ${c.autor} (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul>
+                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul>
                     </div>
                     <div class="mb-6"><p class="text-[10px] text-gray-500 mb-2 uppercase">Equipo</p>
                         <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic text-[10px] uppercase">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div>
@@ -858,7 +964,13 @@
 
         window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
 
-        const renderAll = () => { window.renderMembers(); window.renderAdminUsers(); window.renderCalendar(); window.renderSongbook(); };
+        const renderAll = () => { 
+            window.renderMembers(); 
+            window.renderAdminUsers(); 
+            window.renderCalendar(); 
+            window.renderSongbook(); 
+            window.renderGallery();
+        };
 
         const startFirestoreListeners = () => {
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), (s) => {
@@ -869,6 +981,11 @@
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), (s) => {
                 window.activities = s.docs.map(d => ({id: d.id, ...d.data()}));
                 window.renderCalendar(); window.renderSongbook();
+            }, (e) => console.error(e));
+
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'gallery')), (s) => {
+                window.galleryPhotos = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => new Date(b.date) - new Date(a.date));
+                window.renderGallery();
             }, (e) => console.error(e));
         };
 
@@ -885,4 +1002,3 @@
     </script>
 </body>
 </html>
-
