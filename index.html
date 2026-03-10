@@ -152,6 +152,14 @@
         .gallery-item:hover .gallery-overlay {
             opacity: 1;
         }
+
+        /* Song Image Modal */
+        #song-image-viewer img {
+            max-width: 90vw;
+            max-height: 80vh;
+            border-radius: 8px;
+            box-shadow: 0 0 30px rgba(255,255,255,0.1);
+        }
     </style>
 </head>
 <body>
@@ -252,6 +260,7 @@
                                 <th class="p-4">Autor</th>
                                 <th class="p-4">Cantante</th>
                                 <th class="p-4">Tonalidad</th>
+                                <th class="p-4">Ver</th>
                                 <th class="p-4 actions-column hidden">Acciones</th>
                             </tr>
                         </thead>
@@ -404,12 +413,25 @@
                     <label class="text-[10px] text-gray-500 block mb-1">TONALIDAD</label>
                     <select id="edit-song-key" class="w-full edit-key-select"></select>
                 </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 block mb-1">SUBIR PARTITURA / LETRA (Imagen)</label>
+                    <input type="file" id="edit-song-image-input" accept="image/*" class="w-full text-xs">
+                </div>
                 <div class="flex gap-3 pt-4">
                     <button onclick="closeEditModal()" class="flex-1 p-3 text-xs text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
-                    <button onclick="processSongUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR CAMBIOS</button>
+                    <button id="btn-save-song-edit" onclick="processSongUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR CAMBIOS</button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- Visor de Imagen de Canción -->
+    <div id="song-image-viewer" class="fixed inset-0 modal-overlay z-[300] flex flex-col items-center justify-center p-4 hidden">
+        <button onclick="closeSongImage()" class="absolute top-6 right-6 text-white text-3xl"><i class="fas fa-times"></i></button>
+        <div id="song-image-container" class="animate-in fade-in zoom-in duration-300">
+            <!-- Img se carga aquí -->
+        </div>
+        <p id="song-image-title" class="mt-4 text-xl font-bold silver-text"></p>
     </div>
 
     <!-- Modal Editar Actividad (Planificación) -->
@@ -671,6 +693,7 @@ const firebaseConfig = {
             document.getElementById('edit-song-author').value = song.autor || '';
             document.getElementById('edit-song-singer').value = song.cantante;
             document.getElementById('edit-song-key').value = song.tonalidad || '';
+            document.getElementById('edit-song-image-input').value = '';
             document.getElementById('modal-edit-song').classList.remove('hidden');
         };
 
@@ -679,17 +702,30 @@ const firebaseConfig = {
         window.processSongUpdate = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const original = JSON.parse(decodeURIComponent(document.getElementById('edit-song-original-id').value));
+            const imgInput = document.getElementById('edit-song-image-input');
+            const btn = document.getElementById('btn-save-song-edit');
+            
+            btn.disabled = true;
+            btn.innerText = "ACTUALIZANDO...";
+
+            let newImageData = original.image || null;
+            if(imgInput.files && imgInput.files[0]) {
+                newImageData = await fileToBase64(imgInput.files[0]);
+            }
+
             const updated = {
                 titulo: document.getElementById('edit-song-title').value.trim(),
                 autor: document.getElementById('edit-song-author').value.trim(),
                 cantante: document.getElementById('edit-song-singer').value,
-                tonalidad: document.getElementById('edit-song-key').value
+                tonalidad: document.getElementById('edit-song-key').value,
+                image: newImageData
             };
 
             for(const act of window.activities) {
                 if(act.canciones) {
                     let changed = false;
                     const newSongs = act.canciones.map(s => {
+                        // Buscamos coincidencia exacta de título y cantante
                         if(s.titulo.toLowerCase() === original.titulo.toLowerCase() && s.cantante === original.cantante) {
                             changed = true;
                             return updated;
@@ -703,6 +739,8 @@ const firebaseConfig = {
                     }
                 }
             }
+            btn.disabled = false;
+            btn.innerText = "GUARDAR CAMBIOS";
             closeEditModal();
         };
 
@@ -724,6 +762,24 @@ const firebaseConfig = {
                     }
                 }
             }
+        };
+
+        // --- VISOR DE IMAGEN CANCIÓN ---
+        window.openSongImage = (encodedData) => {
+            const song = JSON.parse(decodeURIComponent(encodedData));
+            if(!song.image) return;
+            
+            const viewer = document.getElementById('song-image-viewer');
+            const container = document.getElementById('song-image-container');
+            const title = document.getElementById('song-image-title');
+            
+            container.innerHTML = `<img src="${song.image}" alt="${song.titulo}">`;
+            title.innerText = `${song.titulo} - ${song.cantante}`;
+            viewer.classList.remove('hidden');
+        };
+
+        window.closeSongImage = () => {
+            document.getElementById('song-image-viewer').classList.add('hidden');
         };
 
         // --- EDICIÓN DE ACTIVIDAD ---
@@ -769,7 +825,8 @@ const firebaseConfig = {
                     titulo: inputs[0].value.trim(), 
                     autor: inputs[1].value.trim(), 
                     cantante: inputs[2].value,
-                    tonalidad: inputs[3].value
+                    tonalidad: inputs[3].value,
+                    image: null // Se mantiene null si no se hereda de base
                 } : null;
             }).filter(i => i);
 
@@ -827,7 +884,10 @@ const firebaseConfig = {
                 if(act.canciones) {
                     act.canciones.forEach(s => {
                         const key = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
-                        if(!todasMap.has(key)) todasMap.set(key, s);
+                        // Si ya existe, nos aseguramos de mantener la que tiene imagen
+                        if(!todasMap.has(key) || (!todasMap.get(key).image && s.image)) {
+                            todasMap.set(key, s);
+                        }
                     });
                 }
             });
@@ -846,6 +906,13 @@ const firebaseConfig = {
                     <td class="p-4 text-gray-400">${song.autor || '-'}</td>
                     <td class="p-4"><span class="px-2 py-0.5 bg-silver/10 border border-silver/20 rounded-full text-[10px] text-silver-text uppercase">${song.cantante}</span></td>
                     <td class="p-4 font-bold text-silver-text">${song.tonalidad || '-'}</td>
+                    <td class="p-4">
+                        ${song.image ? `
+                            <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-colors">
+                                <i class="fas fa-eye text-lg"></i>
+                            </button>
+                        ` : '<span class="text-gray-700">-</span>'}
+                    </td>
                     <td class="p-4 ${isLider ? '' : 'hidden'} actions-column">
                         <div class="flex gap-2">
                             <button onclick="openEditSong('${encoded}')" class="text-blue-400 hover:text-blue-300 p-1"><i class="fas fa-edit"></i></button>
@@ -853,7 +920,7 @@ const firebaseConfig = {
                         </div>
                     </td>
                 </tr>
-            `}).join('') : '<tr><td colspan="5" class="p-8 text-center text-gray-500 italic">No hay canciones registradas</td></tr>';
+            `}).join('') : '<tr><td colspan="6" class="p-8 text-center text-gray-500 italic">No hay canciones registradas</td></tr>';
             
             setupPermissions();
         };
@@ -1002,4 +1069,3 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
-
