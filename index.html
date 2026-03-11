@@ -960,7 +960,7 @@ const firebaseConfig = {
                     const encoded = encodeURIComponent(JSON.stringify(songWithData));
                     return `
                     <li class="flex items-center justify-between group">
-                        <span>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
+                        <span>• <b>${c.titulo}</b> - ${c.autor} (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
                         ${songWithData.image ? `
                             <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-opacity px-2">
                                 <i class="fas fa-eye text-sm"></i>
@@ -1091,3 +1091,4 @@ const firebaseConfig = {
     </script>
 </body>
 </html>
+
