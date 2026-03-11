@@ -260,7 +260,7 @@
                                 <th class="p-4">Autor</th>
                                 <th class="p-4">Cantante</th>
                                 <th class="p-4">Tonalidad</th>
-                                <th class="p-4">Ver</th>
+                                <th class="p-4 text-center">Ver</th>
                                 <th class="p-4 actions-column hidden">Acciones</th>
                             </tr>
                         </thead>
@@ -383,7 +383,7 @@
         </main>
     </div>
 
-    <!-- Modal Editar Canción (Cancionero) -->
+    <!-- Modal Editar Canción -->
     <div id="modal-edit-song" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-md">
             <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider">Editar Canción</h3>
@@ -434,7 +434,7 @@
         <p id="song-image-title" class="mt-4 text-xl font-bold silver-text"></p>
     </div>
 
-    <!-- Modal Editar Actividad (Planificación) -->
+    <!-- Modal Editar Actividad -->
     <div id="modal-edit-activity" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider border-b border-white/10 pb-2">Editar Actividad</h3>
@@ -490,8 +490,7 @@ const firebaseConfig = {
   messagingSenderId: "347966041919",
   appId: "1:347966041919:web:71c81a1b60013478712d8a",
   measurementId: "G-9X5RMXJB0T"
-};
-        const app = initializeApp(firebaseConfig);
+};        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
@@ -547,7 +546,8 @@ const firebaseConfig = {
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
-            document.getElementById('detail-actions').classList.toggle('hidden', !isLider);
+            const detailActions = document.getElementById('detail-actions');
+            if(detailActions) detailActions.classList.toggle('hidden', !isLider);
         };
 
         const fileToBase64 = (file) => {
@@ -725,10 +725,9 @@ const firebaseConfig = {
                 if(act.canciones) {
                     let changed = false;
                     const newSongs = act.canciones.map(s => {
-                        // Buscamos coincidencia exacta de título y cantante
                         if(s.titulo.toLowerCase() === original.titulo.toLowerCase() && s.cantante === original.cantante) {
                             changed = true;
-                            return updated;
+                            return { ...s, ...updated };
                         }
                         return s;
                     });
@@ -825,8 +824,7 @@ const firebaseConfig = {
                     titulo: inputs[0].value.trim(), 
                     autor: inputs[1].value.trim(), 
                     cantante: inputs[2].value,
-                    tonalidad: inputs[3].value,
-                    image: null // Se mantiene null si no se hereda de base
+                    tonalidad: inputs[3].value
                 } : null;
             }).filter(i => i);
 
@@ -884,7 +882,6 @@ const firebaseConfig = {
                 if(act.canciones) {
                     act.canciones.forEach(s => {
                         const key = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
-                        // Si ya existe, nos aseguramos de mantener la que tiene imagen
                         if(!todasMap.has(key) || (!todasMap.get(key).image && s.image)) {
                             todasMap.set(key, s);
                         }
@@ -906,7 +903,7 @@ const firebaseConfig = {
                     <td class="p-4 text-gray-400">${song.autor || '-'}</td>
                     <td class="p-4"><span class="px-2 py-0.5 bg-silver/10 border border-silver/20 rounded-full text-[10px] text-silver-text uppercase">${song.cantante}</span></td>
                     <td class="p-4 font-bold text-silver-text">${song.tonalidad || '-'}</td>
-                    <td class="p-4">
+                    <td class="p-4 text-center">
                         ${song.image ? `
                             <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-colors">
                                 <i class="fas fa-eye text-lg"></i>
@@ -953,6 +950,25 @@ const firebaseConfig = {
             
             if(act) {
                 editBtn.onclick = () => openEditActivity(act.id);
+                
+                // Procesar canciones para asegurar que si hay una imagen en el cancionero, se muestre aquí
+                const listHtml = act.canciones?.map(c => {
+                    // Buscar la versión con imagen en todo el historial si la actual no la tiene
+                    const songWithData = window.activities.flatMap(a => a.canciones || [])
+                        .find(s => s.titulo.toLowerCase() === c.titulo.toLowerCase() && s.cantante === c.cantante && s.image) || c;
+                    
+                    const encoded = encodeURIComponent(JSON.stringify(songWithData));
+                    return `
+                    <li class="flex items-center justify-between group">
+                        <span>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
+                        ${songWithData.image ? `
+                            <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-opacity px-2">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
+                        ` : ''}
+                    </li>`;
+                }).join('') || '<li class="text-gray-500">Sin canciones</li>';
+
                 content.innerHTML = `
                     <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">Actividad</p><h4 class="text-xl font-bold mb-2">${act.activity}</h4></div>
                     
@@ -964,7 +980,7 @@ const firebaseConfig = {
                     ` : ''}
 
                     <div class="mb-4"><p class="text-[10px] text-gray-500 mb-2 uppercase">Repertorio</p>
-                        <ul class="text-sm space-y-1">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> - ${c.autor} (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></li>`).join('') || 'Sin canciones'}</ul>
+                        <ul class="text-sm space-y-2">${listHtml}</ul>
                     </div>
                     <div class="mb-6"><p class="text-[10px] text-gray-500 mb-2 uppercase">Equipo</p>
                         <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic text-[10px] uppercase">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div>
@@ -1048,6 +1064,12 @@ const firebaseConfig = {
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), (s) => {
                 window.activities = s.docs.map(d => ({id: d.id, ...d.data()}));
                 window.renderCalendar(); window.renderSongbook();
+                // Actualizar detalles si están abiertos
+                const detailPanel = document.getElementById('day-details');
+                const dateText = document.getElementById('detail-date')?.innerText;
+                if(detailPanel && !detailPanel.classList.contains('hidden') && dateText) {
+                    showDayDetails(dateText);
+                }
             }, (e) => console.error(e));
 
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'gallery')), (s) => {
