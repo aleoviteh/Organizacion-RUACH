@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Ministerio Ruach - Gestión</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -113,8 +113,8 @@
         }
 
         .modal-overlay {
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(8px);
         }
 
         /* Galeria Styles */
@@ -153,12 +153,47 @@
             opacity: 1;
         }
 
-        /* Song Image Modal */
+        /* Song Image Modal - Responsive Fullscreen */
+        #song-image-viewer {
+            padding: 0;
+        }
+        #song-image-container {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
         #song-image-viewer img {
-            max-width: 90vw;
-            max-height: 80vh;
-            border-radius: 8px;
-            box-shadow: 0 0 30px rgba(255,255,255,0.1);
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            transition: transform 0.2s ease;
+        }
+        
+        /* Ajuste específico para móviles: Fullscreen Stretch */
+        @media (max-width: 768px) {
+            #song-image-viewer img {
+                width: 100vw;
+                height: 100vh;
+                object-fit: fill; /* Estira para ocupar toda la pantalla */
+                border-radius: 0;
+            }
+            #song-image-title {
+                display: none; /* Ocultar título en móviles para más espacio */
+            }
+            .close-viewer-btn {
+                top: 0.5rem !important;
+                right: 0.5rem !important;
+                background: rgba(0,0,0,0.5);
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
         }
 
         /* Search Bar Animation */
@@ -447,13 +482,13 @@
         </div>
     </div>
 
-    <!-- Visor de Imagen de Canción -->
-    <div id="song-image-viewer" class="fixed inset-0 modal-overlay z-[300] flex flex-col items-center justify-center p-4 hidden">
-        <button onclick="closeSongImage()" class="absolute top-6 right-6 text-white text-3xl"><i class="fas fa-times"></i></button>
-        <div id="song-image-container" class="animate-in fade-in zoom-in duration-300">
+    <!-- Visor de Imagen de Canción (Fullscreen en móviles) -->
+    <div id="song-image-viewer" class="fixed inset-0 modal-overlay z-[300] flex flex-col items-center justify-center hidden">
+        <button onclick="closeSongImage()" class="close-viewer-btn absolute top-6 right-6 text-white text-3xl z-[310]"><i class="fas fa-times"></i></button>
+        <div id="song-image-container">
             <!-- Img se carga aquí -->
         </div>
-        <p id="song-image-title" class="mt-4 text-xl font-bold silver-text"></p>
+        <p id="song-image-title" class="mt-4 text-xl font-bold silver-text pb-4"></p>
     </div>
 
     <!-- Modal Editar Actividad -->
@@ -798,10 +833,14 @@ const firebaseConfig = {
             container.innerHTML = `<img src="${song.image}" alt="${song.titulo}">`;
             title.innerText = `${song.titulo} - ${song.cantante}`;
             viewer.classList.remove('hidden');
+            
+            // Bloquear scroll del body
+            document.body.style.overflow = 'hidden';
         };
 
         window.closeSongImage = () => {
             document.getElementById('song-image-viewer').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         };
 
         // --- EDICIÓN DE ACTIVIDAD ---
@@ -989,14 +1028,13 @@ const firebaseConfig = {
                 
                 // Procesar canciones para asegurar que si hay una imagen en el cancionero, se muestre aquí
                 const listHtml = act.canciones?.map(c => {
-                    // Buscar la versión con imagen en todo el historial si la actual no la tiene
                     const songWithData = window.activities.flatMap(a => a.canciones || [])
                         .find(s => s.titulo.toLowerCase() === c.titulo.toLowerCase() && s.cantante === c.cantante && s.image) || c;
                     
                     const encoded = encodeURIComponent(JSON.stringify(songWithData));
                     return `
                     <li class="flex items-center justify-between group">
-                        <span>• <b>${c.titulo}</b> - ${c.autor} (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
+                        <span>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
                         ${songWithData.image ? `
                             <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-opacity px-2">
                                 <i class="fas fa-eye text-sm"></i>
@@ -1100,7 +1138,6 @@ const firebaseConfig = {
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), (s) => {
                 window.activities = s.docs.map(d => ({id: d.id, ...d.data()}));
                 window.renderCalendar(); window.renderSongbook();
-                // Actualizar detalles si están abiertos
                 const detailPanel = document.getElementById('day-details');
                 const dateText = document.getElementById('detail-date')?.innerText;
                 if(detailPanel && !detailPanel.classList.contains('hidden') && dateText) {
