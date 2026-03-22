@@ -172,12 +172,13 @@
             transition: transform 0.2s ease;
         }
         
-        /* Ajuste específico para móviles: Fullscreen Stretch */
+        /* Ajuste específico para móviles: Fullscreen con relación de aspecto preservada */
         @media (max-width: 768px) {
             #song-image-viewer img {
                 width: 100vw;
                 height: 100vh;
-                object-fit: fill; /* Estira para ocupar toda la pantalla */
+                /* contain asegura que la imagen se vea completa sin deformarse */
+                object-fit: contain; 
                 border-radius: 0;
             }
             #song-image-title {
@@ -188,11 +189,12 @@
                 right: 0.5rem !important;
                 background: rgba(0,0,0,0.5);
                 border-radius: 50%;
-                width: 40px;
-                height: 40px;
+                width: 44px;
+                height: 44px;
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                border: 1px solid rgba(255,255,255,0.2);
             }
         }
 
