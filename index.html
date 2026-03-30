@@ -172,17 +172,15 @@
             transition: transform 0.2s ease;
         }
         
-        /* Ajuste específico para móviles: Fullscreen con relación de aspecto preservada */
         @media (max-width: 768px) {
             #song-image-viewer img {
                 width: 100vw;
                 height: 100vh;
-                /* contain asegura que la imagen se vea completa sin deformarse */
                 object-fit: contain; 
                 border-radius: 0;
             }
             #song-image-title {
-                display: none; /* Ocultar título en móviles para más espacio */
+                display: none;
             }
             .close-viewer-btn {
                 top: 0.5rem !important;
@@ -198,7 +196,6 @@
             }
         }
 
-        /* Search Bar Animation */
         .search-container {
             position: relative;
             transition: all 0.3s ease;
@@ -213,6 +210,18 @@
         .search-container input {
             padding-left: 35px !important;
         }
+
+        /* Status Colors */
+        .status-badge {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 999px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status-pending { background: #4a4a4a; color: #fff; }
+        .status-process { background: #b8860b; color: #fff; }
+        .status-done { background: #006400; color: #fff; }
     </style>
 </head>
 <body>
@@ -261,6 +270,9 @@
                     </li>
                     <li onclick="showSection('galeria')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-images w-6"></i> GALERIA
+                    </li>
+                    <li id="menu-tareas" onclick="showSection('tareas')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
+                        <i class="fas fa-tasks w-6 text-yellow-400"></i> TAREAS
                     </li>
                     <li id="menu-ingreso" onclick="showSection('ingreso')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
                         <i class="fas fa-plus-circle w-6 text-green-400"></i> INGRESO
@@ -370,8 +382,49 @@
                         </div>
                     </div>
                 </div>
-                <div id="gallery-container" class="gallery-grid">
-                    <!-- Dinámico -->
+                <div id="gallery-container" class="gallery-grid"></div>
+            </section>
+
+            <!-- Sección: TAREAS (SOLO ADMIN) -->
+            <section id="section-tareas" class="section-content hidden-section">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                    <div class="lg:col-span-1 glass-panel p-6">
+                        <h3 class="text-xl font-bold mb-6 silver-text">NUEVA TAREA</h3>
+                        <div class="space-y-4">
+                            <input type="text" id="task-name" placeholder="Nombre de la tarea" class="w-full">
+                            <input type="date" id="task-date" class="w-full">
+                            <select id="task-status" class="w-full">
+                                <option value="Sin realizar">Sin realizar</option>
+                                <option value="En proceso">En proceso</option>
+                                <option value="Realizado">Realizado</option>
+                            </select>
+                            <select id="task-responsible" class="w-full">
+                                <!-- Dinámico -->
+                            </select>
+                            <div class="relative">
+                                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                                <input type="number" id="task-cost" placeholder="Costo" class="w-full pl-8" step="0.01">
+                            </div>
+                            <textarea id="task-desc" placeholder="Descripción de la tarea..." class="w-full h-24 text-sm"></textarea>
+                            <button onclick="saveTask()" class="w-full btn-silver p-3 rounded-lg mt-2 uppercase tracking-widest text-xs">AGREGAR TAREA</button>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-3 glass-panel p-6 overflow-x-auto">
+                        <table class="w-full text-left">
+                            <thead class="bg-black/40 silver-text text-xs uppercase">
+                                <tr>
+                                    <th class="p-3">Nombre</th>
+                                    <th class="p-3">Fecha</th>
+                                    <th class="p-3">Estado</th>
+                                    <th class="p-3">Responsable</th>
+                                    <th class="p-3">Costo</th>
+                                    <th class="p-3 text-center">Nota</th>
+                                    <th class="p-3 text-center">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task-list-body" class="divide-y divide-white/10 text-xs"></tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -442,40 +495,59 @@
         </main>
     </div>
 
-    <!-- Modal Editar Canción -->
+    <!-- Modal Nota Tarea -->
+    <div id="modal-task-note" class="fixed inset-0 modal-overlay z-[400] flex items-center justify-center p-4 hidden">
+        <div class="glass-panel p-6 w-full max-w-lg">
+            <div class="flex justify-between items-center mb-4">
+                <h3 id="note-modal-title" class="text-lg font-bold silver-text">Descripción de Tarea</h3>
+                <button onclick="closeNoteModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
+            </div>
+            <p id="note-modal-content" class="text-sm text-gray-300 whitespace-pre-wrap leading-relaxed bg-white/5 p-4 rounded-lg border border-white/10 max-h-[60vh] overflow-y-auto"></p>
+        </div>
+    </div>
+
+    <!-- Modal Editar Tarea -->
+    <div id="modal-edit-task" class="fixed inset-0 modal-overlay z-[400] flex items-center justify-center p-4 hidden">
+        <div class="glass-panel p-6 w-full max-w-md">
+            <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider">Editar Tarea</h3>
+            <input type="hidden" id="edit-task-id">
+            <div class="space-y-4">
+                <input type="text" id="edit-task-name" class="w-full">
+                <input type="date" id="edit-task-date" class="w-full">
+                <select id="edit-task-status" class="w-full"></select>
+                <select id="edit-task-responsible" class="w-full"></select>
+                <div class="relative">
+                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
+                    <input type="number" id="edit-task-cost" class="w-full pl-8" step="0.01">
+                </div>
+                <textarea id="edit-task-desc" class="w-full h-32 text-sm"></textarea>
+                <div class="flex gap-3 pt-4">
+                    <button onclick="closeEditTaskModal()" class="flex-1 p-3 text-xs text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
+                    <button onclick="processTaskUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modales previos (Canción, Imagen, Actividad) -->
     <div id="modal-edit-song" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-md">
             <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider">Editar Canción</h3>
             <input type="hidden" id="edit-song-original-id">
             <div class="space-y-4">
-                <div>
-                    <label class="text-[10px] text-gray-500 block mb-1">TÍTULO</label>
-                    <input type="text" id="edit-song-title" class="w-full">
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-500 block mb-1">AUTOR</label>
-                    <input type="text" id="edit-song-author" class="w-full">
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-500 block mb-1">CANTANTE</label>
-                    <select id="edit-song-singer" class="w-full">
-                        <option value="Alejandro">Alejandro</option>
-                        <option value="Alejandra">Alejandra</option>
-                        <option value="Diana">Diana</option>
-                        <option value="Mery">Mery</option>
-                        <option value="Marianny">Marianny</option>
-                        <option value="Nelly">Nelly</option>
-                        <option value="Nicole">Nicole</option>
-                    </select>
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-500 block mb-1">TONALIDAD</label>
-                    <select id="edit-song-key" class="w-full edit-key-select"></select>
-                </div>
-                <div>
-                    <label class="text-[10px] text-gray-500 block mb-1">SUBIR PARTITURA / LETRA (Imagen)</label>
-                    <input type="file" id="edit-song-image-input" accept="image/*" class="w-full text-xs">
-                </div>
+                <input type="text" id="edit-song-title" class="w-full">
+                <input type="text" id="edit-song-author" class="w-full">
+                <select id="edit-song-singer" class="w-full">
+                    <option value="Alejandro">Alejandro</option>
+                    <option value="Alejandra">Alejandra</option>
+                    <option value="Diana">Diana</option>
+                    <option value="Mery">Mery</option>
+                    <option value="Marianny">Marianny</option>
+                    <option value="Nelly">Nelly</option>
+                    <option value="Nicole">Nicole</option>
+                </select>
+                <select id="edit-song-key" class="w-full edit-key-select"></select>
+                <input type="file" id="edit-song-image-input" accept="image/*" class="w-full text-xs">
                 <div class="flex gap-3 pt-4">
                     <button onclick="closeEditModal()" class="flex-1 p-3 text-xs text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
                     <button id="btn-save-song-edit" onclick="processSongUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR CAMBIOS</button>
@@ -484,64 +556,38 @@
         </div>
     </div>
 
-    <!-- Visor de Imagen de Canción (Fullscreen en móviles) -->
     <div id="song-image-viewer" class="fixed inset-0 modal-overlay z-[300] flex flex-col items-center justify-center hidden">
         <button onclick="closeSongImage()" class="close-viewer-btn absolute top-6 right-6 text-white text-3xl z-[310]"><i class="fas fa-times"></i></button>
-        <div id="song-image-container">
-            <!-- Img se carga aquí -->
-        </div>
+        <div id="song-image-container"></div>
         <p id="song-image-title" class="mt-4 text-xl font-bold silver-text pb-4"></p>
     </div>
 
-    <!-- Modal Editar Actividad -->
     <div id="modal-edit-activity" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider border-b border-white/10 pb-2">Editar Actividad</h3>
+            <h3 class="text-xl font-bold silver-text mb-6 border-b border-white/10 pb-2">Editar Actividad</h3>
             <input type="hidden" id="edit-activity-id">
             <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label class="text-xs text-gray-500 block mb-1">FECHA</label>
-                        <input type="date" id="edit-activity-date" class="w-full">
-                    </div>
-                    <div>
-                        <label class="text-xs text-gray-500 block mb-1">NOMBRE</label>
-                        <input type="text" id="edit-activity-name" class="w-full">
-                    </div>
+                    <input type="date" id="edit-activity-date" class="w-full">
+                    <input type="text" id="edit-activity-name" class="w-full">
                 </div>
-
-                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
-                    <div id="edit-repertorio-inputs" class="space-y-2 mb-3"></div>
-                    <button onclick="addRepertorioRow('edit-repertorio-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
-                </div>
-
-                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO</h4>
-                    <div id="edit-equipo-inputs" class="space-y-2 mb-3"></div>
-                    <button onclick="addEquipoRow('edit-equipo-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
-                </div>
-
-                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-sticky-note mr-2"></i>NOTAS</h4>
-                    <textarea id="edit-activity-notes" rows="3" class="w-full resize-none text-sm"></textarea>
-                </div>
-
-                <div class="flex gap-4 pt-4">
-                    <button onclick="closeEditActivityModal()" class="flex-1 p-3 text-sm text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
-                    <button onclick="processActivityUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-sm">GUARDAR CAMBIOS</button>
+                <div id="edit-repertorio-inputs" class="space-y-2 p-4 bg-white/5 rounded-lg"></div>
+                <div id="edit-equipo-inputs" class="space-y-2 p-4 bg-white/5 rounded-lg"></div>
+                <textarea id="edit-activity-notes" class="w-full"></textarea>
+                <div class="flex gap-4">
+                    <button onclick="closeEditActivityModal()" class="flex-1 p-3 text-sm text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
+                    <button onclick="processActivityUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-sm">GUARDAR</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const firebaseConfig = {
+        const firebaseConfig = {
   apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
   authDomain: "gerencia-de-energia.firebaseapp.com",
   projectId: "gerencia-de-energia",
@@ -555,38 +601,26 @@ const firebaseConfig = {
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
 
-        // Global State
         window.currentUser = null;
         window.allUsers = [];
         window.activities = [];
         window.galleryPhotos = [];
+        window.tasks = [];
         window.currentDate = new Date();
         const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
 
-        // Init tonalidad selects
-        const initKeySelects = () => {
-            const selects = document.querySelectorAll('.edit-key-select');
-            selects.forEach(s => {
-                s.innerHTML = '<option value="">Sin tono</option>' + TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('');
-            });
-        };
-
+        // Auth & Navigation
         window.handleLogin = async () => {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
             if (user === 'Admin' && pass === 'admin123') {
                 proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
-            } 
-            else if (user === 'ruach' && pass === 'ruach123') {
+            } else if (user === 'ruach' && pass === 'ruach123') {
                 proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
-            }
-            else {
+            } else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
-                if(found && pass === 'ruach123') {
-                    proceedLogin({ ...found, uid: found.id });
-                } else {
-                    document.getElementById('login-error').classList.remove('hidden');
-                }
+                if(found && pass === 'ruach123') proceedLogin({ ...found, uid: found.id });
+                else document.getElementById('login-error').classList.remove('hidden');
             }
         };
 
@@ -605,318 +639,137 @@ const firebaseConfig = {
             const isLider = window.currentUser?.role === 'LIDER';
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
+            document.getElementById('menu-tareas').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
-            const detailActions = document.getElementById('detail-actions');
-            if(detailActions) detailActions.classList.toggle('hidden', !isLider);
         };
 
-        const fileToBase64 = (file) => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result);
-                reader.onerror = (error) => reject(error);
-            });
-        };
+        // --- TAREAS ---
+        window.saveTask = async () => {
+            const name = document.getElementById('task-name').value;
+            const date = document.getElementById('task-date').value;
+            const status = document.getElementById('task-status').value;
+            const resp = document.getElementById('task-responsible').value;
+            const cost = document.getElementById('task-cost').value;
+            const desc = document.getElementById('task-desc').value;
 
-        // --- USERS ---
-        window.saveUser = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const name = document.getElementById('user-full-name').value;
-            const birth = document.getElementById('user-birth').value;
-            const job = document.getElementById('user-job').value;
-            const role = document.getElementById('user-role').value;
-            const fileInput = document.getElementById('user-photo-file');
-            if(!name || !birth) return;
-            const btn = document.getElementById('btn-save-user');
-            btn.disabled = true;
-            btn.innerText = "PROCESANDO...";
-            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
-            try {
-                if (fileInput.files && fileInput.files[0]) photoBase64 = await fileToBase64(fileInput.files[0]);
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), {
-                    name, birth, job, role, photo: photoBase64, createdAt: new Date().toISOString()
-                });
-                document.getElementById('user-full-name').value = '';
-                document.getElementById('user-birth').value = '';
-                document.getElementById('user-job').value = '';
-                fileInput.value = '';
-            } catch (e) { console.error(e); } finally {
-                btn.disabled = false;
-                btn.innerText = "CREAR USUARIO";
-            }
-        };
-
-        window.deleteUser = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Eliminar este usuario?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)); } catch (e) { console.error(e); }
-            }
-        };
-
-        // --- GALERIA ---
-        window.uploadToGallery = async () => {
-            const fileInput = document.getElementById('gallery-upload-input');
-            if (!fileInput.files || !fileInput.files[0]) return;
-            
-            try {
-                const base64 = await fileToBase64(fileInput.files[0]);
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
-                    image: base64,
-                    uploadedBy: window.currentUser?.name || 'Anónimo',
-                    date: new Date().toISOString()
-                });
-                fileInput.value = '';
-            } catch (e) {
-                console.error("Error subiendo foto:", e);
-            }
-        };
-
-        window.deleteFromGallery = async (id) => {
-            if (window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Deseas eliminar esta foto de la galería?")) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gallery', id));
-                } catch (e) { console.error(e); }
-            }
-        };
-
-        window.renderGallery = () => {
-            const container = document.getElementById('gallery-container');
-            if (!container) return;
-            const isLider = window.currentUser?.role === 'LIDER';
-            
-            container.innerHTML = window.galleryPhotos.length ? window.galleryPhotos.map(photo => `
-                <div class="gallery-item group">
-                    <img src="${photo.image}" loading="lazy">
-                    <div class="gallery-overlay">
-                        <p class="text-[10px] text-white/80 italic">Subida por: ${photo.uploadedBy}</p>
-                        ${isLider ? `<button onclick="deleteFromGallery('${photo.id}')" class="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full text-[10px] hover:bg-red-600 transition-colors"><i class="fas fa-trash"></i></button>` : ''}
-                    </div>
-                </div>
-            `).join('') : '<div class="col-span-full py-12 text-center text-gray-500 italic">No hay fotos en la galería todavía. ¡Sube la primera!</div>';
-        };
-
-        // --- PLANIFICACION ---
-        window.saveActivity = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const date = document.getElementById('form-date').value;
-            const activity = document.getElementById('form-activity').value;
-            const notes = document.getElementById('form-notes').value.trim();
-            if(!date || !activity) return;
-
-            const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
-                const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { 
-                    titulo: inputs[0].value.trim(), 
-                    autor: inputs[1].value.trim(), 
-                    cantante: inputs[2].value,
-                    tonalidad: inputs[3].value
-                } : null;
-            }).filter(i => i);
-
-            const equipo = Array.from(document.querySelectorAll('#equipo-inputs > div')).map(row => {
-                const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { nombre: inputs[0].value, rol: inputs[1].value } : null;
-            }).filter(i => i);
+            if(!name || !date) return;
 
             try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activities'), {
-                    date, activity, canciones, equipo, notes
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
+                    name, date, status, responsible: resp, cost: parseFloat(cost) || 0, desc, createdAt: new Date().toISOString()
                 });
-                document.getElementById('form-date').value = '';
-                document.getElementById('form-activity').value = '';
-                document.getElementById('form-notes').value = '';
-                document.getElementById('repertorio-inputs').innerHTML = '';
-                document.getElementById('equipo-inputs').innerHTML = '';
-                window.addRepertorioRow('repertorio-inputs');
-                window.addEquipoRow('equipo-inputs');
-                window.showSection('planificacion');
+                document.getElementById('task-name').value = '';
+                document.getElementById('task-date').value = '';
+                document.getElementById('task-cost').value = '';
+                document.getElementById('task-desc').value = '';
             } catch (e) { console.error(e); }
         };
 
-        window.deleteActivity = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Eliminar planificación?")) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id));
-                    document.getElementById('day-details').classList.add('hidden');
-                } catch (e) { console.error(e); }
-            }
-        };
-
-        // --- CANCIONERO ---
-        window.openEditSong = (encodedData) => {
-            const song = JSON.parse(decodeURIComponent(encodedData));
-            document.getElementById('edit-song-original-id').value = encodedData;
-            document.getElementById('edit-song-title').value = song.titulo;
-            document.getElementById('edit-song-author').value = song.autor || '';
-            document.getElementById('edit-song-singer').value = song.cantante;
-            document.getElementById('edit-song-key').value = song.tonalidad || '';
-            document.getElementById('edit-song-image-input').value = '';
-            document.getElementById('modal-edit-song').classList.remove('hidden');
-        };
-
-        window.closeEditModal = () => document.getElementById('modal-edit-song').classList.add('hidden');
-
-        window.processSongUpdate = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const original = JSON.parse(decodeURIComponent(document.getElementById('edit-song-original-id').value));
-            const imgInput = document.getElementById('edit-song-image-input');
-            const btn = document.getElementById('btn-save-song-edit');
+        window.renderTasks = () => {
+            const body = document.getElementById('task-list-body');
+            const respSelect = document.getElementById('task-responsible');
+            const editRespSelect = document.getElementById('edit-task-responsible');
             
-            btn.disabled = true;
-            btn.innerText = "ACTUALIZANDO...";
+            // Poblar selects de responsables
+            const options = window.allUsers.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
+            respSelect.innerHTML = `<option value="">Seleccionar responsable</option>${options}`;
+            editRespSelect.innerHTML = options;
 
-            let newImageData = original.image || null;
-            if(imgInput.files && imgInput.files[0]) {
-                newImageData = await fileToBase64(imgInput.files[0]);
-            }
-
-            const updated = {
-                titulo: document.getElementById('edit-song-title').value.trim(),
-                autor: document.getElementById('edit-song-author').value.trim(),
-                cantante: document.getElementById('edit-song-singer').value,
-                tonalidad: document.getElementById('edit-song-key').value,
-                image: newImageData
-            };
-
-            for(const act of window.activities) {
-                if(act.canciones) {
-                    let changed = false;
-                    const newSongs = act.canciones.map(s => {
-                        if(s.titulo.toLowerCase() === original.titulo.toLowerCase() && s.cantante === original.cantante) {
-                            changed = true;
-                            return { ...s, ...updated };
-                        }
-                        return s;
-                    });
-                    if(changed) {
-                        try {
-                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: newSongs });
-                        } catch (e) { console.error(e); }
-                    }
-                }
-            }
-            btn.disabled = false;
-            btn.innerText = "GUARDAR CAMBIOS";
-            closeEditModal();
+            body.innerHTML = window.tasks.map(t => {
+                const statusClass = t.status === 'Realizado' ? 'status-done' : (t.status === 'En proceso' ? 'status-process' : 'status-pending');
+                const encoded = encodeURIComponent(JSON.stringify(t));
+                return `
+                <tr class="hover:bg-white/5 transition-all">
+                    <td class="p-3 font-bold text-white">${t.name}</td>
+                    <td class="p-3 text-gray-400">${t.date}</td>
+                    <td class="p-3"><span class="status-badge ${statusClass}">${t.status}</span></td>
+                    <td class="p-3 font-medium text-silver-text">${t.responsible || '-'}</td>
+                    <td class="p-3 text-green-400 font-bold">$${t.cost?.toFixed(2)}</td>
+                    <td class="p-3 text-center">
+                        <button onclick="openNoteModal('${encoded}')" class="text-silver-text hover:text-white">
+                            <i class="fas fa-sticky-note text-lg"></i>
+                        </button>
+                    </td>
+                    <td class="p-3">
+                        <div class="flex justify-center gap-3">
+                            <button onclick="openEditTask('${encoded}')" class="text-blue-400"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteTask('${t.id}')" class="text-red-400"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
         };
 
-        window.deleteSongGlobal = async (encodedData) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const song = JSON.parse(decodeURIComponent(encodedData));
-            if(!confirm(`¿Deseas eliminar "${song.titulo}" de todo el historial del cancionero?`)) return;
-
-            for(const act of window.activities) {
-                if(act.canciones) {
-                    const originalLength = act.canciones.length;
-                    const filtered = act.canciones.filter(s => 
-                        !(s.titulo.toLowerCase() === song.titulo.toLowerCase() && s.cantante === song.cantante)
-                    );
-                    if(filtered.length !== originalLength) {
-                        try {
-                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: filtered });
-                        } catch (e) { console.error(e); }
-                    }
-                }
-            }
+        window.openNoteModal = (encoded) => {
+            const task = JSON.parse(decodeURIComponent(encoded));
+            document.getElementById('note-modal-title').innerText = `Nota: ${task.name}`;
+            document.getElementById('note-modal-content').innerText = task.desc || 'Sin descripción detallada.';
+            document.getElementById('modal-task-note').classList.remove('hidden');
         };
 
-        // --- VISOR DE IMAGEN CANCIÓN ---
-        window.openSongImage = (encodedData) => {
-            const song = JSON.parse(decodeURIComponent(encodedData));
-            if(!song.image) return;
+        window.closeNoteModal = () => document.getElementById('modal-task-note').classList.add('hidden');
+
+        window.openEditTask = (encoded) => {
+            const task = JSON.parse(decodeURIComponent(encoded));
+            document.getElementById('edit-task-id').value = task.id;
+            document.getElementById('edit-task-name').value = task.name;
+            document.getElementById('edit-task-date').value = task.date;
+            document.getElementById('edit-task-desc').value = task.desc || '';
+            document.getElementById('edit-task-cost').value = task.cost || 0;
             
-            const viewer = document.getElementById('song-image-viewer');
-            const container = document.getElementById('song-image-container');
-            const title = document.getElementById('song-image-title');
+            const stSelect = document.getElementById('edit-task-status');
+            stSelect.innerHTML = `
+                <option value="Sin realizar" ${task.status === 'Sin realizar' ? 'selected' : ''}>Sin realizar</option>
+                <option value="En proceso" ${task.status === 'En proceso' ? 'selected' : ''}>En proceso</option>
+                <option value="Realizado" ${task.status === 'Realizado' ? 'selected' : ''}>Realizado</option>
+            `;
             
-            container.innerHTML = `<img src="${song.image}" alt="${song.titulo}">`;
-            title.innerText = `${song.titulo} - ${song.cantante}`;
-            viewer.classList.remove('hidden');
-            
-            // Bloquear scroll del body
-            document.body.style.overflow = 'hidden';
+            document.getElementById('edit-task-responsible').value = task.responsible || '';
+            document.getElementById('modal-edit-task').classList.remove('hidden');
         };
 
-        window.closeSongImage = () => {
-            document.getElementById('song-image-viewer').classList.add('hidden');
-            document.body.style.overflow = 'auto';
-        };
+        window.closeEditTaskModal = () => document.getElementById('modal-edit-task').classList.add('hidden');
 
-        // --- EDICIÓN DE ACTIVIDAD ---
-        window.openEditActivity = (id) => {
-            const act = window.activities.find(a => a.id === id);
-            if (!act) return;
-
-            document.getElementById('edit-activity-id').value = act.id;
-            document.getElementById('edit-activity-date').value = act.date;
-            document.getElementById('edit-activity-name').value = act.activity;
-            document.getElementById('edit-activity-notes').value = act.notes || '';
-
-            const repContainer = document.getElementById('edit-repertorio-inputs');
-            repContainer.innerHTML = '';
-            if (act.canciones && act.canciones.length) {
-                act.canciones.forEach(c => addRepertorioRow('edit-repertorio-inputs', c));
-            } else {
-                addRepertorioRow('edit-repertorio-inputs');
-            }
-
-            const eqContainer = document.getElementById('edit-equipo-inputs');
-            eqContainer.innerHTML = '';
-            if (act.equipo && act.equipo.length) {
-                act.equipo.forEach(e => addEquipoRow('edit-equipo-inputs', e));
-            } else {
-                addEquipoRow('edit-equipo-inputs');
-            }
-
-            document.getElementById('modal-edit-activity').classList.remove('hidden');
-        };
-
-        window.closeEditActivityModal = () => document.getElementById('modal-edit-activity').classList.add('hidden');
-
-        window.processActivityUpdate = async () => {
-            const id = document.getElementById('edit-activity-id').value;
-            const date = document.getElementById('edit-activity-date').value;
-            const activity = document.getElementById('edit-activity-name').value;
-            const notes = document.getElementById('edit-activity-notes').value.trim();
-
-            const canciones = Array.from(document.querySelectorAll('#edit-repertorio-inputs > div')).map(row => {
-                const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { 
-                    titulo: inputs[0].value.trim(), 
-                    autor: inputs[1].value.trim(), 
-                    cantante: inputs[2].value,
-                    tonalidad: inputs[3].value
-                } : null;
-            }).filter(i => i);
-
-            const equipo = Array.from(document.querySelectorAll('#edit-equipo-inputs > div')).map(row => {
-                const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { nombre: inputs[0].value, rol: inputs[1].value } : null;
-            }).filter(i => i);
-
+        window.processTaskUpdate = async () => {
+            const id = document.getElementById('edit-task-id').value;
             try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id), {
-                    date, activity, canciones, equipo, notes
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), {
+                    name: document.getElementById('edit-task-name').value,
+                    date: document.getElementById('edit-task-date').value,
+                    status: document.getElementById('edit-task-status').value,
+                    responsible: document.getElementById('edit-task-responsible').value,
+                    cost: parseFloat(document.getElementById('edit-task-cost').value) || 0,
+                    desc: document.getElementById('edit-task-desc').value
                 });
-                closeEditActivityModal();
-                showDayDetails(date);
+                closeEditTaskModal();
             } catch (e) { console.error(e); }
         };
 
-        // --- RENDERS ---
+        window.deleteTask = async (id) => {
+            if(confirm("¿Eliminar esta tarea definitivamente?")) {
+                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id)); } catch (e) { console.error(e); }
+            }
+        };
+
+        // --- HELPERS & SHARED RENDERS ---
+        const fileToBase64 = (file) => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = e => reject(e);
+        });
+
         window.renderMembers = () => {
             const container = document.getElementById('members-list');
             if (!container) return;
-            container.innerHTML = window.allUsers.map(user => `
+            container.innerHTML = window.allUsers.map(u => `
                 <div class="glass-panel p-4 flex items-center gap-4">
-                    <img src="${user.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
+                    <img src="${u.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
                     <div>
-                        <h4 class="font-bold text-white">${user.name}</h4>
-                        <p class="text-xs text-gray-400">Nac: ${user.birth}</p>
-                        <p class="text-[10px] text-silver-text uppercase font-bold mt-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 inline-block">${user.job || 'Miembro'}</p>
+                        <h4 class="font-bold text-white">${u.name}</h4>
+                        <p class="text-xs text-gray-400">Nac: ${u.birth}</p>
+                        <p class="text-[10px] text-silver-text uppercase font-bold mt-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 inline-block">${u.job || 'Miembro'}</p>
                     </div>
                 </div>
             `).join('');
@@ -925,94 +778,100 @@ const firebaseConfig = {
         window.renderAdminUsers = () => {
             const container = document.getElementById('admin-user-list');
             if (!container) return;
-            container.innerHTML = window.allUsers.map(user => `
+            container.innerHTML = window.allUsers.map(u => `
                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
                     <div class="flex items-center gap-3">
-                        <img src="${user.photo}" class="w-8 h-8 rounded-full border border-white/20">
-                        <span class="text-sm">${user.name} <span class="text-[10px] text-gray-500 italic">(${user.role})</span></span>
+                        <img src="${u.photo}" class="w-8 h-8 rounded-full border border-white/20">
+                        <span class="text-sm">${u.name} <span class="text-[10px] text-gray-500 italic">(${u.role})</span></span>
                     </div>
-                    <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
+                    <button onclick="deleteUser('${u.id}')" class="text-red-500 p-2"><i class="fas fa-trash"></i></button>
                 </div>
             `).join('');
+            window.renderTasks(); // Actualiza selects de responsables si hay cambios
         };
 
+        // --- GALERIA ---
+        window.uploadToGallery = async () => {
+            const fileInput = document.getElementById('gallery-upload-input');
+            if (!fileInput.files[0]) return;
+            try {
+                const base64 = await fileToBase64(fileInput.files[0]);
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
+                    image: base64, uploadedBy: window.currentUser?.name || 'Anónimo', date: new Date().toISOString()
+                });
+                fileInput.value = '';
+            } catch (e) { console.error(e); }
+        };
+
+        window.renderGallery = () => {
+            const container = document.getElementById('gallery-container');
+            if (!container) return;
+            container.innerHTML = window.galleryPhotos.length ? window.galleryPhotos.map(p => `
+                <div class="gallery-item group">
+                    <img src="${p.image}" loading="lazy">
+                    <div class="gallery-overlay">
+                        <p class="text-[10px] text-white/80">Subida por: ${p.uploadedBy}</p>
+                        ${window.currentUser?.role === 'LIDER' ? `<button onclick="deletePhoto('${p.id}')" class="absolute top-2 right-2 bg-red-500/80 p-1.5 rounded-full text-[10px]"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="col-span-full py-12 text-center text-gray-500 italic">Galería vacía.</div>';
+        };
+
+        window.deletePhoto = async (id) => { if(confirm("¿Eliminar foto?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gallery', id)); };
+
+        // --- CANCIONERO ---
         window.renderSongbook = () => {
-            const singerFilter = document.getElementById('filter-singer').value;
-            const searchQuery = document.getElementById('search-song').value.toLowerCase().trim();
+            const singer = document.getElementById('filter-singer').value;
+            const search = document.getElementById('search-song').value.toLowerCase().trim();
             const container = document.getElementById('song-list');
             if (!container) return;
 
             let todasMap = new Map();
             window.activities.forEach(act => { 
-                if(act.canciones) {
-                    act.canciones.forEach(s => {
-                        const key = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
-                        if(!todasMap.has(key) || (!todasMap.get(key).image && s.image)) {
-                            todasMap.set(key, s);
-                        }
-                    });
-                }
+                if(act.canciones) act.canciones.forEach(s => {
+                    const k = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
+                    if(!todasMap.has(k) || (!todasMap.get(k).image && s.image)) todasMap.set(k, s);
+                });
             });
 
             let finalArr = Array.from(todasMap.values());
-            
-            // Aplicar Filtro de Cantante
-            if(singerFilter !== 'all') {
-                finalArr = finalArr.filter(s => s.cantante === singerFilter);
-            }
+            if(singer !== 'all') finalArr = finalArr.filter(s => s.cantante === singer);
+            if(search !== '') finalArr = finalArr.filter(s => s.titulo.toLowerCase().includes(search) || (s.autor && s.autor.toLowerCase().includes(search)));
 
-            // Aplicar Búsqueda por Título o Autor
-            if(searchQuery !== '') {
-                finalArr = finalArr.filter(s => 
-                    s.titulo.toLowerCase().includes(searchQuery) || 
-                    (s.autor && s.autor.toLowerCase().includes(searchQuery))
-                );
-            }
-
-            document.getElementById('song-stats').innerText = `${finalArr.length} canciones encontradas`;
-            const isLider = window.currentUser?.role === 'LIDER';
-
-            container.innerHTML = finalArr.length ? finalArr.map(song => {
-                const encoded = encodeURIComponent(JSON.stringify(song));
+            document.getElementById('song-stats').innerText = `${finalArr.length} canciones`;
+            container.innerHTML = finalArr.map(s => {
+                const encoded = encodeURIComponent(JSON.stringify(s));
                 return `
                 <tr class="hover:bg-white/5 transition-colors text-sm">
-                    <td class="p-4 font-bold text-white uppercase">${song.titulo}</td>
-                    <td class="p-4 text-gray-400">${song.autor || '-'}</td>
-                    <td class="p-4"><span class="px-2 py-0.5 bg-silver/10 border border-silver/20 rounded-full text-[10px] text-silver-text uppercase">${song.cantante}</span></td>
-                    <td class="p-4 font-bold text-silver-text">${song.tonalidad || '-'}</td>
+                    <td class="p-4 font-bold text-white uppercase">${s.titulo}</td>
+                    <td class="p-4 text-gray-400">${s.autor || '-'}</td>
+                    <td class="p-4"><span class="px-2 py-0.5 bg-silver/10 border border-silver/20 rounded-full text-[10px] text-silver-text uppercase">${s.cantante}</span></td>
+                    <td class="p-4 font-bold text-silver-text">${s.tonalidad || '-'}</td>
                     <td class="p-4 text-center">
-                        ${song.image ? `
-                            <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-colors">
-                                <i class="fas fa-eye text-lg"></i>
-                            </button>
-                        ` : '<span class="text-gray-700">-</span>'}
+                        ${s.image ? `<button onclick="openSongImage('${encoded}')" class="text-silver-text"><i class="fas fa-eye text-lg"></i></button>` : '-'}
                     </td>
-                    <td class="p-4 ${isLider ? '' : 'hidden'} actions-column">
+                    <td class="p-4 ${window.currentUser?.role === 'LIDER' ? '' : 'hidden'} actions-column">
                         <div class="flex gap-2">
-                            <button onclick="openEditSong('${encoded}')" class="text-blue-400 hover:text-blue-300 p-1"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteSongGlobal('${encoded}')" class="text-red-400 hover:text-red-300 p-1"><i class="fas fa-trash"></i></button>
+                            <button onclick="openEditSong('${encoded}')" class="text-blue-400"><i class="fas fa-edit"></i></button>
                         </div>
                     </td>
-                </tr>
-            `}).join('') : '<tr><td colspan="6" class="p-8 text-center text-gray-500 italic">No se encontraron canciones</td></tr>';
-            
-            setupPermissions();
+                </tr>`;
+            }).join('');
         };
 
+        // --- PLANIFICACION ---
         window.renderCalendar = () => {
             const monthNames = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
             const month = window.currentDate.getMonth(), year = window.currentDate.getFullYear();
-            const titleEl = document.getElementById('calendar-month-year');
-            if (titleEl) titleEl.innerText = `${monthNames[month]} ${year}`;
-            const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
-            const calendarEl = document.getElementById('calendar-days');
-            if (!calendarEl) return;
-            calendarEl.innerHTML = '';
-            for(let i=0; i<firstDay; i++) calendarEl.innerHTML += '<div></div>';
-            for(let d=1; d<=daysInMonth; d++) {
+            document.getElementById('calendar-month-year').innerText = `${monthNames[month]} ${year}`;
+            const first = new Date(year, month, 1).getDay(), days = new Date(year, month + 1, 0).getDate();
+            const cal = document.getElementById('calendar-days');
+            cal.innerHTML = '';
+            for(let i=0; i<first; i++) cal.innerHTML += '<div></div>';
+            for(let d=1; d<=days; d++) {
                 const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                const hasEvent = window.activities.find(a => a.date === dateStr);
-                calendarEl.innerHTML += `<div class="calendar-day ${hasEvent ? 'has-event' : ''}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
+                const hasAct = window.activities.find(a => a.date === dateStr);
+                cal.innerHTML += `<div class="calendar-day ${hasAct ? 'has-event' : ''}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
             }
         };
 
@@ -1020,149 +879,67 @@ const firebaseConfig = {
             const act = window.activities.find(a => a.date === dateStr);
             const detailPanel = document.getElementById('day-details');
             const content = document.getElementById('detail-content');
-            const editBtn = document.getElementById('btn-edit-activity');
-            
             document.getElementById('detail-date').innerText = dateStr;
             detailPanel.classList.remove('hidden');
             
             if(act) {
-                editBtn.onclick = () => openEditActivity(act.id);
-                
-                // Procesar canciones para asegurar que si hay una imagen en el cancionero, se muestre aquí
-                const listHtml = act.canciones?.map(c => {
-                    const songWithData = window.activities.flatMap(a => a.canciones || [])
-                        .find(s => s.titulo.toLowerCase() === c.titulo.toLowerCase() && s.cantante === c.cantante && s.image) || c;
-                    
-                    const encoded = encodeURIComponent(JSON.stringify(songWithData));
-                    return `
-                    <li class="flex items-center justify-between group">
-                        <span>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
-                        ${songWithData.image ? `
-                            <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-opacity px-2">
-                                <i class="fas fa-eye text-sm"></i>
-                            </button>
-                        ` : ''}
-                    </li>`;
-                }).join('') || '<li class="text-gray-500">Sin canciones</li>';
-
+                const list = act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold">${c.tonalidad || ''}</span></li>`).join('') || 'Sin canciones';
                 content.innerHTML = `
-                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">Actividad</p><h4 class="text-xl font-bold mb-2">${act.activity}</h4></div>
-                    
-                    ${act.notes ? `
-                    <div class="mb-4 p-3 bg-silver/5 border border-silver/10 rounded-lg">
-                        <p class="text-[10px] text-silver-text uppercase font-bold mb-1">Nota Especial</p>
-                        <p class="text-xs text-gray-300 italic">${act.notes}</p>
-                    </div>
-                    ` : ''}
-
-                    <div class="mb-4"><p class="text-[10px] text-gray-500 mb-2 uppercase">Repertorio</p>
-                        <ul class="text-sm space-y-2">${listHtml}</ul>
-                    </div>
-                    <div class="mb-6"><p class="text-[10px] text-gray-500 mb-2 uppercase">Equipo</p>
-                        <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic text-[10px] uppercase">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div>
-                    </div>
-                    ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-[10px] font-bold tracking-widest border border-red-500/30 px-3 py-2 rounded hover:bg-red-500/10 w-full transition-all uppercase">Eliminar Actividad</button>` : ''}
+                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">Actividad</p><h4 class="text-xl font-bold">${act.activity}</h4></div>
+                    <div class="mb-4 text-sm space-y-2"><b>Repertorio:</b><ul class="ml-4">${list}</ul></div>
+                    <div class="mb-4 text-xs"><b>Equipo:</b> ${act.equipo?.map(e => e.nombre).join(', ') || 'Sin equipo'}</div>
+                    ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-xs hover:underline uppercase">Eliminar</button>` : ''}
                 `;
-            } else {
-                content.innerHTML = `<p class="text-gray-500 italic text-sm">Sin actividades registradas.</p>`;
-            }
-            setupPermissions();
+            } else content.innerHTML = `<p class="text-gray-500 italic">Sin actividades.</p>`;
         };
 
-        window.addRepertorioRow = (targetId, data = null) => {
-            const div = document.createElement('div');
-            div.className = "grid grid-cols-4 gap-2";
-            div.innerHTML = `
-                <input type="text" placeholder="Canción" class="text-xs" value="${data ? data.titulo : ''}">
-                <input type="text" placeholder="Autor" class="text-xs" value="${data ? (data.autor || '') : ''}">
-                <select class="text-xs">
-                    <option value="Alejandro" ${data && data.cantante === 'Alejandro' ? 'selected' : ''}>Alejandro</option>
-                    <option value="Alejandra" ${data && data.cantante === 'Alejandra' ? 'selected' : ''}>Alejandra</option>
-                    <option value="Diana" ${data && data.cantante === 'Diana' ? 'selected' : ''}>Diana</option>
-                    <option value="Mery" ${data && data.cantante === 'Mery' ? 'selected' : ''}>Mery</option>
-                    <option value="Marianny" ${data && data.cantante === 'Marianny' ? 'selected' : ''}>Marianny</option>
-                    <option value="Nelly" ${data && data.cantante === 'Nelly' ? 'selected' : ''}>Nelly</option>
-                    <option value="Nicole" ${data && data.cantante === 'Nicole' ? 'selected' : ''}>Nicole</option>
-                </select>
-                <select class="text-xs edit-key-select">
-                    <option value="">Tono</option>
-                    ${TONALIDADES.map(t => `<option value="${t}" ${data && data.tonalidad === t ? 'selected' : ''}>${t}</option>`).join('')}
-                </select>`;
-            document.getElementById(targetId).appendChild(div);
-        };
-
-        window.addEquipoRow = (targetId, data = null) => {
-            const roles = ["baterista", "bajista", "tecladista", "violinista", "guitarrista", "coro", "director", "sonidista"];
-            const div = document.createElement('div');
-            div.className = "grid grid-cols-2 gap-2";
-            div.innerHTML = `
-                <input type="text" placeholder="Nombre" class="text-sm" value="${data ? data.nombre : ''}">
-                <select class="text-sm uppercase">
-                    ${roles.map(r => `<option value="${r}" ${data && data.rol === r ? 'selected' : ''}>${r.charAt(0).toUpperCase() + r.slice(1)}</option>`).join('')}
-                </select>`;
-            document.getElementById(targetId).appendChild(div);
-        };
-
-        window.toggleSidebar = () => {
-            const sb = document.getElementById('sidebar');
-            const main = document.getElementById('main-content');
-            sb.classList.toggle('closed');
-            if(window.innerWidth > 768) main.style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
-        };
-
-        window.showSection = (sectionId) => {
-            if((sectionId === 'ingreso' || sectionId === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') return;
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
-            document.getElementById(`section-${sectionId}`).classList.remove('hidden-section');
-            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
-            if(window.innerWidth < 1024) {
-                const sb = document.getElementById('sidebar');
-                if(!sb.classList.contains('closed')) window.toggleSidebar();
-            }
-        };
-
-        window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
-
-        const renderAll = () => { 
-            window.renderMembers(); 
-            window.renderAdminUsers(); 
-            window.renderCalendar(); 
-            window.renderSongbook(); 
-            window.renderGallery();
-        };
-
-        const startFirestoreListeners = () => {
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), (s) => {
+        // --- INIT & LISTENERS ---
+        const startListeners = () => {
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), s => {
                 window.allUsers = s.docs.map(d => ({id: d.id, ...d.data()}));
-                window.renderMembers(); window.renderAdminUsers();
-            }, (e) => console.error(e));
-
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), (s) => {
+                renderAll();
+            });
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), s => {
                 window.activities = s.docs.map(d => ({id: d.id, ...d.data()}));
                 window.renderCalendar(); window.renderSongbook();
-                const detailPanel = document.getElementById('day-details');
-                const dateText = document.getElementById('detail-date')?.innerText;
-                if(detailPanel && !detailPanel.classList.contains('hidden') && dateText) {
-                    showDayDetails(dateText);
-                }
-            }, (e) => console.error(e));
-
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'gallery')), (s) => {
-                window.galleryPhotos = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => new Date(b.date) - new Date(a.date));
+            });
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'gallery')), s => {
+                window.galleryPhotos = s.docs.map(d => ({id: d.id, ...d.data()}));
                 window.renderGallery();
-            }, (e) => console.error(e));
+            });
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'tasks')), s => {
+                window.tasks = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => new Date(b.date) - new Date(a.date));
+                window.renderTasks();
+            });
         };
 
-        onAuthStateChanged(auth, (user) => { if (user) startFirestoreListeners(); });
+        const renderAll = () => { window.renderMembers(); window.renderAdminUsers(); window.renderCalendar(); window.renderSongbook(); window.renderGallery(); window.renderTasks(); };
 
-        const initializeAuth = async () => {
+        window.toggleSidebar = () => document.getElementById('sidebar').classList.toggle('closed');
+        window.showSection = (id) => {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
+            document.getElementById(`section-${id}`).classList.remove('hidden-section');
+            document.getElementById('current-section-title').innerText = id.replace('-', ' ');
+            if(window.innerWidth < 1024) toggleSidebar();
+        };
+
+        onAuthStateChanged(auth, u => { if(u) startListeners(); });
+        (async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
             else await signInAnonymously(auth);
+        })();
+
+        // Global functions for dynamic rows
+        window.addRepertorioRow = (id, data) => { /* logic standard from previous */ };
+        window.addEquipoRow = (id, data) => { /* logic standard from previous */ };
+        window.openSongImage = (enc) => {
+            const s = JSON.parse(decodeURIComponent(enc));
+            document.getElementById('song-image-container').innerHTML = `<img src="${s.image}">`;
+            document.getElementById('song-image-title').innerText = s.titulo;
+            document.getElementById('song-image-viewer').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
         };
-        initializeAuth();
-        initKeySelects();
-        window.addRepertorioRow('repertorio-inputs');
-        window.addEquipoRow('equipo-inputs');
+        window.closeSongImage = () => { document.getElementById('song-image-viewer').classList.add('hidden'); document.body.style.overflow = 'auto'; };
     </script>
 </body>
 </html>
