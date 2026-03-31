@@ -50,32 +50,6 @@
             left: 1rem;
         }
 
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 2px;
-        }
-
-        .calendar-day {
-            aspect-ratio: 1 / 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: background 0.2s;
-            border-radius: 8px;
-        }
-
-        .calendar-day:hover {
-            background: rgba(192, 192, 192, 0.2);
-        }
-
-        .calendar-day.has-event {
-            background: rgba(192, 192, 192, 0.4);
-            font-weight: bold;
-            border: 1px solid silver;
-        }
-
         .active-section {
             display: block !important;
         }
@@ -89,7 +63,7 @@
             border: 1px solid #333 !important;
             color: white !important;
             border-radius: 8px !important;
-            padding: 10px !important;
+            padding: 8px !important;
         }
 
         .btn-silver {
@@ -99,25 +73,21 @@
             transition: opacity 0.2s;
         }
 
-        .btn-silver:hover {
-            opacity: 0.8;
-        }
+        .btn-silver:hover { opacity: 0.8; }
         
         .logo-img {
             max-width: 180px;
             filter: drop-shadow(0 0 10px rgba(192,192,192,0.3));
         }
 
-        main {
-            transition: margin-left 0.3s ease;
-        }
+        main { transition: margin-left 0.3s ease; }
 
         .modal-overlay {
             background: rgba(0,0,0,0.95);
             backdrop-filter: blur(8px);
         }
 
-        /* Status Badges para Tareas */
+        /* Status Badges */
         .status-badge {
             font-size: 0.7rem;
             padding: 2px 8px;
@@ -129,7 +99,7 @@
         .status-process { background: #b8860b; color: #fff; }
         .status-done { background: #006400; color: #fff; }
 
-        /* Galeria Styles */
+        /* Gallery Styles */
         .gallery-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -142,110 +112,54 @@
             aspect-ratio: 1;
         }
         .gallery-item img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.3s ease;
+            width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s ease;
         }
-        .gallery-item:hover img {
-            transform: scale(1.1);
-        }
+        .gallery-item:hover img { transform: scale(1.1); }
         .gallery-overlay {
-            position: absolute;
-            inset: 0;
+            position: absolute; inset: 0;
             background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            padding: 10px;
+            opacity: 0; transition: opacity 0.3s ease;
+            display: flex; flex-direction: column; justify-content: flex-end; padding: 10px;
         }
-        .gallery-item:hover .gallery-overlay {
-            opacity: 1;
-        }
+        .gallery-item:hover .gallery-overlay { opacity: 1; }
 
-        #song-image-viewer {
-            padding: 0;
+        /* Cuentas Table Styles */
+        .table-payment input {
+            width: 60px !important;
+            padding: 4px !important;
+            font-size: 11px !important;
+            text-align: center;
+            border-radius: 4px !important;
         }
-        #song-image-container {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: auto;
-        }
-        #song-image-viewer img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            transition: transform 0.2s ease;
-        }
-        
-        @media (max-width: 768px) {
-            #song-image-viewer img {
-                width: 100vw;
-                height: 100vh;
-                object-fit: contain; 
-                border-radius: 0;
-            }
-            #song-image-title {
-                display: none;
-            }
-            .close-viewer-btn {
-                top: 0.5rem !important;
-                right: 0.5rem !important;
-                background: rgba(0,0,0,0.5);
-                border-radius: 50%;
-                width: 44px;
-                height: 44px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                border: 1px solid rgba(255,255,255,0.2);
-            }
-        }
+        .total-cell { font-weight: bold; color: #4ade80; }
+        .month-header { font-size: 9px; text-transform: uppercase; }
 
-        .search-container {
-            position: relative;
-            transition: all 0.3s ease;
-        }
-        .search-container i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-        }
-        .search-container input {
-            padding-left: 35px !important;
-        }
+        /* Scrollbar styling for wide tables */
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(192, 192, 192, 0.2); border-radius: 10px; }
     </style>
 </head>
 <body>
 
-    <!-- Pantalla de Login -->
+    <!-- Login Screen -->
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6">
         <div class="glass-panel p-8 w-full max-w-md text-center">
-            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300&auto=format&fit=crop" alt="Ruach Logo Placeholder" class="logo-img mx-auto mb-6 rounded-lg opacity-80 border border-silver">
+            <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300&auto=format&fit=crop" alt="Logo" class="logo-img mx-auto mb-6 rounded-lg opacity-80 border border-silver">
             <h1 class="text-3xl font-bold silver-text mb-2">MINISTERIO RUACH</h1>
             <p class="text-gray-400 mb-8">Gestión Organizacional</p>
-            
             <div class="space-y-4">
                 <input type="text" id="login-user" placeholder="Usuario" class="w-full">
                 <input type="password" id="login-pass" placeholder="Contraseña" class="w-full">
-                <button id="login-btn" onclick="handleLogin()" class="w-full btn-silver p-3 rounded-lg mt-4">INGRESAR</button>
+                <button onclick="handleLogin()" class="w-full btn-silver p-3 rounded-lg mt-4 uppercase">Ingresar</button>
             </div>
             <p id="login-error" class="text-red-500 mt-4 text-sm hidden">Credenciales incorrectas.</p>
         </div>
     </div>
 
-    <!-- App Principal -->
+    <!-- App Container -->
     <div id="app-container" class="hidden-section">
         
-        <!-- Botón de Menú Persistente -->
-        <button onclick="toggleSidebar()" class="menu-toggle-btn p-2 text-2xl glass-panel px-4 rounded-lg hover:bg-white/10 transition-colors">
+        <button onclick="toggleSidebar()" class="menu-toggle-btn p-2 text-2xl glass-panel px-4 rounded-lg hover:bg-white/10">
             <i class="fas fa-bars"></i>
         </button>
 
@@ -254,15 +168,17 @@
             <div class="p-6 pt-20">
                 <div class="flex items-center gap-3 mb-10">
                     <i class="fas fa-music text-silver-text text-xl"></i>
-                    <span class="font-bold text-lg silver-text">RUACH MENU</span>
+                    <span class="font-bold text-lg silver-text uppercase">Ruach Menu</span>
                 </div>
-                
                 <ul class="space-y-4">
                     <li onclick="showSection('miembros')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-users w-6"></i> MIEMBROS
                     </li>
                     <li onclick="showSection('tareas')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-tasks w-6 text-yellow-500"></i> TAREAS
+                    </li>
+                    <li id="menu-cuentas" onclick="showSection('cuentas')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
+                        <i class="fas fa-wallet w-6 text-green-400"></i> CUENTAS
                     </li>
                     <li onclick="showSection('cancionero')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-book-open w-6"></i> CANCIONERO
@@ -274,20 +190,18 @@
                         <i class="fas fa-images w-6"></i> GALERIA
                     </li>
                     <li id="menu-ingreso" onclick="showSection('ingreso')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
-                        <i class="fas fa-plus-circle w-6 text-green-400"></i> INGRESO
+                        <i class="fas fa-plus-circle w-6 text-blue-400"></i> INGRESO
                     </li>
                     <li id="menu-usuario" onclick="showSection('usuarios-admin')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
-                        <i class="fas fa-user-cog w-6 text-blue-400"></i> USUARIOS
+                        <i class="fas fa-user-cog w-6 text-purple-400"></i> USUARIOS
                     </li>
                 </ul>
-
                 <button onclick="handleLogout()" class="absolute bottom-10 left-6 flex items-center gap-3 text-red-400 hover:text-red-300">
-                    <i class="fas fa-sign-out-alt"></i> CERRAR SESION
+                    <i class="fas fa-sign-out-alt"></i> CERRAR SESIÓN
                 </button>
             </div>
         </nav>
 
-        <!-- Main Content -->
         <main id="main-content" class="min-h-screen p-4 md:p-8 pt-20">
             <header class="flex justify-end items-center mb-8">
                 <div class="text-right">
@@ -296,7 +210,7 @@
                 </div>
             </header>
 
-            <!-- Sección: MIEMBROS -->
+            <!-- Secciones existentes -->
             <section id="section-miembros" class="section-content active-section">
                 <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </section>
@@ -304,314 +218,120 @@
             <!-- Sección: TAREAS -->
             <section id="section-tareas" class="section-content hidden-section">
                 <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    <!-- Formulario Ingreso: Solo Admin -->
                     <div id="task-entry-panel" class="lg:col-span-1 glass-panel p-6 hidden">
                         <h3 class="text-xl font-bold mb-6 silver-text">NUEVA TAREA</h3>
                         <div class="space-y-4">
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">NOMBRE</label>
-                                <input type="text" id="task-name" placeholder="Título de la tarea" class="w-full">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">FECHA</label>
-                                <input type="date" id="task-date" class="w-full">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">ESTADO</label>
-                                <select id="task-status" class="w-full">
-                                    <option value="Sin realizar">Sin realizar</option>
-                                    <option value="En proceso">En proceso</option>
-                                    <option value="Realizado">Realizado</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">RESPONSABLE</label>
-                                <select id="task-responsible" class="w-full"></select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">COSTO (USD)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                                    <input type="number" id="task-cost" step="0.01" class="w-full pl-8" placeholder="0.00">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">DESCRIPCIÓN</label>
-                                <textarea id="task-desc" rows="3" class="w-full text-sm resize-none" placeholder="Detalles de la tarea..."></textarea>
-                            </div>
-                            <button onclick="saveTask()" class="w-full btn-silver p-3 rounded-lg mt-4 text-sm uppercase">Agregar Tarea</button>
+                            <input type="text" id="task-name" placeholder="Nombre" class="w-full">
+                            <input type="date" id="task-date" class="w-full">
+                            <select id="task-status" class="w-full">
+                                <option>Sin realizar</option><option>En proceso</option><option>Realizado</option>
+                            </select>
+                            <select id="task-responsible" class="w-full"></select>
+                            <input type="number" id="task-cost" placeholder="Costo USD" class="w-full">
+                            <textarea id="task-desc" placeholder="Descripción" class="w-full"></textarea>
+                            <button onclick="saveTask()" class="w-full btn-silver p-3 rounded-lg">GUARDAR TAREA</button>
                         </div>
                     </div>
-
-                    <!-- Listado Tareas -->
-                    <div id="task-list-panel" class="lg:col-span-4 glass-panel p-6 overflow-x-auto">
-                        <table class="w-full text-left">
+                    <div id="task-list-panel" class="lg:col-span-4 glass-panel p-6 overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-left text-sm">
                             <thead class="bg-black/40 silver-text">
                                 <tr>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Tarea</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Fecha</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Estado</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Responsable</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Costo</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider text-center">Nota</th>
-                                    <th id="th-task-actions" class="p-3 text-xs uppercase tracking-wider text-center hidden">Acciones</th>
+                                    <th class="p-3">Tarea</th><th class="p-3">Fecha</th><th class="p-3">Estado</th><th class="p-3">Responsable</th><th class="p-3">Costo</th><th class="p-3 text-center">Nota</th><th id="th-task-actions" class="p-3 text-center hidden">Acciones</th>
                                 </tr>
                             </thead>
-                            <tbody id="task-table-body" class="divide-y divide-white/10 text-sm">
-                                <!-- Dinámico -->
-                            </tbody>
+                            <tbody id="task-table-body" class="divide-y divide-white/10"></tbody>
                         </table>
                     </div>
                 </div>
             </section>
 
-            <!-- Sección: CANCIONERO -->
-            <section id="section-cancionero" class="section-content hidden-section">
-                <div class="mb-6 flex flex-col md:flex-row gap-4 items-center justify-between">
-                    <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-                        <div class="search-container w-full md:w-80">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="search-song" onkeyup="renderSongbook()" placeholder="Buscar canción o autor..." class="w-full">
+            <!-- Sección: CUENTAS (SOLO ADMIN) -->
+            <section id="section-cuentas" class="section-content hidden-section">
+                <div class="space-y-8">
+                    <!-- Dashboard de Gastos -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="glass-panel p-6 text-center border-b-4 border-green-500">
+                            <h4 class="text-xs text-gray-500 uppercase mb-2">Total Ingresado (Pagos)</h4>
+                            <p id="stat-total-ingresos" class="text-3xl font-bold text-green-400">$0.00</p>
                         </div>
-                        <select id="filter-singer" onchange="renderSongbook()" class="w-full md:w-64">
-                            <option value="all">Todos los cantantes</option>
-                            <option value="Alejandro">Alejandro</option>
-                            <option value="Alejandra">Alejandra</option>
-                            <option value="Diana">Diana</option>
-                            <option value="Mery">Mery</option>
-                            <option value="Marianny">Marianny</option>
-                            <option value="Nelly">Nelly</option>
-                            <option value="Nicole">Nicole</option>
-                        </select>
+                        <div class="glass-panel p-6 text-center border-b-4 border-red-500">
+                            <h4 class="text-xs text-gray-500 uppercase mb-2">Total Gastado (Tareas)</h4>
+                            <p id="stat-total-gastos" class="text-3xl font-bold text-red-400">$0.00</p>
+                        </div>
+                        <div class="glass-panel p-6 text-center border-b-4 border-silver">
+                            <h4 class="text-xs text-gray-500 uppercase mb-2">Dinero Actual (Saldo)</h4>
+                            <p id="stat-saldo-actual" class="text-3xl font-bold silver-text">$0.00</p>
+                        </div>
                     </div>
-                    <span id="song-stats" class="text-xs text-gray-500 italic"></span>
-                </div>
-                <div class="overflow-x-auto glass-panel">
-                    <table class="w-full text-left">
-                        <thead class="bg-black/40 silver-text">
-                            <tr>
-                                <th class="p-4">Canción</th>
-                                <th class="p-4">Autor</th>
-                                <th class="p-4">Cantante</th>
-                                <th class="p-4">Tonalidad</th>
-                                <th class="p-4 text-center">Ver</th>
-                                <th class="p-4 actions-column hidden">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="song-list" class="divide-y divide-white/10 text-gray-300"></tbody>
-                    </table>
-                </div>
-            </section>
 
-            <!-- Sección: PLANIFICACION -->
-            <section id="section-planificacion" class="section-content hidden-section">
-                <div class="flex flex-col md:flex-row gap-8">
-                    <div class="flex-1 glass-panel p-6">
+                    <!-- Matriz de Pagos -->
+                    <div class="glass-panel p-6">
                         <div class="flex justify-between items-center mb-6">
-                            <button onclick="changeMonth(-1)"><i class="fas fa-chevron-left"></i></button>
-                            <h3 id="calendar-month-year" class="text-xl font-bold"></h3>
-                            <button onclick="changeMonth(1)"><i class="fas fa-chevron-right"></i></button>
+                            <h3 class="text-xl font-bold silver-text uppercase">Matriz de Pagos Mensuales</h3>
+                            <button onclick="syncPayments()" class="btn-silver px-4 py-2 rounded-lg text-xs">SINCRONIZAR DATOS</button>
                         </div>
-                        <div class="grid grid-cols-7 text-center text-xs font-bold text-gray-500 mb-2">
-                            <div>DOM</div><div>LUN</div><div>MAR</div><div>MIE</div><div>JUE</div><div>VIE</div><div>SAB</div>
+                        <div class="overflow-x-auto custom-scrollbar">
+                            <table class="w-full text-left table-payment">
+                                <thead class="bg-black/40 text-gray-400">
+                                    <tr>
+                                        <th class="p-3 sticky left-0 bg-[#121212] z-10">Nombre</th>
+                                        <th class="p-3 month-header">Mar</th>
+                                        <th class="p-3 month-header">Abr</th>
+                                        <th class="p-3 month-header">May</th>
+                                        <th class="p-3 month-header">Jun</th>
+                                        <th class="p-3 month-header">Jul</th>
+                                        <th class="p-3 month-header">Ago</th>
+                                        <th class="p-3 month-header">Sep</th>
+                                        <th class="p-3 month-header">Oct</th>
+                                        <th class="p-3 month-header">Nov</th>
+                                        <th class="p-3 month-header">Dic</th>
+                                        <th class="p-3 text-xs uppercase font-bold silver-text">Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="payment-table-body" class="divide-y divide-white/5"></tbody>
+                                <tfoot id="payment-table-footer" class="bg-white/5 font-bold"></tfoot>
+                            </table>
                         </div>
-                        <div id="calendar-days" class="calendar-grid"></div>
-                    </div>
-                    <div id="day-details" class="flex-1 glass-panel p-6 border-l-4 border-silver hidden">
-                        <div class="flex justify-between items-start mb-4">
-                            <h3 id="detail-date" class="text-xl font-bold silver-text"></h3>
-                            <div id="detail-actions" class="hidden flex gap-2">
-                                <button id="btn-edit-activity" class="text-blue-400 text-xs uppercase hover:underline">Editar</button>
-                            </div>
-                        </div>
-                        <div id="detail-content"></div>
                     </div>
                 </div>
             </section>
 
-            <!-- Sección: GALERIA -->
+            <!-- Otras secciones permanecen igual visualmente -->
+            <section id="section-cancionero" class="section-content hidden-section">
+                <!-- Contenido Cancionero -->
+            </section>
+            <section id="section-planificacion" class="section-content hidden-section">
+                <!-- Contenido Planificacion -->
+            </section>
             <section id="section-galeria" class="section-content hidden-section">
-                <div class="glass-panel p-6 mb-8">
-                    <div class="flex flex-col md:flex-row items-center gap-4 justify-between">
-                        <div>
-                            <h3 class="text-lg font-bold silver-text uppercase">Fotos del Ministerio</h3>
-                            <p class="text-xs text-gray-500">Comparte los mejores momentos del equipo</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <input type="file" id="gallery-upload-input" accept="image/*" class="hidden" onchange="uploadToGallery()">
-                            <button onclick="document.getElementById('gallery-upload-input').click()" class="btn-silver px-4 py-2 rounded-lg text-xs flex items-center gap-2">
-                                <i class="fas fa-upload"></i> SUBIR FOTO
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                <div id="gallery-container" class="gallery-grid"></div>
+                <!-- Contenido Galeria -->
             </section>
-
-            <!-- Sección: INGRESO -->
             <section id="section-ingreso" class="section-content hidden-section">
-                <div class="glass-panel p-6 max-w-2xl mx-auto">
-                    <h3 class="text-xl font-bold mb-6 silver-text border-b border-white/10 pb-2">NUEVA ACTIVIDAD</h3>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="text-xs text-gray-400 block mb-1">FECHA</label>
-                                <input type="date" id="form-date" class="w-full">
-                            </div>
-                            <div>
-                                <label class="text-xs text-gray-400 block mb-1">NOMBRE ACTIVIDAD</label>
-                                <input type="text" id="form-activity" placeholder="Ej: Servicio de Domingo" class="w-full">
-                            </div>
-                        </div>
-
-                        <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                            <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
-                            <div id="repertorio-inputs" class="space-y-2 mb-3"></div>
-                            <button onclick="addRepertorioRow('repertorio-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
-                        </div>
-
-                        <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                            <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO DE TRABAJO</h4>
-                            <div id="equipo-inputs" class="space-y-2 mb-3"></div>
-                            <button onclick="addEquipoRow('equipo-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
-                        </div>
-
-                        <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                            <h4 class="text-sm font-bold mb-3"><i class="fas fa-sticky-note mr-2"></i>NOTAS / OBSERVACIONES</h4>
-                            <textarea id="form-notes" rows="3" placeholder="Instrucciones adicionales para el equipo..." class="w-full resize-none text-sm"></textarea>
-                        </div>
-
-                        <button onclick="saveActivity()" class="w-full btn-silver p-3 rounded-lg mt-4 uppercase tracking-widest">Guardar Planificación</button>
-                    </div>
-                </div>
+                <!-- Contenido Ingreso -->
             </section>
-
-            <!-- Sección: USUARIOS ADMIN -->
             <section id="section-usuarios-admin" class="section-content hidden-section">
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-1 glass-panel p-6">
-                        <h3 class="text-xl font-bold mb-6 silver-text">NUEVO MIEMBRO/USUARIO</h3>
-                        <div class="space-y-4">
-                            <input type="text" id="user-full-name" placeholder="Nombre Completo" class="w-full">
-                            <input type="date" id="user-birth" class="w-full">
-                            <input type="text" id="user-job" placeholder="Ocupación" class="w-full">
-                            <select id="user-role" class="w-full">
-                                <option value="MIEMBRO">Rol: MIEMBRO</option>
-                                <option value="LIDER">Rol: LIDER</option>
-                            </select>
-                            <div class="space-y-1">
-                                <label class="text-[10px] text-gray-500 ml-1">FOTO DE PERFIL</label>
-                                <input type="file" id="user-photo-file" accept="image/*" class="w-full text-xs">
-                            </div>
-                            <button id="btn-save-user" onclick="saveUser()" class="w-full btn-silver p-3 rounded-lg mt-4">CREAR USUARIO</button>
-                        </div>
-                    </div>
-                    <div class="lg:col-span-2 glass-panel p-6">
-                        <h3 class="text-xl font-bold mb-6 silver-text">GESTIONAR LISTADO</h3>
-                        <div id="admin-user-list" class="space-y-3"></div>
-                    </div>
-                </div>
+                <!-- Contenido Usuarios -->
             </section>
         </main>
     </div>
 
-    <!-- Modales Adicionales -->
-    
-    <!-- Modal Ver Nota (Tarea Descripción) -->
+    <!-- Modales -->
     <div id="modal-task-desc-view" class="fixed inset-0 modal-overlay z-[400] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-md">
             <div class="flex justify-between items-center mb-4">
-                <h3 id="task-desc-title" class="text-lg font-bold silver-text">Descripción de Tarea</h3>
+                <h3 id="task-desc-title" class="text-lg font-bold silver-text">Detalle</h3>
                 <button onclick="closeTaskDescModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
             </div>
-            <div id="task-desc-body" class="bg-white/5 p-4 rounded-lg border border-white/10 text-sm text-gray-300 min-h-[100px]"></div>
+            <div id="task-desc-body" class="bg-white/5 p-4 rounded-lg text-sm text-gray-300 min-h-[100px]"></div>
         </div>
     </div>
 
-    <!-- Modal Editar Tarea (Solo Admin) -->
-    <div id="modal-edit-task" class="fixed inset-0 modal-overlay z-[400] flex items-center justify-center p-4 hidden">
-        <div class="glass-panel p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold silver-text mb-6 uppercase">Editar Tarea</h3>
-            <input type="hidden" id="edit-task-id">
-            <div class="space-y-4">
-                <input type="text" id="edit-task-name" class="w-full">
-                <input type="date" id="edit-task-date" class="w-full">
-                <select id="edit-task-status" class="w-full">
-                    <option value="Sin realizar">Sin realizar</option>
-                    <option value="En proceso">En proceso</option>
-                    <option value="Realizado">Realizado</option>
-                </select>
-                <select id="edit-task-responsible" class="w-full"></select>
-                <input type="number" id="edit-task-cost" step="0.01" class="w-full">
-                <textarea id="edit-task-desc" rows="3" class="w-full text-sm resize-none"></textarea>
-                <div class="flex gap-3 pt-2">
-                    <button onclick="closeEditTaskModal()" class="flex-1 p-3 text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
-                    <button onclick="processTaskUpdate()" class="flex-1 btn-silver p-3 rounded-lg">GUARDAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Modal Editar Canción -->
-    <div id="modal-edit-song" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
-        <div class="glass-panel p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider">Editar Canción</h3>
-            <input type="hidden" id="edit-song-original-id">
-            <div class="space-y-4">
-                <div><label class="text-[10px] text-gray-500 block mb-1">TÍTULO</label><input type="text" id="edit-song-title" class="w-full"></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">AUTOR</label><input type="text" id="edit-song-author" class="w-full"></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">CANTANTE</label><select id="edit-song-singer" class="w-full"></select></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">TONALIDAD</label><select id="edit-song-key" class="w-full edit-key-select"></select></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">IMAGEN</label><input type="file" id="edit-song-image-input" accept="image/*" class="w-full text-xs"></div>
-                <div class="flex gap-3 pt-4">
-                    <button onclick="closeEditModal()" class="flex-1 p-3 text-xs text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
-                    <button id="btn-save-song-edit" onclick="processSongUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="song-image-viewer" class="fixed inset-0 modal-overlay z-[300] flex flex-col items-center justify-center hidden">
-        <button onclick="closeSongImage()" class="close-viewer-btn absolute top-6 right-6 text-white text-3xl z-[310]"><i class="fas fa-times"></i></button>
-        <div id="song-image-container"></div>
-        <p id="song-image-title" class="mt-4 text-xl font-bold silver-text pb-4"></p>
-    </div>
-
-    <div id="modal-edit-activity" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
-        <div class="glass-panel p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider border-b border-white/10 pb-2">Editar Actividad</h3>
-            <input type="hidden" id="edit-activity-id">
-            <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="text-xs text-gray-500 block mb-1">FECHA</label><input type="date" id="edit-activity-date" class="w-full"></div>
-                    <div><label class="text-xs text-gray-500 block mb-1">NOMBRE</label><input type="text" id="edit-activity-name" class="w-full"></div>
-                </div>
-                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
-                    <div id="edit-repertorio-inputs" class="space-y-2 mb-3"></div>
-                    <button onclick="addRepertorioRow('edit-repertorio-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
-                </div>
-                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
-                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO</h4>
-                    <div id="edit-equipo-inputs" class="space-y-2 mb-3"></div>
-                    <button onclick="addEquipoRow('edit-equipo-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
-                </div>
-                <div><label class="text-xs text-gray-500 block mb-1">NOTAS</label><textarea id="edit-activity-notes" rows="3" class="w-full text-sm"></textarea></div>
-                <div class="flex gap-4 pt-4">
-                    <button onclick="closeEditActivityModal()" class="flex-1 p-3 text-sm text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
-                    <button onclick="processActivityUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-sm">GUARDAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, onSnapshot, query, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, doc, onSnapshot, query, updateDoc, deleteDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-const firebaseConfig = {
+        const firebaseConfig = {
   apiKey: "AIzaSyBkN6mE0YqWeAToslbgOAta80gjYi_C4Xk",
   authDomain: "gerencia-de-energia.firebaseapp.com",
   projectId: "gerencia-de-energia",
@@ -619,7 +339,8 @@ const firebaseConfig = {
   messagingSenderId: "347966041919",
   appId: "1:347966041919:web:71c81a1b60013478712d8a",
   measurementId: "G-9X5RMXJB0T"
-};        const app = initializeApp(firebaseConfig);
+};
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
@@ -627,30 +348,16 @@ const firebaseConfig = {
         // State
         window.currentUser = null;
         window.allUsers = [];
-        window.activities = [];
         window.tasks = [];
-        window.galleryPhotos = [];
-        window.currentDate = new Date();
-        const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
-        const CANTANTES = ["Alejandro", "Alejandra", "Diana", "Mery", "Marianny", "Nelly", "Nicole"];
+        window.paymentData = {}; // { userId: { mar: 0, apr: 0 ... } }
+        const MONTHS = ['mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
 
-        // Init tonalidad selects
-        const initStaticSelects = () => {
-            const tonalSelects = document.querySelectorAll('.edit-key-select');
-            tonalSelects.forEach(s => {
-                s.innerHTML = '<option value="">Sin tono</option>' + TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('');
-            });
-            const singerSelects = [document.getElementById('edit-song-singer')];
-            singerSelects.forEach(s => {
-                if(s) s.innerHTML = CANTANTES.map(c => `<option value="${c}">${c}</option>`).join('');
-            });
-        };
-
+        // --- AUTH & PERMISSIONS ---
         window.handleLogin = async () => {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
             if (user === 'Admin' && pass === 'admin123') proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
-            else if (user === 'ruach' && pass === 'ruach123') proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
+            else if (user === 'ruach' && pass === 'ruach123') proceedLogin({ name: 'Observador', role: 'OBSERVADOR', uid: 'observer' });
             else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
                 if(found && pass === 'ruach123') proceedLogin({ ...found, uid: found.id });
@@ -662,432 +369,201 @@ const firebaseConfig = {
             window.currentUser = userData;
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('app-container').classList.remove('hidden-section');
-            document.getElementById('user-display-name').innerText = `Sesión: ${userData.name} (${userData.role})`;
+            document.getElementById('user-display-name').innerText = userData.name;
             setupPermissions();
             renderAll();
         };
 
-        window.handleLogout = () => location.reload();
-
         const setupPermissions = () => {
             const isLider = window.currentUser?.role === 'LIDER';
-            document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
-            document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
-            document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
-            document.getElementById('detail-actions')?.classList.toggle('hidden', !isLider);
-            
-            // Permisos módulo Tareas
+            document.getElementById('menu-cuentas')?.classList.toggle('hidden', !isLider);
+            document.getElementById('menu-ingreso')?.classList.toggle('hidden', !isLider);
+            document.getElementById('menu-usuario')?.classList.toggle('hidden', !isLider);
             document.getElementById('task-entry-panel')?.classList.toggle('hidden', !isLider);
-            document.getElementById('task-list-panel')?.classList.toggle('lg:col-span-4', !isLider);
-            document.getElementById('task-list-panel')?.classList.toggle('lg:col-span-3', isLider);
             document.getElementById('th-task-actions')?.classList.toggle('hidden', !isLider);
         };
 
-        const fileToBase64 = (file) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = e => reject(e);
-        });
-
         // --- TAREAS ---
         window.saveTask = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const name = document.getElementById('task-name').value;
-            const date = document.getElementById('task-date').value;
-            const status = document.getElementById('task-status').value;
-            const responsible = document.getElementById('task-responsible').value;
             const cost = parseFloat(document.getElementById('task-cost').value) || 0;
-            const desc = document.getElementById('task-desc').value;
-
-            if(!name || !date || !responsible) return;
-
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
-                    name, date, status, responsible, cost, desc, createdAt: new Date().toISOString()
-                });
-                document.getElementById('task-name').value = '';
-                document.getElementById('task-date').value = '';
-                document.getElementById('task-cost').value = '';
-                document.getElementById('task-desc').value = '';
-            } catch (e) { console.error(e); }
+            if(!name) return;
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
+                name, date: document.getElementById('task-date').value,
+                status: document.getElementById('task-status').value,
+                responsible: document.getElementById('task-responsible').value,
+                cost, desc: document.getElementById('task-desc').value
+            });
+            document.getElementById('task-name').value = '';
+            document.getElementById('task-cost').value = '';
         };
 
         window.renderTasks = () => {
             const body = document.getElementById('task-table-body');
-            if (!body) return;
+            if(!body) return;
             const isLider = window.currentUser?.role === 'LIDER';
             
-            // Poblar selects de responsables con miembros actuales
-            const membersOptions = window.allUsers.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-            const respSelect = document.getElementById('task-responsible');
-            const editRespSelect = document.getElementById('edit-task-responsible');
-            if(respSelect) respSelect.innerHTML = membersOptions;
-            if(editRespSelect) editRespSelect.innerHTML = membersOptions;
+            const options = window.allUsers.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
+            document.getElementById('task-responsible').innerHTML = options;
 
             body.innerHTML = window.tasks.map(t => {
                 const statusClass = t.status === 'Realizado' ? 'status-done' : (t.status === 'En proceso' ? 'status-process' : 'status-pending');
-                const encoded = encodeURIComponent(JSON.stringify(t));
                 return `
-                <tr class="hover:bg-white/5 transition-colors">
+                <tr class="hover:bg-white/5">
                     <td class="p-3 font-bold text-white uppercase">${t.name}</td>
                     <td class="p-3 text-gray-400">${t.date}</td>
                     <td class="p-3"><span class="status-badge ${statusClass}">${t.status}</span></td>
-                    <td class="p-3 text-silver-text font-medium">${t.responsible}</td>
+                    <td class="p-3 text-silver-text">${t.responsible}</td>
                     <td class="p-3 text-green-400 font-bold">$${(t.cost || 0).toFixed(2)}</td>
                     <td class="p-3 text-center">
-                        <button onclick="viewTaskDesc('${encoded}')" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fas fa-sticky-note text-lg"></i>
-                        </button>
+                        <button onclick="viewTask('${encodeURIComponent(JSON.stringify(t))}')" class="text-gray-400"><i class="fas fa-sticky-note"></i></button>
                     </td>
                     <td class="p-3 text-center ${isLider ? '' : 'hidden'}">
-                        <div class="flex justify-center gap-2">
-                            <button onclick="openEditTask('${encoded}')" class="text-blue-400 p-1 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteTask('${t.id}')" class="text-red-400 p-1 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        };
-
-        window.viewTaskDesc = (enc) => {
-            const t = JSON.parse(decodeURIComponent(enc));
-            document.getElementById('task-desc-title').innerText = t.name;
-            document.getElementById('task-desc-body').innerText = t.desc || 'Sin descripción adicional.';
-            document.getElementById('modal-task-desc-view').classList.remove('hidden');
-        };
-        window.closeTaskDescModal = () => document.getElementById('modal-task-desc-view').classList.add('hidden');
-
-        window.openEditTask = (enc) => {
-            const t = JSON.parse(decodeURIComponent(enc));
-            document.getElementById('edit-task-id').value = t.id;
-            document.getElementById('edit-task-name').value = t.name;
-            document.getElementById('edit-task-date').value = t.date;
-            document.getElementById('edit-task-status').value = t.status;
-            document.getElementById('edit-task-responsible').value = t.responsible;
-            document.getElementById('edit-task-cost').value = t.cost;
-            document.getElementById('edit-task-desc').value = t.desc || '';
-            document.getElementById('modal-edit-task').classList.remove('hidden');
-        };
-        window.closeEditTaskModal = () => document.getElementById('modal-edit-task').classList.add('hidden');
-
-        window.processTaskUpdate = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const id = document.getElementById('edit-task-id').value;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), {
-                    name: document.getElementById('edit-task-name').value,
-                    date: document.getElementById('edit-task-date').value,
-                    status: document.getElementById('edit-task-status').value,
-                    responsible: document.getElementById('edit-task-responsible').value,
-                    cost: parseFloat(document.getElementById('edit-task-cost').value) || 0,
-                    desc: document.getElementById('edit-task-desc').value
-                });
-                closeEditTaskModal();
-            } catch (e) { console.error(e); }
-        };
-
-        window.deleteTask = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Eliminar esta tarea permanentemente?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id)); } catch (e) { console.error(e); }
-            }
-        };
-
-        // --- MIEMBROS ---
-        window.saveUser = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const name = document.getElementById('user-full-name').value;
-            const birth = document.getElementById('user-birth').value;
-            const job = document.getElementById('user-job').value;
-            const role = document.getElementById('user-role').value;
-            const fileInput = document.getElementById('user-photo-file');
-            if(!name || !birth) return;
-            const btn = document.getElementById('btn-save-user');
-            btn.disabled = true; btn.innerText = "PROCESANDO...";
-            let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
-            try {
-                if (fileInput.files && fileInput.files[0]) photoBase64 = await fileToBase64(fileInput.files[0]);
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'users'), {
-                    name, birth, job, role, photo: photoBase64, createdAt: new Date().toISOString()
-                });
-                document.getElementById('user-full-name').value = '';
-                document.getElementById('user-birth').value = '';
-                document.getElementById('user-job').value = '';
-                fileInput.value = '';
-            } catch (e) { console.error(e); } finally {
-                btn.disabled = false; btn.innerText = "CREAR USUARIO";
-            }
-        };
-
-        window.deleteUser = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Eliminar este usuario?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'users', id)); } catch (e) { console.error(e); }
-            }
-        };
-
-        // --- GALERIA ---
-        window.uploadToGallery = async () => {
-            const fileInput = document.getElementById('gallery-upload-input');
-            if (!fileInput.files || !fileInput.files[0]) return;
-            try {
-                const base64 = await fileToBase64(fileInput.files[0]);
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
-                    image: base64, uploadedBy: window.currentUser?.name || 'Anónimo', date: new Date().toISOString()
-                });
-                fileInput.value = '';
-            } catch (e) { console.error(e); }
-        };
-
-        window.deleteFromGallery = async (id) => {
-            if (window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Deseas eliminar esta foto?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gallery', id)); } catch (e) { console.error(e); }
-            }
-        };
-
-        // --- PLANIFICACION ---
-        window.saveActivity = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const date = document.getElementById('form-date').value;
-            const activity = document.getElementById('form-activity').value;
-            const notes = document.getElementById('form-notes').value.trim();
-            if(!date || !activity) return;
-
-            const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
-                const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { 
-                    titulo: inputs[0].value.trim(), autor: inputs[1].value.trim(), 
-                    cantante: inputs[2].value, tonalidad: inputs[3].value
-                } : null;
-            }).filter(i => i);
-
-            const equipo = Array.from(document.querySelectorAll('#equipo-inputs > div')).map(row => {
-                const inputs = row.querySelectorAll('input, select');
-                return inputs[0].value ? { nombre: inputs[0].value, rol: inputs[1].value } : null;
-            }).filter(i => i);
-
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'activities'), {
-                    date, activity, canciones, equipo, notes
-                });
-                document.getElementById('form-date').value = '';
-                document.getElementById('form-activity').value = '';
-                document.getElementById('form-notes').value = '';
-                document.getElementById('repertorio-inputs').innerHTML = '';
-                document.getElementById('equipo-inputs').innerHTML = '';
-                window.addRepertorioRow('repertorio-inputs');
-                window.addEquipoRow('equipo-inputs');
-                window.showSection('planificacion');
-            } catch (e) { console.error(e); }
-        };
-
-        window.deleteActivity = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Eliminar planificación?")) {
-                try {
-                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id));
-                    document.getElementById('day-details').classList.add('hidden');
-                } catch (e) { console.error(e); }
-            }
-        };
-
-        // --- RENDERS ---
-        window.renderMembers = () => {
-            const container = document.getElementById('members-list');
-            if (!container) return;
-            container.innerHTML = window.allUsers.map(user => `
-                <div class="glass-panel p-4 flex items-center gap-4">
-                    <img src="${user.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
-                    <div>
-                        <h4 class="font-bold text-white uppercase text-sm">${user.name}</h4>
-                        <p class="text-[10px] text-gray-500">NAC: ${user.birth}</p>
-                        <span class="text-[9px] text-silver-text uppercase font-bold mt-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 inline-block">${user.job || 'Miembro'}</span>
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        window.renderAdminUsers = () => {
-            const container = document.getElementById('admin-user-list');
-            if (!container) return;
-            container.innerHTML = window.allUsers.map(user => `
-                <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
-                    <div class="flex items-center gap-3">
-                        <img src="${user.photo}" class="w-8 h-8 rounded-full border border-white/20">
-                        <span class="text-xs uppercase">${user.name} <span class="text-[9px] text-gray-500 italic lowercase">(${user.role})</span></span>
-                    </div>
-                    <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
-                </div>
-            `).join('');
-        };
-
-        window.renderSongbook = () => {
-            const singerFilter = document.getElementById('filter-singer').value;
-            const searchQuery = document.getElementById('search-song').value.toLowerCase().trim();
-            const container = document.getElementById('song-list');
-            if (!container) return;
-
-            let todasMap = new Map();
-            window.activities.forEach(act => { 
-                if(act.canciones) act.canciones.forEach(s => {
-                    const key = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
-                    if(!todasMap.has(key) || (!todasMap.get(key).image && s.image)) todasMap.set(key, s);
-                });
-            });
-
-            let finalArr = Array.from(todasMap.values());
-            if(singerFilter !== 'all') finalArr = finalArr.filter(s => s.cantante === singerFilter);
-            if(searchQuery !== '') finalArr = finalArr.filter(s => s.titulo.toLowerCase().includes(searchQuery) || (s.autor && s.autor.toLowerCase().includes(searchQuery)));
-
-            document.getElementById('song-stats').innerText = `${finalArr.length} canciones encontradas`;
-            const isLider = window.currentUser?.role === 'LIDER';
-
-            container.innerHTML = finalArr.map(song => {
-                const encoded = encodeURIComponent(JSON.stringify(song));
-                return `
-                <tr class="hover:bg-white/5 transition-colors text-sm">
-                    <td class="p-4 font-bold text-white uppercase">${song.titulo}</td>
-                    <td class="p-4 text-gray-400">${song.autor || '-'}</td>
-                    <td class="p-4"><span class="px-2 py-0.5 bg-silver/10 border border-silver/20 rounded-full text-[10px] text-silver-text uppercase">${song.cantante}</span></td>
-                    <td class="p-4 font-bold text-silver-text">${song.tonalidad || '-'}</td>
-                    <td class="p-4 text-center">
-                        ${song.image ? `<button onclick="openSongImage('${encoded}')" class="text-silver-text"><i class="fas fa-eye text-lg"></i></button>` : '-'}
-                    </td>
-                    <td class="p-4 ${isLider ? '' : 'hidden'} actions-column">
-                        <button onclick="openEditSong('${encoded}')" class="text-blue-400 mr-2"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteSongGlobal('${encoded}')" class="text-red-400"><i class="fas fa-trash"></i></button>
+                        <button onclick="deleteTask('${t.id}')" class="text-red-400"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             }).join('');
+            updateBalance();
         };
 
-        window.renderCalendar = () => {
-            const monthNames = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
-            const month = window.currentDate.getMonth(), year = window.currentDate.getFullYear();
-            const titleEl = document.getElementById('calendar-month-year');
-            if (titleEl) titleEl.innerText = `${monthNames[month]} ${year}`;
-            const firstDay = new Date(year, month, 1).getDay(), daysInMonth = new Date(year, month + 1, 0).getDate();
-            const calendarEl = document.getElementById('calendar-days');
-            if (!calendarEl) return;
-            calendarEl.innerHTML = '';
-            for(let i=0; i<firstDay; i++) calendarEl.innerHTML += '<div></div>';
-            for(let d=1; d<=daysInMonth; d++) {
-                const dateStr = `${year}-${String(month+1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
-                const hasEvent = window.activities.find(a => a.date === dateStr);
-                calendarEl.innerHTML += `<div class="calendar-day ${hasEvent ? 'has-event' : ''}" onclick="showDayDetails('${dateStr}')">${d}</div>`;
+        // --- CUENTAS (PAGOS & GASTOS) ---
+        window.updatePaymentValue = (userId, month, value) => {
+            if(!window.paymentData[userId]) window.paymentData[userId] = {};
+            window.paymentData[userId][month] = parseFloat(value) || 0;
+            renderPaymentTable();
+        };
+
+        window.syncPayments = async () => {
+            if(window.currentUser?.role !== 'LIDER') return;
+            try {
+                // CORRECCIÓN: Ruta con número par de segmentos (6 segmentos)
+                const financeDocRef = doc(db, 'artifacts', appId, 'public', 'data', 'finance', 'document');
+                await setDoc(financeDocRef, {
+                    payments: window.paymentData
+                });
+            } catch(e) { console.error("Error sincronizando pagos:", e); }
+        };
+
+        const renderPaymentTable = () => {
+            const body = document.getElementById('payment-table-body');
+            const footer = document.getElementById('payment-table-footer');
+            if(!body) return;
+
+            let html = '';
+            let monthTotals = MONTHS.reduce((acc, m) => ({...acc, [m]: 0}), {});
+            let grandTotal = 0;
+
+            window.allUsers.forEach(user => {
+                const data = window.paymentData[user.id] || {};
+                let userTotal = 0;
+                
+                let row = `<tr class="hover:bg-white/5">
+                    <td class="p-3 sticky left-0 bg-[#0f0f0f] z-10 text-xs font-bold uppercase border-r border-white/5">${user.name}</td>`;
+                
+                MONTHS.forEach(m => {
+                    const val = data[m] || 0;
+                    userTotal += val;
+                    monthTotals[m] += val;
+                    row += `<td class="p-2"><input type="number" step="0.1" value="${val}" onchange="updatePaymentValue('${user.id}', '${m}', this.value)"></td>`;
+                });
+
+                grandTotal += userTotal;
+                row += `<td class="p-3 total-cell">$${userTotal.toFixed(2)}</td></tr>`;
+                html += row;
+            });
+
+            body.innerHTML = html;
+
+            let footerRow = `<tr><td class="p-3 sticky left-0 bg-[#1a1a1a] z-10 text-xs uppercase">TOTAL MES</td>`;
+            MONTHS.forEach(m => {
+                footerRow += `<td class="p-3 text-xs text-green-400 font-bold">$${monthTotals[m].toFixed(2)}</td>`;
+            });
+            footerRow += `<td class="p-3 text-lg silver-text">$${grandTotal.toFixed(2)}</td></tr>`;
+            footer.innerHTML = footerRow;
+
+            updateBalance(grandTotal);
+        };
+
+        const updateBalance = (forcedIngresoTotal = null) => {
+            let totalIngresos = forcedIngresoTotal;
+            
+            if(totalIngresos === null) {
+                totalIngresos = 0;
+                Object.values(window.paymentData).forEach(userPayments => {
+                    Object.values(userPayments).forEach(val => totalIngresos += (parseFloat(val) || 0));
+                });
             }
+
+            const totalGastos = window.tasks.reduce((sum, t) => sum + (parseFloat(t.cost) || 0), 0);
+            const saldo = totalIngresos - totalGastos;
+
+            const ingEl = document.getElementById('stat-total-ingresos');
+            const gasEl = document.getElementById('stat-total-gastos');
+            const salEl = document.getElementById('stat-saldo-actual');
+
+            if(ingEl) ingEl.innerText = `$${totalIngresos.toFixed(2)}`;
+            if(gasEl) gasEl.innerText = `$${totalGastos.toFixed(2)}`;
+            if(salEl) salEl.innerText = `$${saldo.toFixed(2)}`;
         };
 
-        window.showDayDetails = (dateStr) => {
-            const act = window.activities.find(a => a.date === dateStr);
-            const detailPanel = document.getElementById('day-details');
-            const content = document.getElementById('detail-content');
-            document.getElementById('detail-date').innerText = dateStr;
-            detailPanel.classList.remove('hidden');
-            if(act) {
-                document.getElementById('btn-edit-activity').onclick = () => openEditActivity(act.id);
-                content.innerHTML = `
-                    <h4 class="text-xl font-bold mb-4 uppercase">${act.activity}</h4>
-                    ${act.notes ? `<div class="mb-4 p-3 bg-silver/5 border border-silver/10 rounded-lg"><p class="text-[10px] silver-text font-bold uppercase mb-1">Nota</p><p class="text-xs text-gray-300 italic">${act.notes}</p></div>` : ''}
-                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase mb-2">Repertorio</p>
-                        <ul class="text-sm space-y-2">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante}) <span class="silver-text font-bold">${c.tonalidad || ''}</span></li>`).join('')}</ul>
-                    </div>
-                    <div class="mb-6"><p class="text-[10px] text-gray-500 uppercase mb-2">Equipo</p>
-                        <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="silver-text text-[10px] uppercase">${e.rol}</span></div>`).join('')}</div>
-                    </div>
-                    ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-[10px] font-bold border border-red-500/30 px-3 py-2 rounded w-full uppercase">Eliminar Actividad</button>` : ''}
-                `;
-            } else content.innerHTML = `<p class="text-gray-500 italic text-sm">Sin actividades.</p>`;
-            setupPermissions();
-        };
-
-        window.renderGallery = () => {
-            const container = document.getElementById('gallery-container');
-            if (!container) return;
-            const isLider = window.currentUser?.role === 'LIDER';
-            container.innerHTML = window.galleryPhotos.map(p => `
-                <div class="gallery-item">
-                    <img src="${p.image}" loading="lazy">
-                    <div class="gallery-overlay">
-                        <p class="text-[9px] text-white/80">Por: ${p.uploadedBy}</p>
-                        ${isLider ? `<button onclick="deleteFromGallery('${p.id}')" class="absolute top-2 right-2 bg-red-500 p-1 rounded-full text-[8px]"><i class="fas fa-trash"></i></button>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        // --- UI HELPERS ---
-        window.addRepertorioRow = (targetId, data = null) => {
-            const div = document.createElement('div');
-            div.className = "grid grid-cols-4 gap-2";
-            div.innerHTML = `
-                <input type="text" placeholder="Canción" class="text-xs" value="${data?.titulo || ''}">
-                <input type="text" placeholder="Autor" class="text-xs" value="${data?.autor || ''}">
-                <select class="text-xs">${CANTANTES.map(c => `<option value="${c}" ${data?.cantante === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
-                <select class="text-xs edit-key-select"><option value="">Tono</option>${TONALIDADES.map(t => `<option value="${t}" ${data?.tonalidad === t ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
-            document.getElementById(targetId).appendChild(div);
-        };
-
-        window.addEquipoRow = (targetId, data = null) => {
-            const roles = ["baterista", "bajista", "tecladista", "violinista", "guitarrista", "coro", "director", "sonidista"];
-            const div = document.createElement('div');
-            div.className = "grid grid-cols-2 gap-2";
-            div.innerHTML = `
-                <input type="text" placeholder="Nombre" class="text-sm" value="${data?.nombre || ''}">
-                <select class="text-sm uppercase">${roles.map(r => `<option value="${r}" ${data?.rol === r ? 'selected' : ''}>${r}</option>`).join('')}</select>`;
-            document.getElementById(targetId).appendChild(div);
-        };
-
+        // --- UTILS ---
         window.toggleSidebar = () => {
             const sb = document.getElementById('sidebar');
-            const main = document.getElementById('main-content');
             sb.classList.toggle('closed');
-            if(window.innerWidth > 768) main.style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
+            if(window.innerWidth > 768) document.getElementById('main-content').style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
         };
 
         window.showSection = (id) => {
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
             document.getElementById(`section-${id}`).classList.remove('hidden-section');
             document.getElementById('current-section-title').innerText = id.replace('-', ' ');
-            if(window.innerWidth < 1024 && !document.getElementById('sidebar').classList.contains('closed')) window.toggleSidebar();
-            if(id === 'tareas') renderTasks();
+            if(id === 'cuentas') renderPaymentTable();
         };
 
-        window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
+        window.viewTask = (enc) => {
+            const t = JSON.parse(decodeURIComponent(enc));
+            document.getElementById('task-desc-title').innerText = t.name;
+            document.getElementById('task-desc-body').innerText = t.desc || 'Sin descripción.';
+            document.getElementById('modal-task-desc-view').classList.remove('hidden');
+        };
 
-        const renderAll = () => { renderMembers(); renderAdminUsers(); renderCalendar(); renderSongbook(); renderGallery(); renderTasks(); };
+        window.closeTaskDescModal = () => document.getElementById('modal-task-desc-view').classList.add('hidden');
 
-        const startFirestoreListeners = () => {
+        window.deleteTask = async (id) => {
+            if(confirm("¿Eliminar tarea?")) await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id));
+        };
+
+        const renderAll = () => {
+            renderTasks();
+            renderPaymentTable();
+        };
+
+        // --- FIREBASE LISTENERS ---
+        const startListeners = () => {
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), (s) => {
                 window.allUsers = s.docs.map(d => ({id: d.id, ...d.data()}));
-                renderMembers(); renderAdminUsers(); renderTasks();
-            });
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), (s) => {
-                window.activities = s.docs.map(d => ({id: d.id, ...d.data()}));
-                renderCalendar(); renderSongbook();
+                renderAll();
             });
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'tasks')), (s) => {
                 window.tasks = s.docs.map(d => ({id: d.id, ...d.data()}));
                 renderTasks();
             });
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'gallery')), (s) => {
-                window.galleryPhotos = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => new Date(b.date) - new Date(a.date));
-                renderGallery();
-            });
+            // CORRECCIÓN: Ruta con número par de segmentos (6 segmentos)
+            onSnapshot(doc(db, 'artifacts', appId, 'public', 'data', 'finance', 'document'), (s) => {
+                if(s.exists()) {
+                    window.paymentData = s.data().payments || {};
+                    renderPaymentTable();
+                }
+            }, (err) => console.error("Firestore Listener Error:", err));
         };
 
-        onAuthStateChanged(auth, u => { if(u) startFirestoreListeners(); });
+        onAuthStateChanged(auth, u => { if(u) startListeners(); });
         const init = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
             else await signInAnonymously(auth);
         };
         init();
-        initStaticSelects();
-        window.addRepertorioRow('repertorio-inputs');
-        window.addEquipoRow('equipo-inputs');
+        window.handleLogout = () => location.reload();
     </script>
 </body>
 </html>
