@@ -102,7 +102,7 @@
         .btn-silver:hover {
             opacity: 0.8;
         }
-        
+
         .logo-img {
             max-width: 180px;
             filter: drop-shadow(0 0 10px rgba(192,192,192,0.3));
@@ -116,18 +116,6 @@
             background: rgba(0,0,0,0.95);
             backdrop-filter: blur(8px);
         }
-
-        /* Status Badges para Tareas */
-        .status-badge {
-            font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 999px;
-            font-weight: bold;
-            text-transform: uppercase;
-        }
-        .status-pending { background: #4a4a4a; color: #fff; }
-        .status-process { background: #b8860b; color: #fff; }
-        .status-done { background: #006400; color: #fff; }
 
         /* Galeria Styles */
         .gallery-grid {
@@ -165,6 +153,7 @@
             opacity: 1;
         }
 
+        /* Song Image Modal - Responsive Fullscreen */
         #song-image-viewer {
             padding: 0;
         }
@@ -182,22 +171,28 @@
             object-fit: contain;
             transition: transform 0.2s ease;
         }
-        
+
+        /* Ajuste específico para móviles: Fullscreen Stretch */
+        /* Ajuste específico para móviles: Fullscreen con relación de aspecto preservada */
         @media (max-width: 768px) {
             #song-image-viewer img {
                 width: 100vw;
                 height: 100vh;
+                object-fit: fill; /* Estira para ocupar toda la pantalla */
+                /* contain asegura que la imagen se vea completa sin deformarse */
                 object-fit: contain; 
                 border-radius: 0;
             }
             #song-image-title {
-                display: none;
+                display: none; /* Ocultar título en móviles para más espacio */
             }
             .close-viewer-btn {
                 top: 0.5rem !important;
                 right: 0.5rem !important;
                 background: rgba(0,0,0,0.5);
                 border-radius: 50%;
+                width: 40px;
+                height: 40px;
                 width: 44px;
                 height: 44px;
                 display: flex;
@@ -207,6 +202,7 @@
             }
         }
 
+        /* Search Bar Animation */
         .search-container {
             position: relative;
             transition: all 0.3s ease;
@@ -231,7 +227,7 @@
             <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=300&auto=format&fit=crop" alt="Ruach Logo Placeholder" class="logo-img mx-auto mb-6 rounded-lg opacity-80 border border-silver">
             <h1 class="text-3xl font-bold silver-text mb-2">MINISTERIO RUACH</h1>
             <p class="text-gray-400 mb-8">Gestión Organizacional</p>
-            
+
             <div class="space-y-4">
                 <input type="text" id="login-user" placeholder="Usuario" class="w-full">
                 <input type="password" id="login-pass" placeholder="Contraseña" class="w-full">
@@ -243,7 +239,7 @@
 
     <!-- App Principal -->
     <div id="app-container" class="hidden-section">
-        
+
         <!-- Botón de Menú Persistente -->
         <button onclick="toggleSidebar()" class="menu-toggle-btn p-2 text-2xl glass-panel px-4 rounded-lg hover:bg-white/10 transition-colors">
             <i class="fas fa-bars"></i>
@@ -256,13 +252,10 @@
                     <i class="fas fa-music text-silver-text text-xl"></i>
                     <span class="font-bold text-lg silver-text">RUACH MENU</span>
                 </div>
-                
+
                 <ul class="space-y-4">
                     <li onclick="showSection('miembros')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-users w-6"></i> MIEMBROS
-                    </li>
-                    <li onclick="showSection('tareas')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
-                        <i class="fas fa-tasks w-6 text-yellow-500"></i> TAREAS
                     </li>
                     <li onclick="showSection('cancionero')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-book-open w-6"></i> CANCIONERO
@@ -299,70 +292,6 @@
             <!-- Sección: MIEMBROS -->
             <section id="section-miembros" class="section-content active-section">
                 <div id="members-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-            </section>
-
-            <!-- Sección: TAREAS -->
-            <section id="section-tareas" class="section-content hidden-section">
-                <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-                    <!-- Formulario Ingreso: Solo Admin -->
-                    <div id="task-entry-panel" class="lg:col-span-1 glass-panel p-6 hidden">
-                        <h3 class="text-xl font-bold mb-6 silver-text">NUEVA TAREA</h3>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">NOMBRE</label>
-                                <input type="text" id="task-name" placeholder="Título de la tarea" class="w-full">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">FECHA</label>
-                                <input type="date" id="task-date" class="w-full">
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">ESTADO</label>
-                                <select id="task-status" class="w-full">
-                                    <option value="Sin realizar">Sin realizar</option>
-                                    <option value="En proceso">En proceso</option>
-                                    <option value="Realizado">Realizado</option>
-                                </select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">RESPONSABLE</label>
-                                <select id="task-responsible" class="w-full"></select>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">COSTO (USD)</label>
-                                <div class="relative">
-                                    <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
-                                    <input type="number" id="task-cost" step="0.01" class="w-full pl-8" placeholder="0.00">
-                                </div>
-                            </div>
-                            <div>
-                                <label class="text-[10px] text-gray-500 mb-1 block">DESCRIPCIÓN</label>
-                                <textarea id="task-desc" rows="3" class="w-full text-sm resize-none" placeholder="Detalles de la tarea..."></textarea>
-                            </div>
-                            <button onclick="saveTask()" class="w-full btn-silver p-3 rounded-lg mt-4 text-sm uppercase">Agregar Tarea</button>
-                        </div>
-                    </div>
-
-                    <!-- Listado Tareas -->
-                    <div id="task-list-panel" class="lg:col-span-4 glass-panel p-6 overflow-x-auto">
-                        <table class="w-full text-left">
-                            <thead class="bg-black/40 silver-text">
-                                <tr>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Tarea</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Fecha</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Estado</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Responsable</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider">Costo</th>
-                                    <th class="p-3 text-xs uppercase tracking-wider text-center">Nota</th>
-                                    <th id="th-task-actions" class="p-3 text-xs uppercase tracking-wider text-center hidden">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="task-table-body" class="divide-y divide-white/10 text-sm">
-                                <!-- Dinámico -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
             </section>
 
             <!-- Sección: CANCIONERO -->
@@ -445,7 +374,9 @@
                         </div>
                     </div>
                 </div>
-                <div id="gallery-container" class="gallery-grid"></div>
+                <div id="gallery-container" class="gallery-grid">
+                    <!-- Dinámico -->
+                </div>
             </section>
 
             <!-- Sección: INGRESO -->
@@ -515,91 +446,94 @@
         </main>
     </div>
 
-    <!-- Modales Adicionales -->
-    
-    <!-- Modal Ver Nota (Tarea Descripción) -->
-    <div id="modal-task-desc-view" class="fixed inset-0 modal-overlay z-[400] flex items-center justify-center p-4 hidden">
-        <div class="glass-panel p-6 w-full max-w-md">
-            <div class="flex justify-between items-center mb-4">
-                <h3 id="task-desc-title" class="text-lg font-bold silver-text">Descripción de Tarea</h3>
-                <button onclick="closeTaskDescModal()" class="text-gray-400 hover:text-white"><i class="fas fa-times"></i></button>
-            </div>
-            <div id="task-desc-body" class="bg-white/5 p-4 rounded-lg border border-white/10 text-sm text-gray-300 min-h-[100px]"></div>
-        </div>
-    </div>
-
-    <!-- Modal Editar Tarea (Solo Admin) -->
-    <div id="modal-edit-task" class="fixed inset-0 modal-overlay z-[400] flex items-center justify-center p-4 hidden">
-        <div class="glass-panel p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold silver-text mb-6 uppercase">Editar Tarea</h3>
-            <input type="hidden" id="edit-task-id">
-            <div class="space-y-4">
-                <input type="text" id="edit-task-name" class="w-full">
-                <input type="date" id="edit-task-date" class="w-full">
-                <select id="edit-task-status" class="w-full">
-                    <option value="Sin realizar">Sin realizar</option>
-                    <option value="En proceso">En proceso</option>
-                    <option value="Realizado">Realizado</option>
-                </select>
-                <select id="edit-task-responsible" class="w-full"></select>
-                <input type="number" id="edit-task-cost" step="0.01" class="w-full">
-                <textarea id="edit-task-desc" rows="3" class="w-full text-sm resize-none"></textarea>
-                <div class="flex gap-3 pt-2">
-                    <button onclick="closeEditTaskModal()" class="flex-1 p-3 text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
-                    <button onclick="processTaskUpdate()" class="flex-1 btn-silver p-3 rounded-lg">GUARDAR</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Modal Editar Canción -->
     <div id="modal-edit-song" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-md">
             <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider">Editar Canción</h3>
             <input type="hidden" id="edit-song-original-id">
             <div class="space-y-4">
-                <div><label class="text-[10px] text-gray-500 block mb-1">TÍTULO</label><input type="text" id="edit-song-title" class="w-full"></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">AUTOR</label><input type="text" id="edit-song-author" class="w-full"></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">CANTANTE</label><select id="edit-song-singer" class="w-full"></select></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">TONALIDAD</label><select id="edit-song-key" class="w-full edit-key-select"></select></div>
-                <div><label class="text-[10px] text-gray-500 block mb-1">IMAGEN</label><input type="file" id="edit-song-image-input" accept="image/*" class="w-full text-xs"></div>
+                <div>
+                    <label class="text-[10px] text-gray-500 block mb-1">TÍTULO</label>
+                    <input type="text" id="edit-song-title" class="w-full">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 block mb-1">AUTOR</label>
+                    <input type="text" id="edit-song-author" class="w-full">
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 block mb-1">CANTANTE</label>
+                    <select id="edit-song-singer" class="w-full">
+                        <option value="Alejandro">Alejandro</option>
+                        <option value="Alejandra">Alejandra</option>
+                        <option value="Diana">Diana</option>
+                        <option value="Mery">Mery</option>
+                        <option value="Marianny">Marianny</option>
+                        <option value="Nelly">Nelly</option>
+                        <option value="Nicole">Nicole</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 block mb-1">TONALIDAD</label>
+                    <select id="edit-song-key" class="w-full edit-key-select"></select>
+                </div>
+                <div>
+                    <label class="text-[10px] text-gray-500 block mb-1">SUBIR PARTITURA / LETRA (Imagen)</label>
+                    <input type="file" id="edit-song-image-input" accept="image/*" class="w-full text-xs">
+                </div>
                 <div class="flex gap-3 pt-4">
-                    <button onclick="closeEditModal()" class="flex-1 p-3 text-xs text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
-                    <button id="btn-save-song-edit" onclick="processSongUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR</button>
+                    <button onclick="closeEditModal()" class="flex-1 p-3 text-xs text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
+                    <button id="btn-save-song-edit" onclick="processSongUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-xs">GUARDAR CAMBIOS</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- Visor de Imagen de Canción (Fullscreen en móviles) -->
     <div id="song-image-viewer" class="fixed inset-0 modal-overlay z-[300] flex flex-col items-center justify-center hidden">
         <button onclick="closeSongImage()" class="close-viewer-btn absolute top-6 right-6 text-white text-3xl z-[310]"><i class="fas fa-times"></i></button>
-        <div id="song-image-container"></div>
+        <div id="song-image-container">
+            <!-- Img se carga aquí -->
+        </div>
         <p id="song-image-title" class="mt-4 text-xl font-bold silver-text pb-4"></p>
     </div>
 
+    <!-- Modal Editar Actividad -->
     <div id="modal-edit-activity" class="fixed inset-0 modal-overlay z-[200] flex items-center justify-center p-4 hidden">
         <div class="glass-panel p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h3 class="text-xl font-bold silver-text mb-6 uppercase tracking-wider border-b border-white/10 pb-2">Editar Actividad</h3>
             <input type="hidden" id="edit-activity-id">
             <div class="space-y-6">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div><label class="text-xs text-gray-500 block mb-1">FECHA</label><input type="date" id="edit-activity-date" class="w-full"></div>
-                    <div><label class="text-xs text-gray-500 block mb-1">NOMBRE</label><input type="text" id="edit-activity-name" class="w-full"></div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">FECHA</label>
+                        <input type="date" id="edit-activity-date" class="w-full">
+                    </div>
+                    <div>
+                        <label class="text-xs text-gray-500 block mb-1">NOMBRE</label>
+                        <input type="text" id="edit-activity-name" class="w-full">
+                    </div>
                 </div>
+
                 <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                     <h4 class="text-sm font-bold mb-3"><i class="fas fa-music mr-2"></i>REPERTORIO</h4>
                     <div id="edit-repertorio-inputs" class="space-y-2 mb-3"></div>
                     <button onclick="addRepertorioRow('edit-repertorio-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar otra canción</button>
                 </div>
+
                 <div class="p-4 bg-white/5 rounded-lg border border-white/10">
                     <h4 class="text-sm font-bold mb-3"><i class="fas fa-users mr-2"></i>EQUIPO</h4>
                     <div id="edit-equipo-inputs" class="space-y-2 mb-3"></div>
                     <button onclick="addEquipoRow('edit-equipo-inputs')" class="text-xs text-silver-text hover:underline">+ Agregar integrante</button>
                 </div>
-                <div><label class="text-xs text-gray-500 block mb-1">NOTAS</label><textarea id="edit-activity-notes" rows="3" class="w-full text-sm"></textarea></div>
+
+                <div class="p-4 bg-white/5 rounded-lg border border-white/10">
+                    <h4 class="text-sm font-bold mb-3"><i class="fas fa-sticky-note mr-2"></i>NOTAS</h4>
+                    <textarea id="edit-activity-notes" rows="3" class="w-full resize-none text-sm"></textarea>
+                </div>
+
                 <div class="flex gap-4 pt-4">
-                    <button onclick="closeEditActivityModal()" class="flex-1 p-3 text-sm text-gray-400 border border-white/10 rounded-lg">CANCELAR</button>
-                    <button onclick="processActivityUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-sm">GUARDAR</button>
+                    <button onclick="closeEditActivityModal()" class="flex-1 p-3 text-sm text-gray-400 hover:text-white border border-white/10 rounded-lg">CANCELAR</button>
+                    <button onclick="processActivityUpdate()" class="flex-1 btn-silver p-3 rounded-lg text-sm">GUARDAR CAMBIOS</button>
                 </div>
             </div>
         </div>
@@ -608,7 +542,7 @@
     <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getFirestore, collection, addDoc, doc, onSnapshot, query, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, onSnapshot, query, updateDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
         import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
 const firebaseConfig = {
@@ -619,42 +553,44 @@ const firebaseConfig = {
   messagingSenderId: "347966041919",
   appId: "1:347966041919:web:71c81a1b60013478712d8a",
   measurementId: "G-9X5RMXJB0T"
-};        const app = initializeApp(firebaseConfig);
+};
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const auth = getAuth(app);
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'ministerio-ruach-app';
 
-        // State
+        // Global State
         window.currentUser = null;
         window.allUsers = [];
         window.activities = [];
-        window.tasks = [];
         window.galleryPhotos = [];
         window.currentDate = new Date();
         const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
-        const CANTANTES = ["Alejandro", "Alejandra", "Diana", "Mery", "Marianny", "Nelly", "Nicole"];
 
         // Init tonalidad selects
-        const initStaticSelects = () => {
-            const tonalSelects = document.querySelectorAll('.edit-key-select');
-            tonalSelects.forEach(s => {
+        const initKeySelects = () => {
+            const selects = document.querySelectorAll('.edit-key-select');
+            selects.forEach(s => {
                 s.innerHTML = '<option value="">Sin tono</option>' + TONALIDADES.map(t => `<option value="${t}">${t}</option>`).join('');
-            });
-            const singerSelects = [document.getElementById('edit-song-singer')];
-            singerSelects.forEach(s => {
-                if(s) s.innerHTML = CANTANTES.map(c => `<option value="${c}">${c}</option>`).join('');
             });
         };
 
         window.handleLogin = async () => {
             const user = document.getElementById('login-user').value;
             const pass = document.getElementById('login-pass').value;
-            if (user === 'Admin' && pass === 'admin123') proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
-            else if (user === 'ruach' && pass === 'ruach123') proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
+            if (user === 'Admin' && pass === 'admin123') {
+                proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
+            } 
+            else if (user === 'ruach' && pass === 'ruach123') {
+                proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
+            }
             else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
-                if(found && pass === 'ruach123') proceedLogin({ ...found, uid: found.id });
-                else document.getElementById('login-error').classList.remove('hidden');
+                if(found && pass === 'ruach123') {
+                    proceedLogin({ ...found, uid: found.id });
+                } else {
+                    document.getElementById('login-error').classList.remove('hidden');
+                }
             }
         };
 
@@ -674,128 +610,20 @@ const firebaseConfig = {
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
-            document.getElementById('detail-actions')?.classList.toggle('hidden', !isLider);
-            
-            // Permisos módulo Tareas
-            document.getElementById('task-entry-panel')?.classList.toggle('hidden', !isLider);
-            document.getElementById('task-list-panel')?.classList.toggle('lg:col-span-4', !isLider);
-            document.getElementById('task-list-panel')?.classList.toggle('lg:col-span-3', isLider);
-            document.getElementById('th-task-actions')?.classList.toggle('hidden', !isLider);
+            const detailActions = document.getElementById('detail-actions');
+            if(detailActions) detailActions.classList.toggle('hidden', !isLider);
         };
 
-        const fileToBase64 = (file) => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = e => reject(e);
-        });
-
-        // --- TAREAS ---
-        window.saveTask = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const name = document.getElementById('task-name').value;
-            const date = document.getElementById('task-date').value;
-            const status = document.getElementById('task-status').value;
-            const responsible = document.getElementById('task-responsible').value;
-            const cost = parseFloat(document.getElementById('task-cost').value) || 0;
-            const desc = document.getElementById('task-desc').value;
-
-            if(!name || !date || !responsible) return;
-
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'tasks'), {
-                    name, date, status, responsible, cost, desc, createdAt: new Date().toISOString()
-                });
-                document.getElementById('task-name').value = '';
-                document.getElementById('task-date').value = '';
-                document.getElementById('task-cost').value = '';
-                document.getElementById('task-desc').value = '';
-            } catch (e) { console.error(e); }
+        const fileToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = (error) => reject(error);
+            });
         };
 
-        window.renderTasks = () => {
-            const body = document.getElementById('task-table-body');
-            if (!body) return;
-            const isLider = window.currentUser?.role === 'LIDER';
-            
-            // Poblar selects de responsables con miembros actuales
-            const membersOptions = window.allUsers.map(u => `<option value="${u.name}">${u.name}</option>`).join('');
-            const respSelect = document.getElementById('task-responsible');
-            const editRespSelect = document.getElementById('edit-task-responsible');
-            if(respSelect) respSelect.innerHTML = membersOptions;
-            if(editRespSelect) editRespSelect.innerHTML = membersOptions;
-
-            body.innerHTML = window.tasks.map(t => {
-                const statusClass = t.status === 'Realizado' ? 'status-done' : (t.status === 'En proceso' ? 'status-process' : 'status-pending');
-                const encoded = encodeURIComponent(JSON.stringify(t));
-                return `
-                <tr class="hover:bg-white/5 transition-colors">
-                    <td class="p-3 font-bold text-white uppercase">${t.name}</td>
-                    <td class="p-3 text-gray-400">${t.date}</td>
-                    <td class="p-3"><span class="status-badge ${statusClass}">${t.status}</span></td>
-                    <td class="p-3 text-silver-text font-medium">${t.responsible}</td>
-                    <td class="p-3 text-green-400 font-bold">$${(t.cost || 0).toFixed(2)}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="viewTaskDesc('${encoded}')" class="text-gray-400 hover:text-white transition-colors">
-                            <i class="fas fa-sticky-note text-lg"></i>
-                        </button>
-                    </td>
-                    <td class="p-3 text-center ${isLider ? '' : 'hidden'}">
-                        <div class="flex justify-center gap-2">
-                            <button onclick="openEditTask('${encoded}')" class="text-blue-400 p-1 hover:text-blue-300"><i class="fas fa-edit"></i></button>
-                            <button onclick="deleteTask('${t.id}')" class="text-red-400 p-1 hover:text-red-300"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </td>
-                </tr>
-                `;
-            }).join('');
-        };
-
-        window.viewTaskDesc = (enc) => {
-            const t = JSON.parse(decodeURIComponent(enc));
-            document.getElementById('task-desc-title').innerText = t.name;
-            document.getElementById('task-desc-body').innerText = t.desc || 'Sin descripción adicional.';
-            document.getElementById('modal-task-desc-view').classList.remove('hidden');
-        };
-        window.closeTaskDescModal = () => document.getElementById('modal-task-desc-view').classList.add('hidden');
-
-        window.openEditTask = (enc) => {
-            const t = JSON.parse(decodeURIComponent(enc));
-            document.getElementById('edit-task-id').value = t.id;
-            document.getElementById('edit-task-name').value = t.name;
-            document.getElementById('edit-task-date').value = t.date;
-            document.getElementById('edit-task-status').value = t.status;
-            document.getElementById('edit-task-responsible').value = t.responsible;
-            document.getElementById('edit-task-cost').value = t.cost;
-            document.getElementById('edit-task-desc').value = t.desc || '';
-            document.getElementById('modal-edit-task').classList.remove('hidden');
-        };
-        window.closeEditTaskModal = () => document.getElementById('modal-edit-task').classList.add('hidden');
-
-        window.processTaskUpdate = async () => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            const id = document.getElementById('edit-task-id').value;
-            try {
-                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id), {
-                    name: document.getElementById('edit-task-name').value,
-                    date: document.getElementById('edit-task-date').value,
-                    status: document.getElementById('edit-task-status').value,
-                    responsible: document.getElementById('edit-task-responsible').value,
-                    cost: parseFloat(document.getElementById('edit-task-cost').value) || 0,
-                    desc: document.getElementById('edit-task-desc').value
-                });
-                closeEditTaskModal();
-            } catch (e) { console.error(e); }
-        };
-
-        window.deleteTask = async (id) => {
-            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Eliminar esta tarea permanentemente?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'tasks', id)); } catch (e) { console.error(e); }
-            }
-        };
-
-        // --- MIEMBROS ---
+        // --- USERS ---
         window.saveUser = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const name = document.getElementById('user-full-name').value;
@@ -805,7 +633,8 @@ const firebaseConfig = {
             const fileInput = document.getElementById('user-photo-file');
             if(!name || !birth) return;
             const btn = document.getElementById('btn-save-user');
-            btn.disabled = true; btn.innerText = "PROCESANDO...";
+            btn.disabled = true;
+            btn.innerText = "PROCESANDO...";
             let photoBase64 = 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=100';
             try {
                 if (fileInput.files && fileInput.files[0]) photoBase64 = await fileToBase64(fileInput.files[0]);
@@ -817,7 +646,8 @@ const firebaseConfig = {
                 document.getElementById('user-job').value = '';
                 fileInput.value = '';
             } catch (e) { console.error(e); } finally {
-                btn.disabled = false; btn.innerText = "CREAR USUARIO";
+                btn.disabled = false;
+                btn.innerText = "CREAR USUARIO";
             }
         };
 
@@ -832,20 +662,43 @@ const firebaseConfig = {
         window.uploadToGallery = async () => {
             const fileInput = document.getElementById('gallery-upload-input');
             if (!fileInput.files || !fileInput.files[0]) return;
+
             try {
                 const base64 = await fileToBase64(fileInput.files[0]);
                 await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'gallery'), {
-                    image: base64, uploadedBy: window.currentUser?.name || 'Anónimo', date: new Date().toISOString()
+                    image: base64,
+                    uploadedBy: window.currentUser?.name || 'Anónimo',
+                    date: new Date().toISOString()
                 });
                 fileInput.value = '';
-            } catch (e) { console.error(e); }
+            } catch (e) {
+                console.error("Error subiendo foto:", e);
+            }
         };
 
         window.deleteFromGallery = async (id) => {
             if (window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Deseas eliminar esta foto?")) {
-                try { await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gallery', id)); } catch (e) { console.error(e); }
+            if(confirm("¿Deseas eliminar esta foto de la galería?")) {
+                try {
+                    await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'gallery', id));
+                } catch (e) { console.error(e); }
             }
+        };
+
+        window.renderGallery = () => {
+            const container = document.getElementById('gallery-container');
+            if (!container) return;
+            const isLider = window.currentUser?.role === 'LIDER';
+
+            container.innerHTML = window.galleryPhotos.length ? window.galleryPhotos.map(photo => `
+                <div class="gallery-item group">
+                    <img src="${photo.image}" loading="lazy">
+                    <div class="gallery-overlay">
+                        <p class="text-[10px] text-white/80 italic">Subida por: ${photo.uploadedBy}</p>
+                        ${isLider ? `<button onclick="deleteFromGallery('${photo.id}')" class="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full text-[10px] hover:bg-red-600 transition-colors"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="col-span-full py-12 text-center text-gray-500 italic">No hay fotos en la galería todavía. ¡Sube la primera!</div>';
         };
 
         // --- PLANIFICACION ---
@@ -859,8 +712,10 @@ const firebaseConfig = {
             const canciones = Array.from(document.querySelectorAll('#repertorio-inputs > div')).map(row => {
                 const inputs = row.querySelectorAll('input, select');
                 return inputs[0].value ? { 
-                    titulo: inputs[0].value.trim(), autor: inputs[1].value.trim(), 
-                    cantante: inputs[2].value, tonalidad: inputs[3].value
+                    titulo: inputs[0].value.trim(), 
+                    autor: inputs[1].value.trim(), 
+                    cantante: inputs[2].value,
+                    tonalidad: inputs[3].value
                 } : null;
             }).filter(i => i);
 
@@ -894,6 +749,167 @@ const firebaseConfig = {
             }
         };
 
+        // --- CANCIONERO ---
+        window.openEditSong = (encodedData) => {
+            const song = JSON.parse(decodeURIComponent(encodedData));
+            document.getElementById('edit-song-original-id').value = encodedData;
+            document.getElementById('edit-song-title').value = song.titulo;
+            document.getElementById('edit-song-author').value = song.autor || '';
+            document.getElementById('edit-song-singer').value = song.cantante;
+            document.getElementById('edit-song-key').value = song.tonalidad || '';
+            document.getElementById('edit-song-image-input').value = '';
+            document.getElementById('modal-edit-song').classList.remove('hidden');
+        };
+
+        window.closeEditModal = () => document.getElementById('modal-edit-song').classList.add('hidden');
+
+        window.processSongUpdate = async () => {
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            const original = JSON.parse(decodeURIComponent(document.getElementById('edit-song-original-id').value));
+            const imgInput = document.getElementById('edit-song-image-input');
+            const btn = document.getElementById('btn-save-song-edit');
+
+            btn.disabled = true;
+            btn.innerText = "ACTUALIZANDO...";
+
+            let newImageData = original.image || null;
+            if(imgInput.files && imgInput.files[0]) {
+                newImageData = await fileToBase64(imgInput.files[0]);
+            }
+
+            const updated = {
+                titulo: document.getElementById('edit-song-title').value.trim(),
+                autor: document.getElementById('edit-song-author').value.trim(),
+                cantante: document.getElementById('edit-song-singer').value,
+                tonalidad: document.getElementById('edit-song-key').value,
+                image: newImageData
+            };
+
+            for(const act of window.activities) {
+                if(act.canciones) {
+                    let changed = false;
+                    const newSongs = act.canciones.map(s => {
+                        if(s.titulo.toLowerCase() === original.titulo.toLowerCase() && s.cantante === original.cantante) {
+                            changed = true;
+                            return { ...s, ...updated };
+                        }
+                        return s;
+                    });
+                    if(changed) {
+                        try {
+                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: newSongs });
+                        } catch (e) { console.error(e); }
+                    }
+                }
+            }
+            btn.disabled = false;
+            btn.innerText = "GUARDAR CAMBIOS";
+            closeEditModal();
+        };
+
+        window.deleteSongGlobal = async (encodedData) => {
+            if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
+            const song = JSON.parse(decodeURIComponent(encodedData));
+            if(!confirm(`¿Deseas eliminar "${song.titulo}" de todo el historial del cancionero?`)) return;
+
+            for(const act of window.activities) {
+                if(act.canciones) {
+                    const originalLength = act.canciones.length;
+                    const filtered = act.canciones.filter(s => 
+                        !(s.titulo.toLowerCase() === song.titulo.toLowerCase() && s.cantante === song.cantante)
+                    );
+                    if(filtered.length !== originalLength) {
+                        try {
+                            await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', act.id), { canciones: filtered });
+                        } catch (e) { console.error(e); }
+                    }
+                }
+            }
+        };
+
+        // --- VISOR DE IMAGEN CANCIÓN ---
+        window.openSongImage = (encodedData) => {
+            const song = JSON.parse(decodeURIComponent(encodedData));
+            if(!song.image) return;
+
+            const viewer = document.getElementById('song-image-viewer');
+            const container = document.getElementById('song-image-container');
+            const title = document.getElementById('song-image-title');
+
+            container.innerHTML = `<img src="${song.image}" alt="${song.titulo}">`;
+            title.innerText = `${song.titulo} - ${song.cantante}`;
+            viewer.classList.remove('hidden');
+
+            // Bloquear scroll del body
+            document.body.style.overflow = 'hidden';
+        };
+
+        window.closeSongImage = () => {
+            document.getElementById('song-image-viewer').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        };
+
+        // --- EDICIÓN DE ACTIVIDAD ---
+        window.openEditActivity = (id) => {
+            const act = window.activities.find(a => a.id === id);
+            if (!act) return;
+
+            document.getElementById('edit-activity-id').value = act.id;
+            document.getElementById('edit-activity-date').value = act.date;
+            document.getElementById('edit-activity-name').value = act.activity;
+            document.getElementById('edit-activity-notes').value = act.notes || '';
+
+            const repContainer = document.getElementById('edit-repertorio-inputs');
+            repContainer.innerHTML = '';
+            if (act.canciones && act.canciones.length) {
+                act.canciones.forEach(c => addRepertorioRow('edit-repertorio-inputs', c));
+            } else {
+                addRepertorioRow('edit-repertorio-inputs');
+            }
+
+            const eqContainer = document.getElementById('edit-equipo-inputs');
+            eqContainer.innerHTML = '';
+            if (act.equipo && act.equipo.length) {
+                act.equipo.forEach(e => addEquipoRow('edit-equipo-inputs', e));
+            } else {
+                addEquipoRow('edit-equipo-inputs');
+            }
+
+            document.getElementById('modal-edit-activity').classList.remove('hidden');
+        };
+
+        window.closeEditActivityModal = () => document.getElementById('modal-edit-activity').classList.add('hidden');
+
+        window.processActivityUpdate = async () => {
+            const id = document.getElementById('edit-activity-id').value;
+            const date = document.getElementById('edit-activity-date').value;
+            const activity = document.getElementById('edit-activity-name').value;
+            const notes = document.getElementById('edit-activity-notes').value.trim();
+
+            const canciones = Array.from(document.querySelectorAll('#edit-repertorio-inputs > div')).map(row => {
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { 
+                    titulo: inputs[0].value.trim(), 
+                    autor: inputs[1].value.trim(), 
+                    cantante: inputs[2].value,
+                    tonalidad: inputs[3].value
+                } : null;
+            }).filter(i => i);
+
+            const equipo = Array.from(document.querySelectorAll('#edit-equipo-inputs > div')).map(row => {
+                const inputs = row.querySelectorAll('input, select');
+                return inputs[0].value ? { nombre: inputs[0].value, rol: inputs[1].value } : null;
+            }).filter(i => i);
+
+            try {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'activities', id), {
+                    date, activity, canciones, equipo, notes
+                });
+                closeEditActivityModal();
+                showDayDetails(date);
+            } catch (e) { console.error(e); }
+        };
+
         // --- RENDERS ---
         window.renderMembers = () => {
             const container = document.getElementById('members-list');
@@ -902,9 +918,9 @@ const firebaseConfig = {
                 <div class="glass-panel p-4 flex items-center gap-4">
                     <img src="${user.photo}" class="w-16 h-16 rounded-full object-cover border-2 border-silver">
                     <div>
-                        <h4 class="font-bold text-white uppercase text-sm">${user.name}</h4>
-                        <p class="text-[10px] text-gray-500">NAC: ${user.birth}</p>
-                        <span class="text-[9px] text-silver-text uppercase font-bold mt-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 inline-block">${user.job || 'Miembro'}</span>
+                        <h4 class="font-bold text-white">${user.name}</h4>
+                        <p class="text-xs text-gray-400">Nac: ${user.birth}</p>
+                        <p class="text-[10px] text-silver-text uppercase font-bold mt-1 bg-white/5 px-2 py-0.5 rounded border border-white/10 inline-block">${user.job || 'Miembro'}</p>
                     </div>
                 </div>
             `).join('');
@@ -917,7 +933,7 @@ const firebaseConfig = {
                 <div class="flex justify-between items-center p-3 bg-white/5 rounded-lg border border-white/5">
                     <div class="flex items-center gap-3">
                         <img src="${user.photo}" class="w-8 h-8 rounded-full border border-white/20">
-                        <span class="text-xs uppercase">${user.name} <span class="text-[9px] text-gray-500 italic lowercase">(${user.role})</span></span>
+                        <span class="text-sm">${user.name} <span class="text-[10px] text-gray-500 italic">(${user.role})</span></span>
                     </div>
                     <button onclick="deleteUser('${user.id}')" class="text-red-500 hover:text-red-400 p-2"><i class="fas fa-trash"></i></button>
                 </div>
@@ -932,20 +948,35 @@ const firebaseConfig = {
 
             let todasMap = new Map();
             window.activities.forEach(act => { 
-                if(act.canciones) act.canciones.forEach(s => {
-                    const key = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
-                    if(!todasMap.has(key) || (!todasMap.get(key).image && s.image)) todasMap.set(key, s);
-                });
+                if(act.canciones) {
+                    act.canciones.forEach(s => {
+                        const key = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
+                        if(!todasMap.has(key) || (!todasMap.get(key).image && s.image)) {
+                            todasMap.set(key, s);
+                        }
+                    });
+                }
             });
 
             let finalArr = Array.from(todasMap.values());
-            if(singerFilter !== 'all') finalArr = finalArr.filter(s => s.cantante === singerFilter);
-            if(searchQuery !== '') finalArr = finalArr.filter(s => s.titulo.toLowerCase().includes(searchQuery) || (s.autor && s.autor.toLowerCase().includes(searchQuery)));
+
+            // Aplicar Filtro de Cantante
+            if(singerFilter !== 'all') {
+                finalArr = finalArr.filter(s => s.cantante === singerFilter);
+            }
+
+            // Aplicar Búsqueda por Título o Autor
+            if(searchQuery !== '') {
+                finalArr = finalArr.filter(s => 
+                    s.titulo.toLowerCase().includes(searchQuery) || 
+                    (s.autor && s.autor.toLowerCase().includes(searchQuery))
+                );
+            }
 
             document.getElementById('song-stats').innerText = `${finalArr.length} canciones encontradas`;
             const isLider = window.currentUser?.role === 'LIDER';
 
-            container.innerHTML = finalArr.map(song => {
+            container.innerHTML = finalArr.length ? finalArr.map(song => {
                 const encoded = encodeURIComponent(JSON.stringify(song));
                 return `
                 <tr class="hover:bg-white/5 transition-colors text-sm">
@@ -954,14 +985,22 @@ const firebaseConfig = {
                     <td class="p-4"><span class="px-2 py-0.5 bg-silver/10 border border-silver/20 rounded-full text-[10px] text-silver-text uppercase">${song.cantante}</span></td>
                     <td class="p-4 font-bold text-silver-text">${song.tonalidad || '-'}</td>
                     <td class="p-4 text-center">
-                        ${song.image ? `<button onclick="openSongImage('${encoded}')" class="text-silver-text"><i class="fas fa-eye text-lg"></i></button>` : '-'}
+                        ${song.image ? `
+                            <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-colors">
+                                <i class="fas fa-eye text-lg"></i>
+                            </button>
+                        ` : '<span class="text-gray-700">-</span>'}
                     </td>
                     <td class="p-4 ${isLider ? '' : 'hidden'} actions-column">
-                        <button onclick="openEditSong('${encoded}')" class="text-blue-400 mr-2"><i class="fas fa-edit"></i></button>
-                        <button onclick="deleteSongGlobal('${encoded}')" class="text-red-400"><i class="fas fa-trash"></i></button>
+                        <div class="flex gap-2">
+                            <button onclick="openEditSong('${encoded}')" class="text-blue-400 hover:text-blue-300 p-1"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteSongGlobal('${encoded}')" class="text-red-400 hover:text-red-300 p-1"><i class="fas fa-trash"></i></button>
+                        </div>
                     </td>
-                </tr>`;
-            }).join('');
+                </tr>
+            `}).join('') : '<tr><td colspan="6" class="p-8 text-center text-gray-500 italic">No se encontraron canciones</td></tr>';
+
+            setupPermissions();
         };
 
         window.renderCalendar = () => {
@@ -985,49 +1024,74 @@ const firebaseConfig = {
             const act = window.activities.find(a => a.date === dateStr);
             const detailPanel = document.getElementById('day-details');
             const content = document.getElementById('detail-content');
+            const editBtn = document.getElementById('btn-edit-activity');
+
             document.getElementById('detail-date').innerText = dateStr;
             detailPanel.classList.remove('hidden');
+
             if(act) {
-                document.getElementById('btn-edit-activity').onclick = () => openEditActivity(act.id);
+                editBtn.onclick = () => openEditActivity(act.id);
+
+                // Procesar canciones para asegurar que si hay una imagen en el cancionero, se muestre aquí
+                const listHtml = act.canciones?.map(c => {
+                    const songWithData = window.activities.flatMap(a => a.canciones || [])
+                        .find(s => s.titulo.toLowerCase() === c.titulo.toLowerCase() && s.cantante === c.cantante && s.image) || c;
+
+                    const encoded = encodeURIComponent(JSON.stringify(songWithData));
+                    return `
+                    <li class="flex items-center justify-between group">
+                        <span>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
+                        ${songWithData.image ? `
+                            <button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white transition-opacity px-2">
+                                <i class="fas fa-eye text-sm"></i>
+                            </button>
+                        ` : ''}
+                    </li>`;
+                }).join('') || '<li class="text-gray-500">Sin canciones</li>';
+
                 content.innerHTML = `
-                    <h4 class="text-xl font-bold mb-4 uppercase">${act.activity}</h4>
-                    ${act.notes ? `<div class="mb-4 p-3 bg-silver/5 border border-silver/10 rounded-lg"><p class="text-[10px] silver-text font-bold uppercase mb-1">Nota</p><p class="text-xs text-gray-300 italic">${act.notes}</p></div>` : ''}
-                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase mb-2">Repertorio</p>
-                        <ul class="text-sm space-y-2">${act.canciones?.map(c => `<li>• <b>${c.titulo}</b> (${c.cantante}) <span class="silver-text font-bold">${c.tonalidad || ''}</span></li>`).join('')}</ul>
+                    <div class="mb-4"><p class="text-[10px] text-gray-500 uppercase">Actividad</p><h4 class="text-xl font-bold mb-2">${act.activity}</h4></div>
+                    
+                    ${act.notes ? `
+                    <div class="mb-4 p-3 bg-silver/5 border border-silver/10 rounded-lg">
+                        <p class="text-[10px] text-silver-text uppercase font-bold mb-1">Nota Especial</p>
+                        <p class="text-xs text-gray-300 italic">${act.notes}</p>
                     </div>
-                    <div class="mb-6"><p class="text-[10px] text-gray-500 uppercase mb-2">Equipo</p>
-                        <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="silver-text text-[10px] uppercase">${e.rol}</span></div>`).join('')}</div>
+                    ` : ''}
+
+                    <div class="mb-4"><p class="text-[10px] text-gray-500 mb-2 uppercase">Repertorio</p>
+                        <ul class="text-sm space-y-2">${listHtml}</ul>
                     </div>
-                    ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-[10px] font-bold border border-red-500/30 px-3 py-2 rounded w-full uppercase">Eliminar Actividad</button>` : ''}
+                    <div class="mb-6"><p class="text-[10px] text-gray-500 mb-2 uppercase">Equipo</p>
+                        <div class="grid grid-cols-1 gap-1 text-sm">${act.equipo?.map(e => `<div class="flex justify-between border-b border-white/5 pb-1"><span>${e.nombre}</span> <span class="text-silver-text italic text-[10px] uppercase">${e.rol}</span></div>`).join('') || 'Sin equipo'}</div>
+                    </div>
+                    ${window.currentUser?.role === 'LIDER' ? `<button onclick="deleteActivity('${act.id}')" class="text-red-500 text-[10px] font-bold tracking-widest border border-red-500/30 px-3 py-2 rounded hover:bg-red-500/10 w-full transition-all uppercase">Eliminar Actividad</button>` : ''}
                 `;
-            } else content.innerHTML = `<p class="text-gray-500 italic text-sm">Sin actividades.</p>`;
+            } else {
+                content.innerHTML = `<p class="text-gray-500 italic text-sm">Sin actividades registradas.</p>`;
+            }
             setupPermissions();
         };
 
-        window.renderGallery = () => {
-            const container = document.getElementById('gallery-container');
-            if (!container) return;
-            const isLider = window.currentUser?.role === 'LIDER';
-            container.innerHTML = window.galleryPhotos.map(p => `
-                <div class="gallery-item">
-                    <img src="${p.image}" loading="lazy">
-                    <div class="gallery-overlay">
-                        <p class="text-[9px] text-white/80">Por: ${p.uploadedBy}</p>
-                        ${isLider ? `<button onclick="deleteFromGallery('${p.id}')" class="absolute top-2 right-2 bg-red-500 p-1 rounded-full text-[8px]"><i class="fas fa-trash"></i></button>` : ''}
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        // --- UI HELPERS ---
         window.addRepertorioRow = (targetId, data = null) => {
             const div = document.createElement('div');
             div.className = "grid grid-cols-4 gap-2";
             div.innerHTML = `
-                <input type="text" placeholder="Canción" class="text-xs" value="${data?.titulo || ''}">
-                <input type="text" placeholder="Autor" class="text-xs" value="${data?.autor || ''}">
-                <select class="text-xs">${CANTANTES.map(c => `<option value="${c}" ${data?.cantante === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
-                <select class="text-xs edit-key-select"><option value="">Tono</option>${TONALIDADES.map(t => `<option value="${t}" ${data?.tonalidad === t ? 'selected' : ''}>${t}</option>`).join('')}</select>`;
+                <input type="text" placeholder="Canción" class="text-xs" value="${data ? data.titulo : ''}">
+                <input type="text" placeholder="Autor" class="text-xs" value="${data ? (data.autor || '') : ''}">
+                <select class="text-xs">
+                    <option value="Alejandro" ${data && data.cantante === 'Alejandro' ? 'selected' : ''}>Alejandro</option>
+                    <option value="Alejandra" ${data && data.cantante === 'Alejandra' ? 'selected' : ''}>Alejandra</option>
+                    <option value="Diana" ${data && data.cantante === 'Diana' ? 'selected' : ''}>Diana</option>
+                    <option value="Mery" ${data && data.cantante === 'Mery' ? 'selected' : ''}>Mery</option>
+                    <option value="Marianny" ${data && data.cantante === 'Marianny' ? 'selected' : ''}>Marianny</option>
+                    <option value="Nelly" ${data && data.cantante === 'Nelly' ? 'selected' : ''}>Nelly</option>
+                    <option value="Nicole" ${data && data.cantante === 'Nicole' ? 'selected' : ''}>Nicole</option>
+                </select>
+                <select class="text-xs edit-key-select">
+                    <option value="">Tono</option>
+                    ${TONALIDADES.map(t => `<option value="${t}" ${data && data.tonalidad === t ? 'selected' : ''}>${t}</option>`).join('')}
+                </select>`;
             document.getElementById(targetId).appendChild(div);
         };
 
@@ -1036,8 +1100,10 @@ const firebaseConfig = {
             const div = document.createElement('div');
             div.className = "grid grid-cols-2 gap-2";
             div.innerHTML = `
-                <input type="text" placeholder="Nombre" class="text-sm" value="${data?.nombre || ''}">
-                <select class="text-sm uppercase">${roles.map(r => `<option value="${r}" ${data?.rol === r ? 'selected' : ''}>${r}</option>`).join('')}</select>`;
+                <input type="text" placeholder="Nombre" class="text-sm" value="${data ? data.nombre : ''}">
+                <select class="text-sm uppercase">
+                    ${roles.map(r => `<option value="${r}" ${data && data.rol === r ? 'selected' : ''}>${r.charAt(0).toUpperCase() + r.slice(1)}</option>`).join('')}
+                </select>`;
             document.getElementById(targetId).appendChild(div);
         };
 
@@ -1048,44 +1114,57 @@ const firebaseConfig = {
             if(window.innerWidth > 768) main.style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
         };
 
-        window.showSection = (id) => {
+        window.showSection = (sectionId) => {
+            if((sectionId === 'ingreso' || sectionId === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') return;
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
-            document.getElementById(`section-${id}`).classList.remove('hidden-section');
-            document.getElementById('current-section-title').innerText = id.replace('-', ' ');
-            if(window.innerWidth < 1024 && !document.getElementById('sidebar').classList.contains('closed')) window.toggleSidebar();
-            if(id === 'tareas') renderTasks();
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden-section');
+            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
+            if(window.innerWidth < 1024) {
+                const sb = document.getElementById('sidebar');
+                if(!sb.classList.contains('closed')) window.toggleSidebar();
+            }
         };
 
         window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
 
-        const renderAll = () => { renderMembers(); renderAdminUsers(); renderCalendar(); renderSongbook(); renderGallery(); renderTasks(); };
+        const renderAll = () => { 
+            window.renderMembers(); 
+            window.renderAdminUsers(); 
+            window.renderCalendar(); 
+            window.renderSongbook(); 
+            window.renderGallery();
+        };
 
         const startFirestoreListeners = () => {
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), (s) => {
                 window.allUsers = s.docs.map(d => ({id: d.id, ...d.data()}));
-                renderMembers(); renderAdminUsers(); renderTasks();
-            });
+                window.renderMembers(); window.renderAdminUsers();
+            }, (e) => console.error(e));
+
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'activities')), (s) => {
                 window.activities = s.docs.map(d => ({id: d.id, ...d.data()}));
-                renderCalendar(); renderSongbook();
-            });
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'tasks')), (s) => {
-                window.tasks = s.docs.map(d => ({id: d.id, ...d.data()}));
-                renderTasks();
-            });
+                window.renderCalendar(); window.renderSongbook();
+                const detailPanel = document.getElementById('day-details');
+                const dateText = document.getElementById('detail-date')?.innerText;
+                if(detailPanel && !detailPanel.classList.contains('hidden') && dateText) {
+                    showDayDetails(dateText);
+                }
+            }, (e) => console.error(e));
+
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'gallery')), (s) => {
                 window.galleryPhotos = s.docs.map(d => ({id: d.id, ...d.data()})).sort((a,b) => new Date(b.date) - new Date(a.date));
-                renderGallery();
-            });
+                window.renderGallery();
+            }, (e) => console.error(e));
         };
 
-        onAuthStateChanged(auth, u => { if(u) startFirestoreListeners(); });
-        const init = async () => {
+        onAuthStateChanged(auth, (user) => { if (user) startFirestoreListeners(); });
+
+        const initializeAuth = async () => {
             if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) await signInWithCustomToken(auth, __initial_auth_token);
             else await signInAnonymously(auth);
         };
-        init();
-        initStaticSelects();
+        initializeAuth();
+        initKeySelects();
         window.addRepertorioRow('repertorio-inputs');
         window.addEquipoRow('equipo-inputs');
     </script>
