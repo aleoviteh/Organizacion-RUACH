@@ -269,6 +269,9 @@
                     <li id="menu-ingreso" onclick="showSection('ingreso')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
                         <i class="fas fa-plus-circle w-6 text-green-400"></i> INGRESO
                     </li>
+                    <li onclick="showSection('cuentas')" class="cursor-pointer hover:bg-white/5 p-3 rounded-lg flex items-center gap-3">
+                        <i class="fas fa-wallet text-silver-text w-6"></i> CUENTAS
+                    </li>
                     <li id="menu-usuario" onclick="showSection('usuarios-admin')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
                         <i class="fas fa-user-cog w-6 text-blue-400"></i> USUARIOS
                     </li>
@@ -1167,6 +1170,445 @@ const firebaseConfig = {
         initKeySelects();
         window.addRepertorioRow('repertorio-inputs');
         window.addEquipoRow('equipo-inputs');
+
+                <!-- SECCIÓN CUENTAS (NUEVO) -->
+        <section id="section-cuentas" class="section-content hidden-section">
+            <h2 class="text-2xl font-bold silver-text mb-6 uppercase">Módulo de Cuentas</h2>
+            
+            <!-- Tabs de Submódulos -->
+            <div class="flex gap-2 mb-8 border-b border-white/10 overflow-x-auto pb-1 custom-scrollbar">
+                <button onclick="showSub('ingresos')" id="tab-ingresos" class="tab-btn px-6 py-3 font-bold active">INGRESOS</button>
+                <button onclick="showSub('salidas')" id="tab-salidas" class="tab-btn px-6 py-3 font-bold">SALIDAS</button>
+                <button onclick="showSub('estado')" id="tab-estado" class="tab-btn px-6 py-3 font-bold">ESTADO DE CUENTAS</button>
+            </div>
+
+            <!-- SUBMÓDULO INGRESOS -->
+            <div id="sub-ingresos" class="sub-content">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <button onclick="openModal('modal-ingreso')" class="btn-silver"><i class="fas fa-plus mr-2"></i>NUEVO INGRESO</button>
+                    <div class="relative w-full md:w-80">
+                        <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"></i>
+                        <input type="text" id="search-ingresos" placeholder="Buscar por miembro..." class="pl-10" oninput="renderIngresos()">
+                    </div>
+                </div>
+                <div class="glass-panel overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left min-w-[700px]">
+                        <thead class="bg-white/5 silver-text uppercase text-xs">
+                            <tr>
+                                <th class="p-4">Miembro</th>
+                                <th class="p-4">Mes</th>
+                                <th class="p-4">Cantidad</th>
+                                <th class="p-4">Tipo</th>
+                                <th class="p-4">Referencia</th>
+                                <th class="p-4 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-ingresos" class="text-sm divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUBMÓDULO SALIDAS -->
+            <div id="sub-salidas" class="sub-content hidden">
+                <div class="mb-6">
+                    <button onclick="openModal('modal-salida')" class="btn-silver"><i class="fas fa-arrow-down mr-2"></i>INGRESO</button>
+                </div>
+                <div class="glass-panel overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left min-w-[700px]">
+                        <thead class="bg-white/5 silver-text uppercase text-xs">
+                            <tr>
+                                <th class="p-4">Fecha</th>
+                                <th class="p-4">Actividad</th>
+                                <th class="p-4">Responsable</th>
+                                <th class="p-4">Costo</th>
+                                <th class="p-4">Descripción</th>
+                                <th class="p-4 text-center">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-salidas" class="text-sm divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- SUBMÓDULO ESTADO DE CUENTAS -->
+            <div id="sub-estado" class="sub-content hidden">
+                <!-- Dashboard -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="glass-panel p-6 border-l-4 border-green-500">
+                        <p class="text-xs text-gray-400 uppercase mb-2 font-bold tracking-widest">Ingresos Totales</p>
+                        <div id="dash-ingresos-usd" class="text-lg font-bold text-green-400">USD: $0.00</div>
+                        <div id="dash-ingresos-bs" class="text-sm text-gray-300">BS: 0.00</div>
+                    </div>
+                    <div class="glass-panel p-6 border-l-4 border-red-500">
+                        <p class="text-xs text-gray-400 uppercase mb-2 font-bold tracking-widest">Salidas Totales</p>
+                        <div id="dash-salidas-usd" class="text-lg font-bold text-red-400">USD: $0.00</div>
+                        <div id="dash-salidas-bs" class="text-sm text-gray-300">BS: 0.00</div>
+                    </div>
+                    <div class="glass-panel p-6 border-l-4 border-silver">
+                        <p class="text-xs text-gray-400 uppercase mb-2 font-bold tracking-widest">Estado Actual</p>
+                        <div id="dash-actual-usd" class="text-lg font-bold silver-text">USD: $0.00</div>
+                        <div id="dash-actual-bs" class="text-sm text-gray-300">BS: 0.00</div>
+                    </div>
+                </div>
+
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="font-bold silver-text uppercase text-sm tracking-widest">Historial de Transacciones (BS a USD)</h3>
+                    <button onclick="openModal('modal-trans')" class="btn-silver text-xs">REALIZAR TRANSACCIÓN</button>
+                </div>
+
+                <div class="glass-panel overflow-x-auto custom-scrollbar">
+                    <table class="w-full text-left min-w-[600px]">
+                        <thead class="bg-white/5 silver-text uppercase text-xs">
+                            <tr>
+                                <th class="p-4">Fecha</th>
+                                <th class="p-4">Monto BS</th>
+                                <th class="p-4">Tasa</th>
+                                <th class="p-4">Monto USD (+)</th>
+                                <th class="p-4">Referencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-trans" class="text-sm divide-y divide-white/5"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+  <!-- MODAL INGRESO -->
+    <div id="modal-ingreso" class="modal-overlay">
+        <div class="glass-panel p-8 w-full max-w-md">
+            <h3 class="text-xl font-bold silver-text mb-6" id="modal-ingreso-title">Registrar Ingreso</h3>
+            <input type="hidden" id="edit-ingreso-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">MIEMBRO</label>
+                    <select id="field-i-miembro" class="mt-1"></select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">FECHA DE PAGO</label>
+                    <input type="date" id="field-i-fecha" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">CANTIDAD</label>
+                    <input type="number" id="field-i-cantidad" step="0.01" placeholder="0.00" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">TIPO</label>
+                    <select id="field-i-tipo" class="mt-1">
+                        <option value="Binance">Binance (USD)</option>
+                        <option value="Efectivo">Efectivo (USD)</option>
+                        <option value="Transferencia">Transferencia (BS)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">REFERENCIA</label>
+                    <input type="text" id="field-i-ref" placeholder="Nro de referencia" class="mt-1">
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="saveIngreso()" class="btn-silver flex-1">GUARDAR</button>
+                    <button onclick="closeModal('modal-ingreso')" class="bg-white/10 hover:bg-white/20 flex-1 rounded-lg">CERRAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SALIDA -->
+    <div id="modal-salida" class="modal-overlay">
+        <div class="glass-panel p-8 w-full max-w-md">
+            <h3 class="text-xl font-bold silver-text mb-6" id="modal-salida-title">Registrar Salida</h3>
+            <input type="hidden" id="edit-salida-id">
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">FECHA DE ACTIVIDAD</label>
+                    <input type="date" id="field-s-fecha" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">ACTIVIDAD</label>
+                    <input type="text" id="field-s-act" placeholder="Nombre de la actividad" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">RESPONSABLE</label>
+                    <select id="field-s-responsable" class="mt-1"></select>
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">COSTO</label>
+                    <input type="number" id="field-s-costo" step="0.01" placeholder="0.00" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">DESCRIPCIÓN</label>
+                    <textarea id="field-s-desc" rows="3" placeholder="Breve descripción..." class="mt-1"></textarea>
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="saveSalida()" class="btn-silver flex-1">GUARDAR</button>
+                    <button onclick="closeModal('modal-salida')" class="bg-white/10 hover:bg-white/20 flex-1 rounded-lg">CERRAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL TRANSACCIÓN -->
+    <div id="modal-trans" class="modal-overlay">
+        <div class="glass-panel p-8 w-full max-w-md">
+            <h3 class="text-xl font-bold silver-text mb-6 uppercase">Transacción BS a USD</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">FECHA</label>
+                    <input type="date" id="field-t-fecha" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">MONTO EN BOLÍVARES (-)</label>
+                    <input type="number" id="field-t-bs" step="0.01" placeholder="0.00" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">TASA DE CAMBIO</label>
+                    <input type="number" id="field-t-tasa" step="0.01" placeholder="Ej: 36.50" class="mt-1">
+                </div>
+                <div>
+                    <label class="text-xs text-gray-400 font-bold">REFERENCIA</label>
+                    <input type="text" id="field-t-ref" placeholder="Nro de operación" class="mt-1">
+                </div>
+                <div class="flex gap-4 pt-4">
+                    <button onclick="saveTrans()" class="btn-silver flex-1">REGISTRAR</button>
+                    <button onclick="closeModal('modal-trans')" class="bg-white/10 hover:bg-white/20 flex-1 rounded-lg">CERRAR</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+ window.openModal = (id) => {
+            document.getElementById(id).classList.add('open');
+            if (id === 'modal-ingreso' || id === 'modal-salida') updateMemberDropdowns();
+        };
+
+        window.closeModal = (id) => {
+            document.getElementById(id).classList.remove('open');
+            clearFormFields(id);
+        };
+
+        const clearFormFields = (id) => {
+            const inputs = document.getElementById(id).querySelectorAll('input, select, textarea');
+            inputs.forEach(i => {
+                if (i.id !== 'edit-ingreso-id' && i.id !== 'edit-salida-id') i.value = '';
+            });
+            const hid = document.getElementById('edit-ingreso-id');
+            if(hid) hid.value = '';
+            const hid2 = document.getElementById('edit-salida-id');
+            if(hid2) hid2.value = '';
+        };
+
+       const updateMemberDropdowns = () => {
+            const options = members.length > 0 
+                ? members.map(m => `<option value="${m.name}">${m.name}</option>`).join('')
+                : `<option value="">Sin miembros registrados</option>`;
+            
+            document.getElementById('field-i-miembro').innerHTML = options;
+            document.getElementById('field-s-responsable').innerHTML = options;
+        };
+
+        const getMesNombre = (fechaStr) => {
+            if (!fechaStr) return '-';
+            const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+            const date = new Date(fechaStr + 'T00:00:00');
+            return meses[date.getMonth()];
+        };
+
+           // Listeners Publicos con el path estricto
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'members'), s => {
+                members = s.docs.map(d => ({id: d.id, ...d.data()}));
+                renderMembers();
+            }, err);
+
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'ingresos'), s => {
+                ingresos = s.docs.map(d => ({id: d.id, ...d.data()}));
+                renderIngresos();
+                recalcDashboard();
+            }, err);
+
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'salidas'), s => {
+                salidas = s.docs.map(d => ({id: d.id, ...d.data()}));
+                renderSalidas();
+                recalcDashboard();
+            }, err);
+
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'transacciones'), s => {
+                transacciones = s.docs.map(d => ({id: d.id, ...d.data()}));
+                renderTrans();
+            }, err);
+        };
+
+        // Acciones Ingresos
+        window.saveIngreso = async () => {
+            const id = document.getElementById('edit-ingreso-id').value;
+            const data = {
+                miembro: document.getElementById('field-i-miembro').value,
+                fecha: document.getElementById('field-i-fecha').value,
+                cantidad: parseFloat(document.getElementById('field-i-cantidad').value) || 0,
+                tipo: document.getElementById('field-i-tipo').value,
+                referencia: document.getElementById('field-i-ref').value
+            };
+
+            if (id) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'ingresos', id), data);
+            } else {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'ingresos'), data);
+            }
+            closeModal('modal-ingreso');
+        };
+
+        window.renderIngresos = () => {
+            const search = document.getElementById('search-ingresos').value.toLowerCase();
+            const body = document.getElementById('table-ingresos');
+            body.innerHTML = ingresos
+                .filter(i => i.miembro.toLowerCase().includes(search))
+                .map(i => `
+                    <tr>
+                        <td class="p-4 font-bold uppercase">${i.miembro}</td>
+                        <td class="p-4">${getMesNombre(i.fecha)}</td>
+                        <td class="p-4 font-bold ${i.tipo === 'Transferencia' ? 'text-blue-400' : 'text-green-400'}">
+                            ${i.tipo === 'Transferencia' ? 'Bs.' : '$'} ${i.cantidad.toFixed(2)}
+                        </td>
+                        <td class="p-4 text-xs italic opacity-60">${i.tipo}</td>
+                        <td class="p-4 font-mono text-xs">${i.referencia || '-'}</td>
+                        <td class="p-4">
+                            <div class="flex justify-center gap-4">
+                                <button onclick="editIngreso('${i.id}')" class="text-silver-text hover:text-white"><i class="fas fa-edit"></i></button>
+                                <button onclick="deleteItem('ingresos', '${i.id}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+        };
+
+        window.editIngreso = (id) => {
+            const i = ingresos.find(x => x.id === id);
+            if (!i) return;
+            openModal('modal-ingreso');
+            document.getElementById('edit-ingreso-id').value = i.id;
+            document.getElementById('field-i-miembro').value = i.miembro;
+            document.getElementById('field-i-fecha').value = i.fecha;
+            document.getElementById('field-i-cantidad').value = i.cantidad;
+            document.getElementById('field-i-tipo').value = i.tipo;
+            document.getElementById('field-i-ref').value = i.referencia;
+            document.getElementById('modal-ingreso-title').innerText = "Editar Ingreso";
+        };
+
+        // Acciones Salidas
+        window.saveSalida = async () => {
+            const id = document.getElementById('edit-salida-id').value;
+            const data = {
+                fecha: document.getElementById('field-s-fecha').value,
+                actividad: document.getElementById('field-s-act').value,
+                responsable: document.getElementById('field-s-responsable').value,
+                costo: parseFloat(document.getElementById('field-s-costo').value) || 0,
+                descripcion: document.getElementById('field-s-desc').value
+            };
+
+            if (id) {
+                await updateDoc(doc(db, 'artifacts', appId, 'public', 'data', 'salidas', id), data);
+            } else {
+                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'salidas'), data);
+            }
+            closeModal('modal-salida');
+        };
+
+        window.renderSalidas = () => {
+            const body = document.getElementById('table-salidas');
+            body.innerHTML = salidas.map(s => `
+                <tr>
+                    <td class="p-4 text-xs">${s.fecha}</td>
+                    <td class="p-4 font-bold uppercase">${s.actividad}</td>
+                    <td class="p-4 text-gray-400 text-xs">${s.responsable}</td>
+                    <td class="p-4 font-bold text-red-400">$ ${s.costo.toFixed(2)}</td>
+                    <td class="p-4 text-xs opacity-60 italic truncate max-w-[150px]">${s.descripcion}</td>
+                    <td class="p-4">
+                        <div class="flex justify-center gap-4">
+                            <button onclick="editSalida('${s.id}')" class="text-silver-text hover:text-white"><i class="fas fa-edit"></i></button>
+                            <button onclick="deleteItem('salidas', '${s.id}')" class="text-red-400 hover:text-red-600"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        window.editSalida = (id) => {
+            const s = salidas.find(x => x.id === id);
+            if (!s) return;
+            openModal('modal-salida');
+            document.getElementById('edit-salida-id').value = s.id;
+            document.getElementById('field-s-fecha').value = s.fecha;
+            document.getElementById('field-s-act').value = s.actividad;
+            document.getElementById('field-s-responsable').value = s.responsable;
+            document.getElementById('field-s-costo').value = s.costo;
+            document.getElementById('field-s-desc').value = s.descripcion;
+            document.getElementById('modal-salida-title').innerText = "Editar Salida";
+        };
+
+        // Transacciones BS a USD
+        window.saveTrans = async () => {
+            const bs = parseFloat(document.getElementById('field-t-bs').value) || 0;
+            const tasa = parseFloat(document.getElementById('field-t-tasa').value) || 1;
+            const data = {
+                fecha: document.getElementById('field-t-fecha').value,
+                montoBs: bs,
+                tasa: tasa,
+                montoUsd: bs / tasa,
+                referencia: document.getElementById('field-t-ref').value
+            };
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'transacciones'), data);
+            closeModal('modal-trans');
+            recalcDashboard();
+        };
+
+        const renderTrans = () => {
+            const body = document.getElementById('table-trans');
+            body.innerHTML = transacciones.map(t => `
+                <tr>
+                    <td class="p-4 text-xs">${t.fecha}</td>
+                    <td class="p-4 text-red-300">- Bs. ${t.montoBs.toFixed(2)}</td>
+                    <td class="p-4 text-xs italic">${t.tasa.toFixed(2)}</td>
+                    <td class="p-4 font-bold text-green-400">+ $ ${t.montoUsd.toFixed(2)}</td>
+                    <td class="p-4 font-mono text-xs opacity-50">${t.referencia || '-'}</td>
+                </tr>
+            `).join('');
+        };
+
+        // Dashboard & Balances
+        const recalcDashboard = () => {
+            // Ingresos USD (Binance, Efectivo)
+            const iUsd = ingresos
+                .filter(i => i.tipo !== 'Transferencia')
+                .reduce((acc, curr) => acc + curr.cantidad, 0);
+            
+            // Ingresos BS (Transferencia)
+            const iBsTotal = ingresos
+                .filter(i => i.tipo === 'Transferencia')
+                .reduce((acc, curr) => acc + curr.cantidad, 0);
+
+            // Restar BS de las transacciones ya realizadas
+            const bsCambiados = transacciones.reduce((acc, curr) => acc + curr.montoBs, 0);
+            const usdObtenidos = transacciones.reduce((acc, curr) => acc + curr.montoUsd, 0);
+
+            // Salidas (Todas se asumen en USD para el balance final de caja)
+            const sUsd = salidas.reduce((acc, curr) => acc + curr.costo, 0);
+
+            const finalUsdIn = iUsd + usdObtenidos;
+            const finalBsIn = iBsTotal - bsCambiados;
+
+            document.getElementById('dash-ingresos-usd').innerText = `USD: $ ${iUsd.toFixed(2)}`;
+            document.getElementById('dash-ingresos-bs').innerText = `BS: ${iBsTotal.toFixed(2)}`;
+            
+            document.getElementById('dash-salidas-usd').innerText = `USD: $ ${sUsd.toFixed(2)}`;
+            document.getElementById('dash-salidas-bs').innerText = `BS: 0.00`;
+
+            document.getElementById('dash-actual-usd').innerText = `USD: $ ${(finalUsdIn - sUsd).toFixed(2)}`;
+            document.getElementById('dash-actual-bs').innerText = `BS: ${finalBsIn.toFixed(2)}`;
+        };
+
+        window.deleteItem = async (coll, id) => {
+            if (confirm("¿Estás seguro de eliminar este registro?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', coll, id));
+            }
+        };
+
     </script>
 </body>
 </html>
