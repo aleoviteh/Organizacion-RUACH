@@ -766,7 +766,7 @@ const firebaseConfig = {
 
         window.closeEditModal = () => document.getElementById('modal-edit-song').classList.add('hidden');
 
-        window.processSongUpdate = async () => {
+        window.processSongUpdate = async () => {3
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
             const original = JSON.parse(decodeURIComponent(document.getElementById('edit-song-original-id').value));
             const imgInput = document.getElementById('edit-song-image-input');
@@ -1433,7 +1433,7 @@ const firebaseConfig = {
                 transacciones = s.docs.map(d => ({id: d.id, ...d.data()}));
                 renderTrans();
             }, err);
-        };
+
 
         // Acciones Ingresos
         window.saveIngreso = async () => {
