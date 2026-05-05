@@ -125,6 +125,27 @@
             backdrop-filter: blur(8px);
         }
 
+        /* Finanzas Styles */
+        .finance-table input {
+            width: 70px;
+            text-align: center;
+            font-size: 0.75rem;
+            padding: 4px !important;
+            border: 1px solid rgba(255,255,255,0.05) !important;
+            background: transparent !important;
+        }
+        .finance-table input:focus {
+            background: rgba(255,255,255,0.1) !important;
+            outline: none;
+        }
+        .sticky-col {
+            position: sticky;
+            left: 0;
+            background: #1a1a1a;
+            z-index: 10;
+            min-width: 120px;
+        }
+
         /* Galeria Styles */
         .gallery-grid {
             display: grid;
@@ -160,14 +181,7 @@
         .gallery-item:hover .gallery-overlay {
             opacity: 1;
         }
-    /* Finanzas Styles */
-        .finance-table input {
-            width: 75px;
-            text-align: center;
-            font-size: 0.7rem;
-            padding: 4px !important;
-            border: 1px solid rgba(255,255,255,0.05) !important;
-        }
+
         #song-image-viewer {
             padding: 0;
         }
@@ -270,11 +284,11 @@
                     <li onclick="showSection('planificacion')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-calendar-alt w-6"></i> PLANIFICACION
                     </li>
-                                        <li onclick="showSection('finanzas')" class="cursor-pointer flex items-center gap-3 p-2 border-b border-transparent hover:border-emerald-400 transition-all text-emerald-400 font-bold">
-                        <i class="fas fa-wallet w-6"></i> FINANZAS
-                    </li>
                     <li onclick="showSection('galeria')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-images w-6"></i> GALERIA
+                    </li>
+                    <li onclick="showSection('finanzas')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-emerald-500 transition-all text-emerald-400 font-bold">
+                        <i class="fas fa-wallet w-6"></i> FINANZAS
                     </li>
                     <li id="menu-ingreso" onclick="showSection('ingreso')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
                         <i class="fas fa-plus-circle w-6 text-green-400"></i> INGRESO
@@ -343,6 +357,101 @@
                 </div>
             </section>
 
+            <!-- Sección: FINANZAS (NUEVO) -->
+            <section id="section-finanzas" class="section-content hidden-section">
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Tabs Finanzas -->
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        <button onclick="switchFinanceTab('ingresos')" id="btn-tab-ingresos" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold bg-white/10">Aportes Mensuales</button>
+                        <button onclick="switchFinanceTab('compras')" id="btn-tab-compras" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Registro de Compras</button>
+                        <button onclick="switchFinanceTab('resumen')" id="btn-tab-resumen" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Resumen de Cuenta</button>
+                    </div>
+
+                    <!-- Contenido: Aportes -->
+                    <div id="finance-tab-ingresos" class="finance-sub-section">
+                        <div class="glass-panel p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h3 class="font-bold silver-text text-sm uppercase">Control de Aportes</h3>
+                                    <p class="text-[10px] text-gray-500 italic">Monto en dólares ($) editable manualmente por líderes</p>
+                                </div>
+                                <button onclick="addNewFinanceMember()" class="admin-only hidden btn-silver px-4 py-2 rounded text-[10px] uppercase">+ Añadir Miembro</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left finance-table border-collapse">
+                                    <thead class="text-[10px] text-gray-500 uppercase border-b border-white/10">
+                                        <tr>
+                                            <th class="p-3 sticky-col">Nombres</th>
+                                            <th class="p-3">Ene</th><th class="p-3">Feb</th><th class="p-3">Mar</th>
+                                            <th class="p-3">Abr</th><th class="p-3">May</th><th class="p-3">Jun</th>
+                                            <th class="p-3">Jul</th><th class="p-3">Ago</th><th class="p-3">Sep</th>
+                                            <th class="p-3">Oct</th><th class="p-3">Nov</th><th class="p-3">Dic</th>
+                                            <th class="p-3 admin-only hidden">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="finance-income-body" class="divide-y divide-white/5">
+                                        <!-- Filas dinámicas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido: Compras -->
+                    <div id="finance-tab-compras" class="finance-sub-section hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="lg:col-span-1 glass-panel p-6 admin-only hidden">
+                                <h3 class="font-bold silver-text text-xs uppercase mb-4">Nueva Compra / Gasto</h3>
+                                <div class="space-y-3">
+                                    <input type="date" id="purchase-date" class="w-full text-xs">
+                                    <input type="text" id="purchase-resp" placeholder="Responsable" class="w-full text-xs">
+                                    <textarea id="purchase-desc" placeholder="Descripción de la compra" class="w-full text-xs" rows="3"></textarea>
+                                    <input type="number" id="purchase-cost" placeholder="Monto ($)" class="w-full text-xs">
+                                    <button onclick="saveNewPurchase()" class="w-full btn-silver p-3 rounded uppercase text-[10px] mt-2">Registrar Gasto</button>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 glass-panel p-6">
+                                <h3 class="font-bold silver-text text-xs uppercase mb-4">Historial de Egresos</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-[11px]">
+                                        <thead class="text-gray-500 uppercase border-b border-white/10">
+                                            <tr>
+                                                <th class="p-2">Fecha</th>
+                                                <th class="p-2">Responsable</th>
+                                                <th class="p-2">Descripción</th>
+                                                <th class="p-2 text-right">Costo ($)</th>
+                                                <th class="p-2 admin-only hidden text-center">Eliminar</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="finance-purchases-list" class="divide-y divide-white/5">
+                                            <!-- Lista de compras -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido: Resumen -->
+                    <div id="finance-tab-resumen" class="finance-sub-section hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="glass-panel p-8 text-center border-b-2 border-green-500/30">
+                                <p class="text-[10px] text-gray-500 uppercase mb-2">Ingresos (Aportes)</p>
+                                <h2 id="summary-total-in" class="text-4xl font-bold text-green-400">$0.00</h2>
+                            </div>
+                            <div class="glass-panel p-8 text-center border-b-2 border-red-500/30">
+                                <p class="text-[10px] text-gray-500 uppercase mb-2">Gastos (Compras)</p>
+                                <h2 id="summary-total-out" class="text-4xl font-bold text-red-400">$0.00</h2>
+                            </div>
+                            <div class="glass-panel p-8 text-center border-t-4 border-silver shadow-xl">
+                                <p class="text-[10px] text-gray-500 uppercase mb-2">Dinero Actual en Caja</p>
+                                <h2 id="summary-balance" class="text-5xl font-bold silver-text">$0.00</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             <!-- Sección: PLANIFICACION -->
             <section id="section-planificacion" class="section-content hidden-section">
                 <div class="flex flex-col md:flex-row gap-8">
@@ -357,14 +466,11 @@
                         </div>
                         <div id="calendar-days" class="calendar-grid"></div>
                     </div>
-                    <!-- Panel lateral de detalles (ahora soporta múltiples actividades) -->
                     <div id="day-details" class="flex-1 glass-panel p-6 border-l-4 border-silver hidden">
                         <div class="flex justify-between items-start mb-4">
                             <h3 id="detail-date" class="text-xl font-bold silver-text"></h3>
                         </div>
-                        <div id="activities-container" class="space-y-6">
-                            <!-- Lista de actividades aquí -->
-                        </div>
+                        <div id="activities-container" class="space-y-6"></div>
                     </div>
                 </div>
             </section>
@@ -547,97 +653,6 @@
         </div>
     </div>
 
-                <!-- Sección: FINANZAS (NUEVO MODULO) -->
-            <section id="section-finanzas" class="section-content hidden-section">
-                <div class="grid grid-cols-1 gap-6">
-                    <!-- Tabs -->
-                    <div class="flex gap-2 overflow-x-auto pb-2">
-                        <button onclick="showFinanceTab('aportes')" id="tab-aportes" class="px-6 py-2 rounded-lg glass-panel text-[10px] bg-white/10 uppercase font-bold">Ingresos (Aportes)</button>
-                        <button onclick="showFinanceTab('compras')" id="tab-compras" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Compras (Gastos)</button>
-                        <button onclick="showFinanceTab('resumen')" id="tab-resumen" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Resumen General</button>
-                    </div>
-
-                    <!-- Contenido Aportes -->
-                    <div id="finance-aportes" class="finance-tab">
-                        <div class="glass-panel p-6">
-                            <div class="flex justify-between items-center mb-6">
-                                <div>
-                                    <h3 class="font-bold silver-text text-sm uppercase">Tabla de Aportes Anuales</h3>
-                                    <p class="text-[10px] text-gray-500">Montos en Dólares ($)</p>
-                                </div>
-                                <button onclick="addFinanceName()" class="admin-only hidden btn-silver px-4 py-2 rounded text-[10px] uppercase">+ Nuevo Nombre</button>
-                            </div>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left finance-table border-collapse">
-                                    <thead>
-                                        <tr class="text-[10px] text-gray-500 uppercase border-b border-white/10">
-                                            <th class="p-2 sticky-col">Nombres</th>
-                                            <th class="p-2">Ene</th><th class="p-2">Feb</th><th class="p-2">Mar</th>
-                                            <th class="p-2">Abr</th><th class="p-2">May</th><th class="p-2">Jun</th>
-                                            <th class="p-2">Jul</th><th class="p-2">Ago</th><th class="p-2">Sep</th>
-                                            <th class="p-2">Oct</th><th class="p-2">Nov</th><th class="p-2">Dic</th>
-                                            <th class="p-2 admin-only hidden text-center">Acción</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="finance-income-body" class="divide-y divide-white/5"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contenido Compras -->
-                    <div id="finance-compras" class="finance-tab hidden">
-                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            <div class="admin-only hidden glass-panel p-6">
-                                <h3 class="font-bold silver-text mb-4 text-xs uppercase">Registrar Compra</h3>
-                                <div class="space-y-3">
-                                    <input type="date" id="comp-date" class="w-full text-xs">
-                                    <input type="text" id="comp-resp" placeholder="Responsable" class="w-full text-xs">
-                                    <textarea id="comp-desc" placeholder="Descripción" class="w-full text-xs" rows="2"></textarea>
-                                    <input type="number" id="comp-cost" placeholder="Costo ($)" class="w-full text-xs">
-                                    <button onclick="savePurchase()" class="w-full btn-silver p-3 rounded uppercase text-[10px]">Guardar Gasto</button>
-                                </div>
-                            </div>
-                            <div class="lg:col-span-2 glass-panel p-6">
-                                <h3 class="font-bold silver-text mb-4 text-xs uppercase">Historial de Gastos</h3>
-                                <div class="overflow-x-auto">
-                                    <table class="w-full text-left text-[11px]">
-                                        <thead class="text-gray-500 uppercase border-b border-white/10">
-                                            <tr>
-                                                <th class="p-2">Fecha</th>
-                                                <th class="p-2">Responsable</th>
-                                                <th class="p-2">Descripción</th>
-                                                <th class="p-2 text-right">Costo</th>
-                                                <th class="p-2 admin-only hidden text-center">Acción</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="finance-purchase-body" class="divide-y divide-white/5"></tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contenido Resumen -->
-                    <div id="finance-resumen" class="finance-tab hidden">
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="glass-panel p-8 text-center">
-                                <p class="text-[10px] text-gray-500 uppercase mb-2">Ingresos Totales</p>
-                                <h2 id="total-incomes" class="text-3xl font-bold text-green-400">$0.00</h2>
-                            </div>
-                            <div class="glass-panel p-8 text-center">
-                                <p class="text-[10px] text-gray-500 uppercase mb-2">Egresos Totales</p>
-                                <h2 id="total-expenses" class="text-3xl font-bold text-red-400">$0.00</h2>
-                            </div>
-                            <div class="glass-panel p-8 text-center border-t-4 border-silver">
-                                <p class="text-[10px] text-gray-500 uppercase mb-2">Dinero Actual</p>
-                                <h2 id="total-balance" class="text-4xl font-bold silver-text">$0.00</h2>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
     <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -661,10 +676,10 @@ const firebaseConfig = {
         // Global State
         window.currentUser = null;
         window.allUsers = [];
-        window.finIncomes = [];
-        window.finPurchases = [];
         window.activities = [];
         window.galleryPhotos = [];
+        window.financeIncomes = [];
+        window.financePurchases = [];
         window.currentDate = new Date();
         const TONALIDADES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B", "Cm", "C#m", "Dm", "D#m", "Em", "Fm", "F#m", "Gm", "G#m", "Am", "A#m", "Bm"];
 
@@ -701,6 +716,7 @@ const firebaseConfig = {
             document.getElementById('user-display-name').innerText = `Sesión: ${userData.name} (${userData.role})`;
             setupPermissions();
             renderAll();
+            initFinanceListeners();
         };
 
         window.handleLogout = () => location.reload();
@@ -710,6 +726,7 @@ const firebaseConfig = {
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isLider));
         };
 
         const fileToBase64 = (file) => {
@@ -776,19 +793,118 @@ const firebaseConfig = {
             }
         };
 
-        window.renderGallery = () => {
-            const container = document.getElementById('gallery-container');
-            if (!container) return;
+        // --- FINANZAS ---
+        const initFinanceListeners = () => {
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'finance_incomes'), snap => {
+                window.financeIncomes = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderFinanceIncomes();
+                updateFinanceSummary();
+            });
+
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'finance_purchases'), snap => {
+                window.financePurchases = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderFinancePurchases();
+                updateFinanceSummary();
+            });
+        };
+
+        window.switchFinanceTab = (tab) => {
+            document.querySelectorAll('.finance-sub-section').forEach(s => s.classList.add('hidden'));
+            document.getElementById(`finance-tab-${tab}`).classList.remove('hidden');
+            document.querySelectorAll('[id^="btn-tab-"]').forEach(b => b.classList.remove('bg-white/10'));
+            document.getElementById(`btn-tab-${tab}`).classList.add('bg-white/10');
+        };
+
+        window.addNewFinanceMember = async () => {
+            const name = prompt("Nombre completo del miembro:");
+            if(!name) return;
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'finance_incomes'), {
+                name: name.toUpperCase(),
+                months: Array(12).fill(0)
+            });
+        };
+
+        window.updateIncomeValue = async (docId, monthIdx, value) => {
+            if(window.currentUser?.role !== 'LIDER') return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'finance_incomes', docId);
+            const row = window.financeIncomes.find(i => i.id === docId);
+            const newMonths = [...row.months];
+            newMonths[monthIdx] = parseFloat(value) || 0;
+            await updateDoc(docRef, { months: newMonths });
+        };
+
+        window.deleteFinanceRow = async (docId) => {
+            if(confirm("¿Eliminar este registro de aportes?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'finance_incomes', docId));
+            }
+        };
+
+        window.saveNewPurchase = async () => {
+            const date = document.getElementById('purchase-date').value;
+            const resp = document.getElementById('purchase-resp').value;
+            const desc = document.getElementById('purchase-desc').value;
+            const cost = parseFloat(document.getElementById('purchase-cost').value);
+            if(!date || isNaN(cost)) return;
+
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'finance_purchases'), {
+                date, resp, desc, cost
+            });
+
+            document.getElementById('purchase-resp').value = '';
+            document.getElementById('purchase-desc').value = '';
+            document.getElementById('purchase-cost').value = '';
+        };
+
+        window.deletePurchase = async (docId) => {
+            if(confirm("¿Eliminar este registro de gasto?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'finance_purchases', docId));
+            }
+        };
+
+        const renderFinanceIncomes = () => {
             const isLider = window.currentUser?.role === 'LIDER';
-            container.innerHTML = window.galleryPhotos.length ? window.galleryPhotos.map(photo => `
-                <div class="gallery-item group">
-                    <img src="${photo.image}" loading="lazy">
-                    <div class="gallery-overlay">
-                        <p class="text-[10px] text-white/80 italic">Subida por: ${photo.uploadedBy}</p>
-                        ${isLider ? `<button onclick="deleteFromGallery('${photo.id}')" class="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full text-[10px] hover:bg-red-600 transition-colors"><i class="fas fa-trash"></i></button>` : ''}
-                    </div>
-                </div>
-            `).join('') : '<div class="col-span-full py-12 text-center text-gray-500 italic">No hay fotos en la galería todavía.</div>';
+            const body = document.getElementById('finance-income-body');
+            body.innerHTML = window.financeIncomes.map(row => `
+                <tr class="hover:bg-white/5 transition-colors">
+                    <td class="p-3 sticky-col font-bold text-[10px] uppercase">${row.name}</td>
+                    ${row.months.map((val, idx) => `
+                        <td class="p-2">
+                            <input type="number" step="0.01" value="${val}" 
+                                onchange="updateIncomeValue('${row.id}', ${idx}, this.value)"
+                                ${!isLider ? 'disabled' : ''}>
+                        </td>
+                    `).join('')}
+                    <td class="p-3 admin-only ${isLider ? '' : 'hidden'} text-center">
+                        <button onclick="deleteFinanceRow('${row.id}')" class="text-red-900 hover:text-red-500"><i class="fas fa-trash"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        const renderFinancePurchases = () => {
+            const isLider = window.currentUser?.role === 'LIDER';
+            const body = document.getElementById('finance-purchases-list');
+            body.innerHTML = window.financePurchases.sort((a,b) => new Date(b.date) - new Date(a.date)).map(p => `
+                <tr>
+                    <td class="p-2 text-gray-500 font-mono">${p.date}</td>
+                    <td class="p-2 font-bold">${p.resp}</td>
+                    <td class="p-2 text-gray-400 italic">${p.desc}</td>
+                    <td class="p-2 text-right font-bold text-red-400">$${p.cost.toFixed(2)}</td>
+                    <td class="p-2 admin-only ${isLider ? '' : 'hidden'} text-center">
+                        <button onclick="deletePurchase('${p.id}')" class="text-red-900 hover:text-red-500"><i class="fas fa-times"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        const updateFinanceSummary = () => {
+            const totalIn = window.financeIncomes.reduce((acc, row) => acc + row.months.reduce((a, b) => a + b, 0), 0);
+            const totalOut = window.financePurchases.reduce((acc, p) => acc + p.cost, 0);
+            const balance = totalIn - totalOut;
+
+            document.getElementById('summary-total-in').innerText = `$${totalIn.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('summary-total-out').innerText = `$${totalOut.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
+            document.getElementById('summary-balance').innerText = `$${balance.toLocaleString('en-US', {minimumFractionDigits: 2})}`;
         };
 
         // --- PLANIFICACION ---
@@ -836,7 +952,6 @@ const firebaseConfig = {
             }
         };
 
-        // --- CANCIONERO ---
         window.openEditSong = (encodedData) => {
             const song = JSON.parse(decodeURIComponent(encodedData));
             document.getElementById('edit-song-original-id').value = encodedData;
@@ -1034,7 +1149,6 @@ const firebaseConfig = {
             }
         };
 
-        // Modificado para mostrar múltiples actividades
         window.showDayDetails = (dateStr) => {
             const dayActs = window.activities
                 .filter(a => a.date === dateStr)
@@ -1074,19 +1188,16 @@ const firebaseConfig = {
                                     </div>
                                 ` : ''}
                             </div>
-                            
                             ${act.notes ? `
                                 <div class="mb-4 p-2 bg-black/20 rounded border border-white/5">
                                     <p class="text-[9px] text-gray-500 uppercase mb-1">Notas</p>
                                     <p class="text-xs text-gray-300 italic">${act.notes}</p>
                                 </div>
                             ` : ''}
-
                             <div class="mb-4">
                                 <p class="text-[10px] text-gray-500 mb-1 uppercase">Repertorio</p>
                                 <ul class="text-xs space-y-0.5">${listHtml}</ul>
                             </div>
-
                             <div>
                                 <p class="text-[10px] text-gray-500 mb-1 uppercase">Equipo</p>
                                 <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
@@ -1098,130 +1209,11 @@ const firebaseConfig = {
                                     `).join('') || '<span class="text-gray-600">Sin equipo</span>'}
                                 </div>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 }).join('');
             } else {
                 container.innerHTML = `<p class="text-gray-500 italic text-sm py-10 text-center">Sin actividades registradas para hoy.</p>`;
             }
-        };
-  // --- FINANZAS LOGIC ---
-        const initFinanceListeners = () => {
-            // Escuchar Aportes
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'fin_incomes'), snap => {
-                window.finIncomes = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderFinanceIncomes();
-                calculateSummary();
-            });
-
-            // Escuchar Compras
-            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'fin_purchases'), snap => {
-                window.finPurchases = snap.docs.map(d => ({id: d.id, ...d.data()}));
-                renderFinancePurchases();
-                calculateSummary();
-            });
-        };
-
-        window.showFinanceTab = (tabId) => {
-            document.querySelectorAll('.finance-tab').forEach(t => t.classList.add('hidden'));
-            document.getElementById(`finance-${tabId}`).classList.remove('hidden');
-            document.querySelectorAll('[id^="tab-"]').forEach(b => b.classList.remove('bg-white/10'));
-            document.getElementById(`tab-${tabId}`).classList.add('bg-white/10');
-        };
-
-        window.addFinanceName = async () => {
-            const name = prompt("Ingrese nombre completo:");
-            if(!name) return;
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fin_incomes'), {
-                name: name,
-                months: Array(12).fill(0)
-            });
-        };
-
-        window.updateIncomeCell = async (docId, monthIdx, val) => {
-            if(window.currentUser?.role !== 'LIDER') return;
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'fin_incomes', docId);
-            const row = window.finIncomes.find(i => i.id === docId);
-            const newMonths = [...row.months];
-            newMonths[monthIdx] = parseFloat(val) || 0;
-            await updateDoc(docRef, { months: newMonths });
-        };
-
-        window.deleteIncomeRow = async (docId) => {
-            if(window.currentUser?.role !== 'LIDER') return;
-            if(confirm("¿Eliminar este registro?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'fin_incomes', docId));
-            }
-        };
-
-        window.savePurchase = async () => {
-            const date = document.getElementById('comp-date').value;
-            const resp = document.getElementById('comp-resp').value;
-            const desc = document.getElementById('comp-desc').value;
-            const cost = parseFloat(document.getElementById('comp-cost').value);
-            if(!date || isNaN(cost)) return;
-
-            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fin_purchases'), {
-                date, resp, desc, cost
-            });
-
-            document.getElementById('comp-resp').value = '';
-            document.getElementById('comp-desc').value = '';
-            document.getElementById('comp-cost').value = '';
-        };
-
-        window.deletePurchase = async (docId) => {
-            if(confirm("¿Eliminar este gasto?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'fin_purchases', docId));
-            }
-        };
-
-        // --- RENDERS ---
-        const renderFinanceIncomes = () => {
-            const isLider = window.currentUser?.role === 'LIDER';
-            const body = document.getElementById('finance-income-body');
-            body.innerHTML = window.finIncomes.map(row => `
-                <tr class="hover:bg-white/5">
-                    <td class="p-2 sticky-col font-bold text-[10px] uppercase">${row.name}</td>
-                    ${row.months.map((m, idx) => `
-                        <td class="p-1">
-                            <input type="number" value="${m}" 
-                                onchange="updateIncomeCell('${row.id}', ${idx}, this.value)"
-                                ${!isLider ? 'disabled' : ''}
-                                class="bg-transparent hover:bg-white/10 transition-colors">
-                        </td>
-                    `).join('')}
-                    <td class="p-2 admin-only ${isLider ? '' : 'hidden'} text-center">
-                        <button onclick="deleteIncomeRow('${row.id}')" class="text-red-500/40 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        };
-
-        const renderFinancePurchases = () => {
-            const isLider = window.currentUser?.role === 'LIDER';
-            const body = document.getElementById('finance-purchase-body');
-            body.innerHTML = window.finPurchases.sort((a,b) => new Date(b.date) - new Date(a.date)).map(p => `
-                <tr>
-                    <td class="p-2 text-gray-400 font-mono">${p.date}</td>
-                    <td class="p-2 font-bold">${p.resp}</td>
-                    <td class="p-2 text-gray-400 italic">${p.desc}</td>
-                    <td class="p-2 text-right font-bold text-red-400">$${p.cost.toFixed(2)}</td>
-                    <td class="p-2 admin-only ${isLider ? '' : 'hidden'} text-center">
-                        <button onclick="deletePurchase('${p.id}')" class="text-red-900 hover:text-red-500"><i class="fas fa-times"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        };
-
-        const calculateSummary = () => {
-            const totalIn = window.finIncomes.reduce((acc, row) => acc + row.months.reduce((a, b) => a + b, 0), 0);
-            const totalOut = window.finPurchases.reduce((acc, p) => acc + p.cost, 0);
-            const balance = totalIn - totalOut;
-
-            document.getElementById('total-incomes').innerText = `$${totalIn.toFixed(2)}`;
-            document.getElementById('total-expenses').innerText = `$${totalOut.toFixed(2)}`;
-            document.getElementById('total-balance').innerText = `$${balance.toFixed(2)}`;
         };
 
         window.addRepertorioRow = (targetId, data = null) => {
@@ -1248,7 +1240,7 @@ const firebaseConfig = {
         };
 
         window.addEquipoRow = (targetId, data = null) => {
-            const roles = ["baterista", "bajista", "guitarrista", "tecladista", "violinista", "guitarrista", "coro", "director", "sonidista"];
+            const roles = ["baterista", "bajista", "tecladista", "violinista", "guitarrista", "coro", "director", "sonidista"];
             const div = document.createElement('div');
             div.className = "grid grid-cols-2 gap-2";
             div.innerHTML = `
@@ -1270,7 +1262,7 @@ const firebaseConfig = {
             if((sectionId === 'ingreso' || sectionId === 'usuarios-admin') && window.currentUser?.role !== 'LIDER') return;
             document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
             document.getElementById(`section-${sectionId}`).classList.remove('hidden-section');
-            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
+            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ').toUpperCase();
             if(window.innerWidth < 1024) {
                 const sb = document.getElementById('sidebar');
                 if(!sb.classList.contains('closed')) window.toggleSidebar();
@@ -1279,18 +1271,23 @@ const firebaseConfig = {
 
         window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
 
-        const renderAll = () => { 
-            window.renderMembers(); window.renderAdminUsers(); window.renderCalendar(); window.renderSongbook(); window.renderGallery();
+        window.renderGallery = () => {
+            const container = document.getElementById('gallery-container');
+            if (!container) return;
+            const isLider = window.currentUser?.role === 'LIDER';
+            container.innerHTML = window.galleryPhotos.length ? window.galleryPhotos.map(photo => `
+                <div class="gallery-item group">
+                    <img src="${photo.image}" loading="lazy">
+                    <div class="gallery-overlay">
+                        <p class="text-[10px] text-white/80 italic">Subida por: ${photo.uploadedBy}</p>
+                        ${isLider ? `<button onclick="deleteFromGallery('${photo.id}')" class="absolute top-2 right-2 bg-red-500/80 text-white p-1.5 rounded-full text-[10px] hover:bg-red-600 transition-colors"><i class="fas fa-trash"></i></button>` : ''}
+                    </div>
+                </div>
+            `).join('') : '<div class="col-span-full py-12 text-center text-gray-500 italic">No hay fotos en la galería todavía.</div>';
         };
 
-          const calculateSummary = () => {
-            const totalIn = window.finIncomes.reduce((acc, row) => acc + row.months.reduce((a, b) => a + b, 0), 0);
-            const totalOut = window.finPurchases.reduce((acc, p) => acc + p.cost, 0);
-            const balance = totalIn - totalOut;
-
-            document.getElementById('total-incomes').innerText = `$${totalIn.toFixed(2)}`;
-            document.getElementById('total-expenses').innerText = `$${totalOut.toFixed(2)}`;
-            document.getElementById('total-balance').innerText = `$${balance.toFixed(2)}`;
+        const renderAll = () => { 
+            window.renderMembers(); window.renderAdminUsers(); window.renderCalendar(); window.renderSongbook(); window.renderGallery();
         };
 
         const startFirestoreListeners = () => {
