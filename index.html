@@ -955,7 +955,39 @@ const firebaseConfig = {
                 </div>
             `).join('') : '<p class="text-center text-xs text-gray-500 italic py-4">No hay compras registradas en los últimos 7 días.</p>';
         };
+   // --- UI HELPERS ---
+        window.toggleSidebar = () => {
+            const sb = document.getElementById('sidebar');
+            const main = document.getElementById('main-content');
+            sb.classList.toggle('closed');
+            if(window.innerWidth > 768) main.style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
+        };
 
+        window.showSection = (sectionId) => {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
+            document.getElementById(`section-${sectionId}`).classList.remove('hidden-section');
+            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
+            if(window.innerWidth < 1024) {
+                const sb = document.getElementById('sidebar');
+                if(!sb.classList.contains('closed')) window.toggleSidebar();
+            }
+            if(sectionId === 'finanzas') showFinanceSub('ingresos');
+        };
+
+        window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
+
+        const renderAll = () => { 
+            window.renderMembers(); window.renderCalendar(); window.renderFinanceIncome(); window.renderExpenses(); 
+            if(document.getElementById('section-finanzas').classList.contains('active-section')) renderFinanceSummary();
+        };
+                // --- LISTENERS ---
+        const startListeners = () => {
+            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'financeIncome')), (s) => {
+                window.financeIncome = s.docs.map(d => ({id: d.id, ...d.data()}));
+                window.renderFinanceIncome();
+                renderFinanceSummary();
+            });
+            };
         // --- PLANIFICACION ---
         window.saveActivity = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
@@ -1357,6 +1389,8 @@ const firebaseConfig = {
         };
         initializeAuth(); initKeySelects();
         window.addRepertorioRow('repertorio-inputs'); window.addEquipoRow('equipo-inputs');
+
+        
     </script>
 </body>
 </html>
