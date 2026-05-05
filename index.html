@@ -160,7 +160,14 @@
         .gallery-item:hover .gallery-overlay {
             opacity: 1;
         }
-
+    /* Finanzas Styles */
+        .finance-table input {
+            width: 75px;
+            text-align: center;
+            font-size: 0.7rem;
+            padding: 4px !important;
+            border: 1px solid rgba(255,255,255,0.05) !important;
+        }
         #song-image-viewer {
             padding: 0;
         }
@@ -217,24 +224,6 @@
         .search-container input {
             padding-left: 35px !important;
         }
-                /* Finanzas specific styles */
-        .finance-table input {
-            padding: 4px !important;
-            text-align: center;
-            width: 60px;
-            font-size: 0.75rem;
-        }
-        .finance-month-col {
-            min-width: 70px;
-            text-align: center;
-        }
-        .finance-sticky-col {
-            position: sticky;
-            left: 0;
-            background: #141414;
-            z-index: 10;
-            min-width: 150px;
-        }
     </style>
 </head>
 <body>
@@ -281,11 +270,11 @@
                     <li onclick="showSection('planificacion')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-calendar-alt w-6"></i> PLANIFICACION
                     </li>
+                                        <li onclick="showSection('finanzas')" class="cursor-pointer flex items-center gap-3 p-2 border-b border-transparent hover:border-emerald-400 transition-all text-emerald-400 font-bold">
+                        <i class="fas fa-wallet w-6"></i> FINANZAS
+                    </li>
                     <li onclick="showSection('galeria')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all">
                         <i class="fas fa-images w-6"></i> GALERIA
-                    </li>
-                                        <li id="menu-finanzas" onclick="showSection('finanzas')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
-                        <i class="fas fa-wallet w-6 text-yellow-400"></i> FINANZAS
                     </li>
                     <li id="menu-ingreso" onclick="showSection('ingreso')" class="cursor-pointer hover:text-gray-300 flex items-center gap-3 p-2 border-b border-transparent hover:border-silver transition-all hidden">
                         <i class="fas fa-plus-circle w-6 text-green-400"></i> INGRESO
@@ -309,128 +298,6 @@
                     <p id="user-display-name" class="text-xs text-gray-500"></p>
                 </div>
             </header>
-            
-   <!-- Sección: FINANZAS (NUEVA) -->
-            <section id="section-finanzas" class="section-content hidden-section">
-                <!-- Submenú Finanzas -->
-                <div class="flex flex-wrap gap-4 mb-8">
-                    <button onclick="showFinanceSub('ingresos')" class="flex-1 glass-panel p-4 hover:bg-white/10 transition-all text-center">
-                        <i class="fas fa-hand-holding-usd mb-2 text-xl silver-text"></i>
-                        <p class="text-xs font-bold uppercase">Ingresos</p>
-                    </button>
-                    <button onclick="showFinanceSub('compras')" class="flex-1 glass-panel p-4 hover:bg-white/10 transition-all text-center">
-                        <i class="fas fa-shopping-cart mb-2 text-xl silver-text"></i>
-                        <p class="text-xs font-bold uppercase">Compras</p>
-                    </button>
-                    <button onclick="showFinanceSub('resumen')" class="flex-1 glass-panel p-4 hover:bg-white/10 transition-all text-center">
-                        <i class="fas fa-chart-line mb-2 text-xl silver-text"></i>
-                        <p class="text-xs font-bold uppercase">Resumen</p>
-                    </button>
-                </div>
-
-                <!-- Finanzas: INGRESOS -->
-                <div id="finance-sub-ingresos" class="finance-sub-section hidden">
-                    <div class="glass-panel p-6 overflow-hidden">
-                        <div class="flex justify-between items-center mb-6">
-                            <h3 class="text-lg font-bold silver-text">REGISTRO DE INGRESOS MENSUALES ($)</h3>
-                            <button onclick="addNewFinanceRow()" class="btn-silver px-4 py-2 rounded-lg text-[10px]">+ NUEVA FILA</button>
-                        </div>
-                        <div class="overflow-x-auto">
-                            <table class="w-full text-left text-xs finance-table border-collapse">
-                                <thead class="bg-black/40">
-                                    <tr>
-                                        <th class="p-3 finance-sticky-col border-b border-white/10">Nombre</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Ene</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Feb</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Mar</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Abr</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">May</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Jun</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Jul</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Ago</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Sep</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Oct</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Nov</th>
-                                        <th class="p-3 finance-month-col border-b border-white/10">Dic</th>
-                                        <th class="p-3 border-b border-white/10">Acción</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="finance-income-body"></tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Finanzas: COMPRAS -->
-                <div id="finance-sub-compras" class="finance-sub-section hidden">
-                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                        <div class="glass-panel p-6 lg:col-span-1">
-                            <h3 class="text-lg font-bold silver-text mb-6">REGISTRAR GASTO</h3>
-                            <div class="space-y-4">
-                                <div>
-                                    <label class="text-[10px] text-gray-500 block mb-1">FECHA</label>
-                                    <input type="date" id="expense-date" class="w-full">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-gray-500 block mb-1">RESPONSABLE</label>
-                                    <input type="text" id="expense-user" placeholder="Nombre" class="w-full">
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-gray-500 block mb-1">DESCRIPCIÓN</label>
-                                    <textarea id="expense-desc" placeholder="¿En qué se gastó?" rows="3" class="w-full resize-none"></textarea>
-                                </div>
-                                <div>
-                                    <label class="text-[10px] text-gray-500 block mb-1">COSTO ($)</label>
-                                    <input type="number" id="expense-cost" step="0.01" class="w-full">
-                                </div>
-                                <button onclick="saveExpense()" class="w-full btn-silver p-3 rounded-lg mt-4 text-xs">GUARDAR COMPRA</button>
-                            </div>
-                        </div>
-                        <div class="glass-panel p-6 lg:col-span-2 overflow-hidden">
-                            <h3 class="text-lg font-bold silver-text mb-6">HISTORIAL DE COMPRAS</h3>
-                            <div class="overflow-x-auto">
-                                <table class="w-full text-left text-xs">
-                                    <thead class="bg-black/40">
-                                        <tr>
-                                            <th class="p-3">Fecha</th>
-                                            <th class="p-3">Responsable</th>
-                                            <th class="p-3">Descripción</th>
-                                            <th class="p-3">Costo</th>
-                                            <th class="p-3"></th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="expense-history-body" class="divide-y divide-white/10"></tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Finanzas: RESUMEN -->
-                <div id="finance-sub-resumen" class="finance-sub-section hidden">
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="glass-panel p-8 text-center border-l-4 border-green-500">
-                            <p class="text-xs text-gray-500 uppercase mb-2">Total Ingresos</p>
-                            <h4 id="summary-total-income" class="text-3xl font-bold text-green-400">$0.00</h4>
-                        </div>
-                        <div class="glass-panel p-8 text-center border-l-4 border-red-500">
-                            <p class="text-xs text-gray-500 uppercase mb-2">Total Gastos</p>
-                            <h4 id="summary-total-expenses" class="text-3xl font-bold text-red-400">$0.00</h4>
-                        </div>
-                        <div class="glass-panel p-8 text-center border-l-4 border-blue-500">
-                            <p class="text-xs text-gray-500 uppercase mb-2">Saldo Actual</p>
-                            <h4 id="summary-balance" class="text-3xl font-bold silver-text">$0.00</h4>
-                        </div>
-                    </div>
-                    
-                    <div class="glass-panel p-6">
-                        <h3 class="text-lg font-bold silver-text mb-6">RESUMEN SEMANAL DE COMPRAS</h3>
-                        <div id="weekly-expense-container" class="space-y-4">
-                            <!-- Aquí se mostrarán las compras de la última semana -->
-                        </div>
-                    </div>
-                </div>
-            </section>
 
             <!-- Sección: MIEMBROS -->
             <section id="section-miembros" class="section-content active-section">
@@ -680,6 +547,97 @@
         </div>
     </div>
 
+                <!-- Sección: FINANZAS (NUEVO MODULO) -->
+            <section id="section-finanzas" class="section-content hidden-section">
+                <div class="grid grid-cols-1 gap-6">
+                    <!-- Tabs -->
+                    <div class="flex gap-2 overflow-x-auto pb-2">
+                        <button onclick="showFinanceTab('aportes')" id="tab-aportes" class="px-6 py-2 rounded-lg glass-panel text-[10px] bg-white/10 uppercase font-bold">Ingresos (Aportes)</button>
+                        <button onclick="showFinanceTab('compras')" id="tab-compras" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Compras (Gastos)</button>
+                        <button onclick="showFinanceTab('resumen')" id="tab-resumen" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Resumen General</button>
+                    </div>
+
+                    <!-- Contenido Aportes -->
+                    <div id="finance-aportes" class="finance-tab">
+                        <div class="glass-panel p-6">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h3 class="font-bold silver-text text-sm uppercase">Tabla de Aportes Anuales</h3>
+                                    <p class="text-[10px] text-gray-500">Montos en Dólares ($)</p>
+                                </div>
+                                <button onclick="addFinanceName()" class="admin-only hidden btn-silver px-4 py-2 rounded text-[10px] uppercase">+ Nuevo Nombre</button>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left finance-table border-collapse">
+                                    <thead>
+                                        <tr class="text-[10px] text-gray-500 uppercase border-b border-white/10">
+                                            <th class="p-2 sticky-col">Nombres</th>
+                                            <th class="p-2">Ene</th><th class="p-2">Feb</th><th class="p-2">Mar</th>
+                                            <th class="p-2">Abr</th><th class="p-2">May</th><th class="p-2">Jun</th>
+                                            <th class="p-2">Jul</th><th class="p-2">Ago</th><th class="p-2">Sep</th>
+                                            <th class="p-2">Oct</th><th class="p-2">Nov</th><th class="p-2">Dic</th>
+                                            <th class="p-2 admin-only hidden text-center">Acción</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="finance-income-body" class="divide-y divide-white/5"></tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Compras -->
+                    <div id="finance-compras" class="finance-tab hidden">
+                        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                            <div class="admin-only hidden glass-panel p-6">
+                                <h3 class="font-bold silver-text mb-4 text-xs uppercase">Registrar Compra</h3>
+                                <div class="space-y-3">
+                                    <input type="date" id="comp-date" class="w-full text-xs">
+                                    <input type="text" id="comp-resp" placeholder="Responsable" class="w-full text-xs">
+                                    <textarea id="comp-desc" placeholder="Descripción" class="w-full text-xs" rows="2"></textarea>
+                                    <input type="number" id="comp-cost" placeholder="Costo ($)" class="w-full text-xs">
+                                    <button onclick="savePurchase()" class="w-full btn-silver p-3 rounded uppercase text-[10px]">Guardar Gasto</button>
+                                </div>
+                            </div>
+                            <div class="lg:col-span-2 glass-panel p-6">
+                                <h3 class="font-bold silver-text mb-4 text-xs uppercase">Historial de Gastos</h3>
+                                <div class="overflow-x-auto">
+                                    <table class="w-full text-left text-[11px]">
+                                        <thead class="text-gray-500 uppercase border-b border-white/10">
+                                            <tr>
+                                                <th class="p-2">Fecha</th>
+                                                <th class="p-2">Responsable</th>
+                                                <th class="p-2">Descripción</th>
+                                                <th class="p-2 text-right">Costo</th>
+                                                <th class="p-2 admin-only hidden text-center">Acción</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="finance-purchase-body" class="divide-y divide-white/5"></tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenido Resumen -->
+                    <div id="finance-resumen" class="finance-tab hidden">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="glass-panel p-8 text-center">
+                                <p class="text-[10px] text-gray-500 uppercase mb-2">Ingresos Totales</p>
+                                <h2 id="total-incomes" class="text-3xl font-bold text-green-400">$0.00</h2>
+                            </div>
+                            <div class="glass-panel p-8 text-center">
+                                <p class="text-[10px] text-gray-500 uppercase mb-2">Egresos Totales</p>
+                                <h2 id="total-expenses" class="text-3xl font-bold text-red-400">$0.00</h2>
+                            </div>
+                            <div class="glass-panel p-8 text-center border-t-4 border-silver">
+                                <p class="text-[10px] text-gray-500 uppercase mb-2">Dinero Actual</p>
+                                <h2 id="total-balance" class="text-4xl font-bold silver-text">$0.00</h2>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
     <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -703,6 +661,8 @@ const firebaseConfig = {
         // Global State
         window.currentUser = null;
         window.allUsers = [];
+        window.finIncomes = [];
+        window.finPurchases = [];
         window.activities = [];
         window.galleryPhotos = [];
         window.currentDate = new Date();
@@ -747,7 +707,6 @@ const firebaseConfig = {
 
         const setupPermissions = () => {
             const isLider = window.currentUser?.role === 'LIDER';
-            document.getElementById('menu-finanzas').classList.toggle('hidden', !isLider);
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
@@ -832,162 +791,6 @@ const firebaseConfig = {
             `).join('') : '<div class="col-span-full py-12 text-center text-gray-500 italic">No hay fotos en la galería todavía.</div>';
         };
 
-                // --- FINANZAS LOGIC ---
-        window.showFinanceSub = (sub) => {
-            document.querySelectorAll('.finance-sub-section').forEach(s => s.classList.add('hidden'));
-            document.getElementById(`finance-sub-${sub}`).classList.remove('hidden');
-            if(sub === 'resumen') renderFinanceSummary();
-        };
-
-        window.addNewFinanceRow = async () => {
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'financeIncome'), {
-                    name: '', jan: 0, feb: 0, mar: 0, apr: 0, may: 0, jun: 0, jul: 0, aug: 0, sep: 0, oct: 0, nov: 0, dec: 0
-                });
-            } catch (e) { console.error(e); }
-        };
-
-        window.updateFinanceField = async (id, field, value) => {
-            try {
-                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'financeIncome', id);
-                const update = {};
-                update[field] = field === 'name' ? value : parseFloat(value) || 0;
-                await updateDoc(docRef, update);
-            } catch (e) { console.error(e); }
-        };
-
-        window.deleteFinanceRow = async (id) => {
-            if(confirm("¿Eliminar esta fila de ingresos?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'financeIncome', id));
-            }
-        };
-
-        window.renderFinanceIncome = () => {
-            const container = document.getElementById('finance-income-body');
-            if(!container) return;
-            container.innerHTML = window.financeIncome.map(row => `
-                <tr class="border-b border-white/5 hover:bg-white/5">
-                    <td class="p-2 finance-sticky-col">
-                        <input type="text" value="${row.name}" onblur="updateFinanceField('${row.id}', 'name', this.value)" class="w-full text-left !w-full">
-                    </td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.jan || 0}" onblur="updateFinanceField('${row.id}', 'jan', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.feb || 0}" onblur="updateFinanceField('${row.id}', 'feb', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.mar || 0}" onblur="updateFinanceField('${row.id}', 'mar', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.apr || 0}" onblur="updateFinanceField('${row.id}', 'apr', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.may || 0}" onblur="updateFinanceField('${row.id}', 'may', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.jun || 0}" onblur="updateFinanceField('${row.id}', 'jun', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.jul || 0}" onblur="updateFinanceField('${row.id}', 'jul', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.aug || 0}" onblur="updateFinanceField('${row.id}', 'aug', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.sep || 0}" onblur="updateFinanceField('${row.id}', 'sep', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.oct || 0}" onblur="updateFinanceField('${row.id}', 'oct', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.nov || 0}" onblur="updateFinanceField('${row.id}', 'nov', this.value)"></td>
-                    <td class="p-2 finance-month-col"><input type="number" value="${row.dec || 0}" onblur="updateFinanceField('${row.id}', 'dec', this.value)"></td>
-                    <td class="p-2 text-center">
-                        <button onclick="deleteFinanceRow('${row.id}')" class="text-red-500 hover:text-red-400"><i class="fas fa-trash-alt"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        };
-
-        window.saveExpense = async () => {
-            const date = document.getElementById('expense-date').value;
-            const user = document.getElementById('expense-user').value;
-            const desc = document.getElementById('expense-desc').value;
-            const cost = parseFloat(document.getElementById('expense-cost').value);
-            if(!date || !user || !desc || isNaN(cost)) return;
-            try {
-                await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'financeExpenses'), {
-                    date, user, desc, cost, createdAt: new Date().toISOString()
-                });
-                document.getElementById('expense-date').value = '';
-                document.getElementById('expense-user').value = '';
-                document.getElementById('expense-desc').value = '';
-                document.getElementById('expense-cost').value = '';
-            } catch (e) { console.error(e); }
-        };
-
-        window.deleteExpense = async (id) => {
-            if(confirm("¿Eliminar registro de compra?")) {
-                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'financeExpenses', id));
-            }
-        };
-
-        window.renderExpenses = () => {
-            const container = document.getElementById('expense-history-body');
-            if(!container) return;
-            container.innerHTML = window.financeExpenses.map(exp => `
-                <tr>
-                    <td class="p-3">${exp.date}</td>
-                    <td class="p-3">${exp.user}</td>
-                    <td class="p-3 text-gray-400">${exp.desc}</td>
-                    <td class="p-3 font-bold text-red-400">$${exp.cost.toFixed(2)}</td>
-                    <td class="p-3 text-right">
-                        <button onclick="deleteExpense('${exp.id}')" class="text-red-500/50 hover:text-red-500"><i class="fas fa-times"></i></button>
-                    </td>
-                </tr>
-            `).join('');
-        };
-
-        window.renderFinanceSummary = () => {
-            const totalIncome = window.financeIncome.reduce((acc, row) => {
-                return acc + (row.jan||0) + (row.feb||0) + (row.mar||0) + (row.apr||0) + (row.may||0) + (row.jun||0) + (row.jul||0) + (row.aug||0) + (row.sep||0) + (row.oct||0) + (row.nov||0) + (row.dec||0);
-            }, 0);
-            const totalExpenses = window.financeExpenses.reduce((acc, exp) => acc + (exp.cost || 0), 0);
-            const balance = totalIncome - totalExpenses;
-
-            document.getElementById('summary-total-income').innerText = `$${totalIncome.toFixed(2)}`;
-            document.getElementById('summary-total-expenses').innerText = `$${totalExpenses.toFixed(2)}`;
-            document.getElementById('summary-balance').innerText = `$${balance.toFixed(2)}`;
-
-            // Compras de la semana (últimos 7 días)
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-            const weekly = window.financeExpenses.filter(exp => new Date(exp.date) >= oneWeekAgo);
-            
-            const weeklyContainer = document.getElementById('weekly-expense-container');
-            weeklyContainer.innerHTML = weekly.length ? weekly.map(exp => `
-                <div class="flex justify-between items-center bg-white/5 p-3 rounded-lg border border-white/5">
-                    <div>
-                        <p class="text-xs font-bold">${exp.desc}</p>
-                        <p class="text-[9px] text-gray-500 uppercase">${exp.date} • ${exp.user}</p>
-                    </div>
-                    <span class="text-sm font-bold text-red-400">-$${exp.cost.toFixed(2)}</span>
-                </div>
-            `).join('') : '<p class="text-center text-xs text-gray-500 italic py-4">No hay compras registradas en los últimos 7 días.</p>';
-        };
-   // --- UI HELPERS ---
-        window.toggleSidebar = () => {
-            const sb = document.getElementById('sidebar');
-            const main = document.getElementById('main-content');
-            sb.classList.toggle('closed');
-            if(window.innerWidth > 768) main.style.marginLeft = sb.classList.contains('closed') ? '0' : '256px';
-        };
-
-        window.showSection = (sectionId) => {
-            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden-section'));
-            document.getElementById(`section-${sectionId}`).classList.remove('hidden-section');
-            document.getElementById('current-section-title').innerText = sectionId.replace('-', ' ');
-            if(window.innerWidth < 1024) {
-                const sb = document.getElementById('sidebar');
-                if(!sb.classList.contains('closed')) window.toggleSidebar();
-            }
-            if(sectionId === 'finanzas') showFinanceSub('ingresos');
-        };
-
-        window.changeMonth = (delta) => { window.currentDate.setMonth(window.currentDate.getMonth() + delta); window.renderCalendar(); };
-
-        const renderAll = () => { 
-            window.renderMembers(); window.renderCalendar(); window.renderFinanceIncome(); window.renderExpenses(); 
-            if(document.getElementById('section-finanzas').classList.contains('active-section')) renderFinanceSummary();
-        };
-                // --- LISTENERS ---
-        const startListeners = () => {
-            onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'financeIncome')), (s) => {
-                window.financeIncome = s.docs.map(d => ({id: d.id, ...d.data()}));
-                window.renderFinanceIncome();
-                renderFinanceSummary();
-            });
-            };
         // --- PLANIFICACION ---
         window.saveActivity = async () => {
             if (!auth.currentUser || window.currentUser?.role !== 'LIDER') return;
@@ -1302,6 +1105,124 @@ const firebaseConfig = {
                 container.innerHTML = `<p class="text-gray-500 italic text-sm py-10 text-center">Sin actividades registradas para hoy.</p>`;
             }
         };
+  // --- FINANZAS LOGIC ---
+        const initFinanceListeners = () => {
+            // Escuchar Aportes
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'fin_incomes'), snap => {
+                window.finIncomes = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderFinanceIncomes();
+                calculateSummary();
+            });
+
+            // Escuchar Compras
+            onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'fin_purchases'), snap => {
+                window.finPurchases = snap.docs.map(d => ({id: d.id, ...d.data()}));
+                renderFinancePurchases();
+                calculateSummary();
+            });
+        };
+
+        window.showFinanceTab = (tabId) => {
+            document.querySelectorAll('.finance-tab').forEach(t => t.classList.add('hidden'));
+            document.getElementById(`finance-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('[id^="tab-"]').forEach(b => b.classList.remove('bg-white/10'));
+            document.getElementById(`tab-${tabId}`).classList.add('bg-white/10');
+        };
+
+        window.addFinanceName = async () => {
+            const name = prompt("Ingrese nombre completo:");
+            if(!name) return;
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fin_incomes'), {
+                name: name,
+                months: Array(12).fill(0)
+            });
+        };
+
+        window.updateIncomeCell = async (docId, monthIdx, val) => {
+            if(window.currentUser?.role !== 'LIDER') return;
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'fin_incomes', docId);
+            const row = window.finIncomes.find(i => i.id === docId);
+            const newMonths = [...row.months];
+            newMonths[monthIdx] = parseFloat(val) || 0;
+            await updateDoc(docRef, { months: newMonths });
+        };
+
+        window.deleteIncomeRow = async (docId) => {
+            if(window.currentUser?.role !== 'LIDER') return;
+            if(confirm("¿Eliminar este registro?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'fin_incomes', docId));
+            }
+        };
+
+        window.savePurchase = async () => {
+            const date = document.getElementById('comp-date').value;
+            const resp = document.getElementById('comp-resp').value;
+            const desc = document.getElementById('comp-desc').value;
+            const cost = parseFloat(document.getElementById('comp-cost').value);
+            if(!date || isNaN(cost)) return;
+
+            await addDoc(collection(db, 'artifacts', appId, 'public', 'data', 'fin_purchases'), {
+                date, resp, desc, cost
+            });
+
+            document.getElementById('comp-resp').value = '';
+            document.getElementById('comp-desc').value = '';
+            document.getElementById('comp-cost').value = '';
+        };
+
+        window.deletePurchase = async (docId) => {
+            if(confirm("¿Eliminar este gasto?")) {
+                await deleteDoc(doc(db, 'artifacts', appId, 'public', 'data', 'fin_purchases', docId));
+            }
+        };
+
+        // --- RENDERS ---
+        const renderFinanceIncomes = () => {
+            const isLider = window.currentUser?.role === 'LIDER';
+            const body = document.getElementById('finance-income-body');
+            body.innerHTML = window.finIncomes.map(row => `
+                <tr class="hover:bg-white/5">
+                    <td class="p-2 sticky-col font-bold text-[10px] uppercase">${row.name}</td>
+                    ${row.months.map((m, idx) => `
+                        <td class="p-1">
+                            <input type="number" value="${m}" 
+                                onchange="updateIncomeCell('${row.id}', ${idx}, this.value)"
+                                ${!isLider ? 'disabled' : ''}
+                                class="bg-transparent hover:bg-white/10 transition-colors">
+                        </td>
+                    `).join('')}
+                    <td class="p-2 admin-only ${isLider ? '' : 'hidden'} text-center">
+                        <button onclick="deleteIncomeRow('${row.id}')" class="text-red-500/40 hover:text-red-500"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        const renderFinancePurchases = () => {
+            const isLider = window.currentUser?.role === 'LIDER';
+            const body = document.getElementById('finance-purchase-body');
+            body.innerHTML = window.finPurchases.sort((a,b) => new Date(b.date) - new Date(a.date)).map(p => `
+                <tr>
+                    <td class="p-2 text-gray-400 font-mono">${p.date}</td>
+                    <td class="p-2 font-bold">${p.resp}</td>
+                    <td class="p-2 text-gray-400 italic">${p.desc}</td>
+                    <td class="p-2 text-right font-bold text-red-400">$${p.cost.toFixed(2)}</td>
+                    <td class="p-2 admin-only ${isLider ? '' : 'hidden'} text-center">
+                        <button onclick="deletePurchase('${p.id}')" class="text-red-900 hover:text-red-500"><i class="fas fa-times"></i></button>
+                    </td>
+                </tr>
+            `).join('');
+        };
+
+        const calculateSummary = () => {
+            const totalIn = window.finIncomes.reduce((acc, row) => acc + row.months.reduce((a, b) => a + b, 0), 0);
+            const totalOut = window.finPurchases.reduce((acc, p) => acc + p.cost, 0);
+            const balance = totalIn - totalOut;
+
+            document.getElementById('total-incomes').innerText = `$${totalIn.toFixed(2)}`;
+            document.getElementById('total-expenses').innerText = `$${totalOut.toFixed(2)}`;
+            document.getElementById('total-balance').innerText = `$${balance.toFixed(2)}`;
+        };
 
         window.addRepertorioRow = (targetId, data = null) => {
             const div = document.createElement('div');
@@ -1362,6 +1283,16 @@ const firebaseConfig = {
             window.renderMembers(); window.renderAdminUsers(); window.renderCalendar(); window.renderSongbook(); window.renderGallery();
         };
 
+          const calculateSummary = () => {
+            const totalIn = window.finIncomes.reduce((acc, row) => acc + row.months.reduce((a, b) => a + b, 0), 0);
+            const totalOut = window.finPurchases.reduce((acc, p) => acc + p.cost, 0);
+            const balance = totalIn - totalOut;
+
+            document.getElementById('total-incomes').innerText = `$${totalIn.toFixed(2)}`;
+            document.getElementById('total-expenses').innerText = `$${totalOut.toFixed(2)}`;
+            document.getElementById('total-balance').innerText = `$${balance.toFixed(2)}`;
+        };
+
         const startFirestoreListeners = () => {
             onSnapshot(query(collection(db, 'artifacts', appId, 'public', 'data', 'users')), (s) => {
                 window.allUsers = s.docs.map(d => ({id: d.id, ...d.data()}));
@@ -1389,8 +1320,6 @@ const firebaseConfig = {
         };
         initializeAuth(); initKeySelects();
         window.addRepertorioRow('repertorio-inputs'); window.addEquipoRow('equipo-inputs');
-
-        
     </script>
 </body>
 </html>
