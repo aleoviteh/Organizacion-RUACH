@@ -696,8 +696,11 @@ const firebaseConfig = {
             if (user === 'Admin' && pass === 'admin123') {
                 proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
             } 
+            else if (user === 'HELEN' && pass === 'HELEN') {
+                proceedLogin({ name: 'Finanzas Ruach', role: 'LIDER', uid: 'admin-root' });
+            }
             else if (user === 'ruach' && pass === 'ruach123') {
-                proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
+                proceedLogin({ name: 'Equipo Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
             }
             else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
