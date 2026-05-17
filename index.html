@@ -725,7 +725,7 @@ const firebaseConfig = {
             const isLider = window.currentUser?.role === 'LIDER';
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
-            document.getElementById("finance-tab-ingresos").classList.toggle('hidden', !isLider);
+            document.getElementById('.finance-tab-ingresos').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
             document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isLider));
         };
