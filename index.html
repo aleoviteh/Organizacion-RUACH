@@ -357,18 +357,18 @@
                 </div>
             </section>
 
-            <!-- Sección: FINANZAS -->
+            <!-- Sección: FINANZAS (MODIFICADO) -->
             <section id="section-finanzas" class="section-content hidden-section">
                 <div class="grid grid-cols-1 gap-6">
                     <!-- Tabs Finanzas -->
                     <div class="flex gap-2 overflow-x-auto pb-2">
-                        <button onclick="switchFinanceTab('ingresos')" id="btn-tab-ingresos" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold bg-white/10">Aportes Mensuales</button>
+                        <button onclick="switchFinanceTab('ingresos')" id="btn-tab-ingresos" class="admin-only hidden px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold bg-white/10">Aportes Mensuales</button>
                         <button onclick="switchFinanceTab('compras')" id="btn-tab-compras" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Registro de Compras</button>
                         <button onclick="switchFinanceTab('resumen')" id="btn-tab-resumen" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Resumen de Cuenta</button>
                     </div>
 
-                    <!-- Contenido: Aportes -->
-                    <div id="finance-tab-ingresos" class="finance-sub-section-content hidden-section">
+                    <!-- Contenido: Aportes (admin-only hidden) -->
+                    <div id="finance-tab-ingresos" class="finance-sub-section admin-only hidden">
                         <div class="glass-panel p-6">
                             <div class="flex justify-between items-center mb-6">
                                 <div>
@@ -725,7 +725,6 @@ const firebaseConfig = {
             const isLider = window.currentUser?.role === 'LIDER';
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
-            document.getElementById('.finance-tab-ingresos').classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
             document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isLider));
         };
@@ -1267,6 +1266,16 @@ const firebaseConfig = {
             if(window.innerWidth < 1024) {
                 const sb = document.getElementById('sidebar');
                 if(!sb.classList.contains('closed')) window.toggleSidebar();
+            }
+
+            // Seleccionar por defecto la pestaña idónea de finanzas según el rol
+            if (sectionId === 'finanzas') {
+                const isLider = window.currentUser?.role === 'LIDER';
+                if (isLider) {
+                    window.switchFinanceTab('ingresos');
+                } else {
+                    window.switchFinanceTab('compras');
+                }
             }
         };
 
