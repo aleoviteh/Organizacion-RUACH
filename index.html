@@ -357,7 +357,7 @@
                 </div>
             </section>
 
-            <!-- Sección: FINANZAS (NUEVO) -->
+            <!-- Sección: FINANZAS -->
             <section id="section-finanzas" class="section-content hidden-section">
                 <div class="grid grid-cols-1 gap-6">
                     <!-- Tabs Finanzas -->
@@ -368,7 +368,7 @@
                     </div>
 
                     <!-- Contenido: Aportes -->
-                    <div id="finance-tab-ingresos" class="finance-sub-section">
+                    <div id="finance-tab-ingresos" class="finance-sub-section-content hidden-section">
                         <div class="glass-panel p-6">
                             <div class="flex justify-between items-center mb-6">
                                 <div>
@@ -725,6 +725,7 @@ const firebaseConfig = {
             const isLider = window.currentUser?.role === 'LIDER';
             document.getElementById('menu-ingreso').classList.toggle('hidden', !isLider);
             document.getElementById('menu-usuario').classList.toggle('hidden', !isLider);
+            document.getElementById("finance-tab-ingresos").classList.toggle('hidden', !isLider);
             document.querySelectorAll('.actions-column').forEach(el => el.classList.toggle('hidden', !isLider));
             document.querySelectorAll('.admin-only').forEach(el => el.classList.toggle('hidden', !isLider));
         };
