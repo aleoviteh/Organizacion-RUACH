@@ -1201,7 +1201,7 @@ const firebaseConfig = {
                 return;
             }
 
-            const songsText = act.canciones?.map(c => `- ${c.titulo} (Cantor/a: ${c.cantante}) [Tono: ${c.tonalidad || 'Sin tono'}]`).join('\n') || "Ninguna canción registrada aún.";
+            const songsText = act.canciones?.map(c => `- ${c.titulo} - ${c.autor} (Cantor/a: ${c.cantante}) [Tono: ${c.tonalidad || 'Sin tono'}]`).join('\n') || "Ninguna canción registrada aún.";
             const teamText = act.equipo?.map(e => `- ${e.nombre} (${e.rol})`).join('\n') || "Ningún integrante asignado aún.";
 
             const prompt = `
