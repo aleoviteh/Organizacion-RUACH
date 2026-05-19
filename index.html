@@ -335,6 +335,7 @@
                             <option value="Marianny">Marianny</option>
                             <option value="Nelly">Nelly</option>
                             <option value="Nicole">Nicole</option>
+                            <option value="Yency">Yency</option>
                         </select>
                     </div>
                     <span id="song-stats" class="text-xs text-gray-500 italic"></span>
@@ -377,7 +378,7 @@
                     <!-- Tabs Finanzas -->
                     <div class="flex gap-2 overflow-x-auto pb-2">
                         <button onclick="switchFinanceTab('ingresos')" id="btn-tab-ingresos" class="admin-only hidden px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold bg-white/10">Aportes Mensuales</button>
-                        <button onclick="switchFinanceTab('compras')" id="btn-tab-compras" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Registro de Compras</button>
+                        <button onclick="switchFinanceTab('compras')" id="btn-tab-compras" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Registro de Movimientos</button>
                         <button onclick="switchFinanceTab('resumen')" id="btn-tab-resumen" class="px-6 py-2 rounded-lg glass-panel text-[10px] uppercase font-bold">Resumen de Cuenta</button>
                     </div>
 
@@ -601,6 +602,7 @@
                         <option value="Marianny">Marianny</option>
                         <option value="Nelly">Nelly</option>
                         <option value="Nicole">Nicole</option>
+                        <option value="Yency">Yency</option>
                     </select>
                 </div>
                 <div>
@@ -738,6 +740,9 @@ const firebaseConfig = {
             const pass = document.getElementById('login-pass').value;
             if (user === 'Admin' && pass === 'admin123') {
                 proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
+            } 
+                 else if (user === 'HELEN' && pass === 'HELEN123') {
+                proceedLogin({ name: 'Finanzas Ruach', role: 'LIDER', uid: 'admin-root' });
             } 
             else if (user === 'ruach' && pass === 'ruach123') {
                 proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
@@ -1496,6 +1501,7 @@ const firebaseConfig = {
                     <option value="Marianny" ${data && data.cantante === 'Marianny' ? 'selected' : ''}>Marianny</option>
                     <option value="Nelly" ${data && data.cantante === 'Nelly' ? 'selected' : ''}>Nelly</option>
                     <option value="Nicole" ${data && data.cantante === 'Nicole' ? 'selected' : ''}>Nicole</option>
+                    <option value="Yency" ${data && data.cantante === 'Yency' ? 'selected' : ''}>Yency</option>
                 </select>
                 <select class="text-xs edit-key-select">
                     <option value="">Tono</option>
