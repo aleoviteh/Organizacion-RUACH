@@ -135,7 +135,7 @@
             background: transparent !important;
         }
         .finance-table input:focus {
-            background: rgba(255,255,255,0.1) !important;
+            background: rgba(255, 255, 255, 0.1) !important;
             outline: none;
         }
         .sticky-col {
@@ -252,7 +252,7 @@
             <div class="space-y-4">
                 <input type="text" id="login-user" placeholder="Usuario" class="w-full">
                 <input type="password" id="login-pass" placeholder="Contraseña" class="w-full">
-                <button id="login-btn" onclick="handleLogin()" class="w-full btn-silver p-3 rounded-lg mt-4">INGRESAR</button>
+                <button id="login-btn" onclick="handleLogin()" class="w-full btn-silver p-3 rounded-lg mt-4 font-bold">INGRESAR</button>
             </div>
             <p id="login-error" class="text-red-500 mt-4 text-sm hidden">Credenciales incorrectas.</p>
         </div>
@@ -335,11 +335,25 @@
                             <option value="Marianny">Marianny</option>
                             <option value="Nelly">Nelly</option>
                             <option value="Nicole">Nicole</option>
-                            <option value="Yency">Yency</option>
                         </select>
                     </div>
                     <span id="song-stats" class="text-xs text-gray-500 italic"></span>
                 </div>
+
+                <!-- Diseñador de Setlist Temático ✨ -->
+                <div class="glass-panel p-5 mb-6 border border-emerald-500/20 flex flex-col md:flex-row items-center justify-between gap-4">
+                    <div class="flex-1">
+                        <h4 class="font-bold text-sm silver-text flex items-center gap-1"><i class="fas fa-sparkles"></i> REPERTORIO CON INTELIGENCIA ARTIFICIAL</h4>
+                        <p class="text-[10px] text-gray-400">Genera un setlist temático para tu sermón o servicio analizando las canciones actuales del ministerio.</p>
+                    </div>
+                    <div class="flex gap-2 w-full md:w-auto">
+                        <input type="text" id="ai-worship-theme" placeholder="Ej: Redención, Consuelo, Victoria..." class="text-xs w-full md:w-60">
+                        <button onclick="window.generateAISetlist()" class="btn-silver text-xs px-4 py-2 flex items-center gap-1 whitespace-nowrap">
+                            ✨ Sugerir Setlist
+                        </button>
+                    </div>
+                </div>
+
                 <div class="overflow-x-auto glass-panel">
                     <table class="w-full text-left">
                         <thead class="bg-black/40 silver-text">
@@ -389,9 +403,7 @@
                                             <th class="p-3 admin-only hidden">Acción</th>
                                         </tr>
                                     </thead>
-                                    <tbody id="finance-income-body" class="divide-y divide-white/5">
-                                        <!-- Filas dinámicas -->
-                                    </tbody>
+                                    <tbody id="finance-income-body" class="divide-y divide-white/5"></tbody>
                                 </table>
                             </div>
                         </div>
@@ -412,7 +424,7 @@
                             </div>
                             <div class="lg:col-span-2 glass-panel p-6">
                                 <h3 class="font-bold silver-text text-xs uppercase mb-4">Historial de Egresos</h3>
-                                <div class="overflow-x-auto">
+                                <div class="overflow-x-auto mb-6">
                                     <table class="w-full text-left text-[11px]">
                                         <thead class="text-gray-500 uppercase border-b border-white/10">
                                             <tr>
@@ -423,10 +435,14 @@
                                                 <th class="p-2 admin-only hidden text-center">Eliminar</th>
                                             </tr>
                                         </thead>
-                                        <tbody id="finance-purchases-list" class="divide-y divide-white/5">
-                                            <!-- Lista de compras -->
-                                        </tbody>
+                                        <tbody id="finance-purchases-list" class="divide-y divide-white/5"></tbody>
                                     </table>
+                                </div>
+
+                                <!-- Resumen de Ingresos Mensuales dentro del Historial de Compras -->
+                                <div class="border-t border-white/10 pt-4 mt-6">
+                                    <h3 class="font-bold silver-text text-xs uppercase mb-3"><i class="fas fa-chart-bar mr-2"></i>Total Ingresos Mensuales Recaudados</h3>
+                                    <div class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 text-center" id="finance-monthly-totals-list"></div>
                                 </div>
                             </div>
                         </div>
@@ -585,7 +601,6 @@
                         <option value="Marianny">Marianny</option>
                         <option value="Nelly">Nelly</option>
                         <option value="Nicole">Nicole</option>
-                        <option value="Yency">Yency</option>
                     </select>
                 </div>
                 <div>
@@ -653,6 +668,34 @@
         </div>
     </div>
 
+    <!-- Modal para mostrar Respuestas de Gemini IA ✨ -->
+    <div id="modal-ai-response" class="fixed inset-0 modal-overlay z-[400] flex items-center justify-center p-4 hidden">
+        <div class="glass-panel p-6 w-full max-w-2xl max-h-[85vh] flex flex-col">
+            <div class="flex justify-between items-center border-b border-white/10 pb-3 mb-4">
+                <h3 id="ai-modal-title" class="text-lg font-bold silver-text flex items-center gap-2">
+                    <i class="fas fa-robot text-emerald-400"></i> Asistente de Alabanza Ruach IA
+                </h3>
+                <button onclick="window.closeAIModal()" class="text-gray-400 hover:text-white p-1">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="flex-1 overflow-y-auto custom-scrollbar text-sm text-gray-300 space-y-4 pr-1 leading-relaxed whitespace-pre-line" id="ai-response-content">
+                <!-- Se inyecta la respuesta aquí -->
+            </div>
+            <div class="flex gap-3 pt-4 border-t border-white/10 mt-4">
+                <button onclick="window.copyAIContent()" class="btn-silver py-2.5 px-4 text-xs flex items-center justify-center gap-2 flex-1">
+                    <i class="fas fa-copy"></i> Copiar Guía Devocional
+                </button>
+                <button onclick="window.closeAIModal()" class="bg-white/10 hover:bg-white/20 py-2.5 px-4 text-xs rounded-lg flex-1">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification Overlay -->
+    <div id="toast-notification" class="fixed bottom-5 right-5 z-[600] px-4 py-3 rounded-lg shadow-lg text-xs font-bold transition-all duration-300 opacity-0 transform translate-y-5 pointer-events-none"></div>
+
     <!-- Firebase SDK Logic -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
@@ -696,11 +739,8 @@ const firebaseConfig = {
             if (user === 'Admin' && pass === 'admin123') {
                 proceedLogin({ name: 'Admin Ruach', role: 'LIDER', uid: 'admin-root' });
             } 
-            else if (user === 'HELEN' && pass === 'HELEN') {
-                proceedLogin({ name: 'Finanzas Ruach', role: 'LIDER', uid: 'admin-root' });
-            }
             else if (user === 'ruach' && pass === 'ruach123') {
-                proceedLogin({ name: 'Equipo Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
+                proceedLogin({ name: 'Observador Ruach', role: 'OBSERVADOR', uid: 'observer-user' });
             }
             else {
                 const found = window.allUsers.find(u => u.name.toLowerCase().replace(/\s/g, '') === user.toLowerCase());
@@ -802,12 +842,14 @@ const firebaseConfig = {
                 window.financeIncomes = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderFinanceIncomes();
                 updateFinanceSummary();
+                renderMonthlyIncomeSummary();
             });
 
             onSnapshot(collection(db, 'artifacts', appId, 'public', 'data', 'finance_purchases'), snap => {
                 window.financePurchases = snap.docs.map(d => ({id: d.id, ...d.data()}));
                 renderFinancePurchases();
                 updateFinanceSummary();
+                renderMonthlyIncomeSummary();
             });
         };
 
@@ -897,6 +939,26 @@ const firebaseConfig = {
                         <button onclick="deletePurchase('${p.id}')" class="text-red-900 hover:text-red-500"><i class="fas fa-times"></i></button>
                     </td>
                 </tr>
+            `).join('');
+        };
+
+        const renderMonthlyIncomeSummary = () => {
+            const container = document.getElementById('finance-monthly-totals-list');
+            if (!container) return;
+            const monthNames = ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"];
+            const monthlyTotals = Array(12).fill(0);
+            window.financeIncomes.forEach(row => {
+                if (row.months && Array.isArray(row.months)) {
+                    row.months.forEach((val, idx) => {
+                        monthlyTotals[idx] += parseFloat(val) || 0;
+                    });
+                }
+            });
+            container.innerHTML = monthlyTotals.map((tot, idx) => `
+                <div class="bg-white/5 p-2 rounded border border-white/5 flex flex-col justify-center">
+                    <span class="text-gray-400 uppercase font-semibold text-[9px]">${monthNames[idx]}</span>
+                    <span class="font-bold text-green-400 text-xs mt-0.5">$${tot.toFixed(2)}</span>
+                </div>
             `).join('');
         };
 
@@ -1060,6 +1122,202 @@ const firebaseConfig = {
             } catch (e) { console.error(e); }
         };
 
+        // --- INTEGRADOR GEMINI API (REINTENTOS EXPONENCIALES Y SELECCIÓN TEMÁTICA) ✨ ---
+        
+        // Helper universal con sistema de reintentos exponencial (5 intentos)
+        async function runGeminiLLM(prompt, systemPrompt = "") {
+            const apiKey = ""; // La API Key se provee automáticamente por el ambiente
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }] }]
+            };
+            if (systemPrompt) {
+                payload.systemInstruction = { parts: [{ text: systemPrompt }] };
+            }
+
+            const wait = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+            const retryIntervals = [1000, 2000, 4000, 8000, 16000];
+
+            for (let attempt = 0; attempt <= retryIntervals.length; attempt++) {
+                try {
+                    const res = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                    if (!res.ok) throw new Error(`HTTP Error Status: ${res.status}`);
+                    const data = await res.json();
+                    const aiText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (aiText) return aiText;
+                    throw new Error("Respuesta no estructurada de la IA");
+                } catch (error) {
+                    if (attempt === retryIntervals.length) {
+                        throw new Error("No se pudo conectar con el motor de Inteligencia Artificial después de 5 intentos. Verifica la conexión.");
+                    }
+                    await wait(retryIntervals[attempt]);
+                }
+            }
+        }
+
+        window.showToast = (message, type = 'error') => {
+            const toast = document.getElementById('toast-notification');
+            toast.innerText = message;
+            if (type === 'error') {
+                toast.className = "fixed bottom-5 right-5 z-[600] px-4 py-3 rounded-lg shadow-lg text-xs font-bold transition-all duration-300 bg-red-600/90 text-white border border-red-500";
+            } else {
+                toast.className = "fixed bottom-5 right-5 z-[600] px-4 py-3 rounded-lg shadow-lg text-xs font-bold transition-all duration-300 bg-green-600/90 text-white border border-green-500";
+            }
+            toast.classList.remove('opacity-0', 'translate-y-5', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-5', 'pointer-events-none');
+            }, 5000);
+        };
+
+        window.closeAIModal = () => {
+            document.getElementById('modal-ai-response').classList.add('hidden');
+        };
+
+        window.copyAIContent = () => {
+            const content = document.getElementById('ai-response-content').innerText;
+            const el = document.createElement('textarea');
+            el.value = content;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+            window.showToast("¡Texto de la IA copiado con éxito al portapapeles!", "success");
+        };
+
+        // Servicio 1: Devocional y Plan de Ensayo para una actividad planificada ✨
+        window.generateDevotional = async (activityId) => {
+            const act = window.activities.find(a => a.id === activityId);
+            if (!act) {
+                window.showToast("No se pudo encontrar la actividad seleccionada.");
+                return;
+            }
+
+            const songsText = act.canciones?.map(c => `- ${c.titulo} (Cantor/a: ${c.cantante}) [Tono: ${c.tonalidad || 'Sin tono'}]`).join('\n') || "Ninguna canción registrada aún.";
+            const teamText = act.equipo?.map(e => `- ${e.nombre} (${e.rol})`).join('\n') || "Ningún integrante asignado aún.";
+
+            const prompt = `
+            Actúa como un pastor, director musical y teólogo litúrgico para el Ministerio Ruach.
+            Planifica una guía de ensayo completa y devocional espiritual para la siguiente actividad programada:
+            
+            Nombre de la Actividad: ${act.activity}
+            Fecha del Evento: ${act.date}
+            Observaciones Iniciales: ${act.notes || 'Ninguna observación cargada.'}
+            Repertorio Musical Seleccionado:
+            ${songsText}
+
+            Equipo de Trabajo Convocado:
+            ${teamText}
+
+            Por favor, genera una respuesta que contenga de forma clara:
+            1. ✨ ENFOQUE DEVOCIONAL DE ALABANZA: Un lema espiritual del día, un versículo bíblico motivacional relevante y una breve meditación (1 párrafo) que conecte el mensaje con el repertorio.
+            2. ✨ TRANSICIONES Y FLUIDEZ DE ADORACIÓN: Guía específica sobre cómo conectar cada canción litúrgicamente (puntos de oración sugeridos para el líder de alabanza y frases de transición espiritual entre los temas).
+            3. ✨ INDICACIONES TÉCNICAS DE ENSAYO: Sugerencias de ritmo, dinámicas de intensidad (clímax, momentos acústicos) y enfoque instrumental (batería, guitarras, teclados, voces) para aprovechar al máximo el tiempo de práctica grupal.
+            `;
+
+            const sysPrompt = "Eres un refinado consejero espiritual e instructor de alabanza del Ministerio Ruach. Redacta de manera solemne, inspiradora, muy clara y estructurada en español.";
+
+            // Mostrar cargador
+            const modal = document.getElementById('modal-ai-response');
+            const contentArea = document.getElementById('ai-response-content');
+            contentArea.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 gap-3">
+                    <i class="fas fa-spinner fa-spin text-4xl text-emerald-400"></i>
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Invocando a la Inteligencia Artificial de Gemini...</p>
+                    <p class="text-[10px] text-gray-500 italic">Estructurando dinámica de repertorio y bosquejo espiritual...</p>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+
+            try {
+                const aiResult = await runGeminiLLM(prompt, sysPrompt);
+                contentArea.innerHTML = aiResult;
+            } catch (err) {
+                contentArea.innerHTML = `
+                    <div class="text-center py-10">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
+                        <p class="text-sm font-bold text-red-400">${err.message}</p>
+                        <p class="text-xs text-gray-500 mt-2">Prueba intentarlo nuevamente en unos instantes.</p>
+                    </div>
+                `;
+            }
+        };
+
+        // Servicio 2: Sugerir setlist dinámico temático en Cancionero ✨
+        window.generateAISetlist = async () => {
+            const themeInput = document.getElementById('ai-worship-theme');
+            const theme = themeInput.value.trim();
+            if (!theme) {
+                window.showToast("Por favor, ingresa un lema o tema litúrgico para que el asistente IA pueda diseñar el repertorio.");
+                return;
+            }
+
+            // Extraer canciones únicas registradas en toda la base de datos de actividades
+            let uniqueSongs = new Map();
+            window.activities.forEach(act => {
+                if (act.canciones) {
+                    act.canciones.forEach(s => {
+                        const key = `${s.titulo.toLowerCase().trim()}-${s.cantante}`;
+                        if (!uniqueSongs.has(key)) {
+                            uniqueSongs.set(key, s);
+                        }
+                    });
+                }
+            });
+
+            const songListText = Array.from(uniqueSongs.values())
+                .map(s => `- "${s.titulo}" de ${s.autor || 'Autor desconocido'} (Voz sugerida: ${s.cantante}, Tono registrado: ${s.tonalidad || 'Indeterminado'})`)
+                .join('\n');
+
+            if (!songListText) {
+                window.showToast("No existen canciones cargadas en las planificaciones del sistema para alimentar el cancionero de la IA. Registra alguna actividad primero.", "error");
+                return;
+            }
+
+            const prompt = `
+            Actúa como director musical senior y planificador de cultos para el Ministerio Ruach.
+            Se nos ha pedido diseñar un setlist temático para el siguiente enfoque bíblico/sermón: "${theme}".
+            
+            Las canciones actualmente disponibles en nuestra base de datos histórica son las siguientes:
+            ${songListText}
+
+            Por favor, elabora una propuesta detallada:
+            1. ✨ PROPUESTA DE SETLIST SUGERIDO (Elegir entre 3 y 4 temas de nuestra lista disponible que mejor se adapten al lema). Si estimas muy necesario, puedes proponer 1 canción externa ideal justificándola espiritualmente.
+            2. ✨ SECUENCIA Y TRANSICIÓN DE TONOS: Estructura el orden de las canciones y explica el flujo melódico (cómo modular o pasar de un tono al otro según los tonos registrados para el equipo).
+            3. ✨ DIRECCIÓN Y EXHORTACIÓN CONGREGACIONAL: Redacta pequeños enunciados de exhortación que el director de canto puede decir al público para conducirlos a través del significado del setlist.
+            `;
+
+            const sysPrompt = "Eres el cerebro musical del Ministerio Ruach. Tu meta es maximizar la fluidez melódica, coherencia bíblica y simplificar la coordinación técnica para la banda musical.";
+
+            // Abrir y cargar modal
+            const modal = document.getElementById('modal-ai-response');
+            const contentArea = document.getElementById('ai-response-content');
+            contentArea.innerHTML = `
+                <div class="flex flex-col items-center justify-center py-12 gap-3">
+                    <i class="fas fa-sparkles fa-spin text-4xl text-emerald-400"></i>
+                    <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Diseñando Setlist Temático con Gemini IA...</p>
+                    <p class="text-[10px] text-gray-500 italic">Hilando tonos y buscando armonías bíblicas para el tema "${theme}"...</p>
+                </div>
+            `;
+            modal.classList.remove('hidden');
+
+            try {
+                const aiResult = await runGeminiLLM(prompt, sysPrompt);
+                contentArea.innerHTML = aiResult;
+                themeInput.value = '';
+            } catch (err) {
+                contentArea.innerHTML = `
+                    <div class="text-center py-10">
+                        <i class="fas fa-exclamation-triangle text-red-500 text-3xl mb-3"></i>
+                        <p class="text-sm font-bold text-red-400">${err.message}</p>
+                    </div>
+                `;
+            }
+        };
+
         // --- RENDERS ---
         window.renderMembers = () => {
             const container = document.getElementById('members-list');
@@ -1172,7 +1430,7 @@ const firebaseConfig = {
                         const encoded = encodeURIComponent(JSON.stringify(songWithData));
                         return `
                         <li class="flex items-center justify-between group py-1">
-                            <span>• <b>${c.titulo}</b> - ${c.autor} (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
+                            <span>• <b>${c.titulo}</b> (${c.cantante}) <span class="text-silver-text font-bold ml-1">${c.tonalidad || ''}</span></span>
                             ${songWithData.image ? `<button onclick="openSongImage('${encoded}')" class="text-silver-text hover:text-white px-2"><i class="fas fa-eye text-xs"></i></button>` : ''}
                         </li>`;
                     }).join('') || '<li class="text-gray-500">Sin canciones</li>';
@@ -1201,7 +1459,7 @@ const firebaseConfig = {
                                 <p class="text-[10px] text-gray-500 mb-1 uppercase">Repertorio</p>
                                 <ul class="text-xs space-y-0.5">${listHtml}</ul>
                             </div>
-                            <div>
+                            <div class="mb-4">
                                 <p class="text-[10px] text-gray-500 mb-1 uppercase">Equipo</p>
                                 <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-[11px]">
                                     ${act.equipo?.map(e => `
@@ -1212,6 +1470,11 @@ const firebaseConfig = {
                                     `).join('') || '<span class="text-gray-600">Sin equipo</span>'}
                                 </div>
                             </div>
+                            
+                            <!-- Botón Devocional Inteligente Gemini ✨ -->
+                            <button onclick="window.generateDevotional('${act.id}')" class="w-full btn-silver p-2.5 rounded-lg text-xs mt-3 flex items-center justify-center gap-2 tracking-wide">
+                                ✨ Plan devocional y de ensayo con IA
+                            </button>
                         </div>`;
                 }).join('');
             } else {
@@ -1233,7 +1496,6 @@ const firebaseConfig = {
                     <option value="Marianny" ${data && data.cantante === 'Marianny' ? 'selected' : ''}>Marianny</option>
                     <option value="Nelly" ${data && data.cantante === 'Nelly' ? 'selected' : ''}>Nelly</option>
                     <option value="Nicole" ${data && data.cantante === 'Nicole' ? 'selected' : ''}>Nicole</option>
-                    <option value="Yency" ${data && data.cantante === 'Yency' ? 'selected' : ''}>Yency</option>
                 </select>
                 <select class="text-xs edit-key-select">
                     <option value="">Tono</option>
@@ -1271,7 +1533,6 @@ const firebaseConfig = {
                 if(!sb.classList.contains('closed')) window.toggleSidebar();
             }
 
-            // Seleccionar por defecto la pestaña idónea de finanzas según el rol
             if (sectionId === 'finanzas') {
                 const isLider = window.currentUser?.role === 'LIDER';
                 if (isLider) {
